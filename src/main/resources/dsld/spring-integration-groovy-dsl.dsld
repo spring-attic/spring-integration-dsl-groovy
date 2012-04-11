@@ -1,0 +1,25 @@
+ 
+currentType("org.springframework.integration.dsl.groovy.builder.MessageFlowBuilder").accept {
+	provider = "EIP MessageFlowBuilder DSL"
+	
+	method name: "messageFlow", type: "org.springframework.integration.dsl.groovy.builder.IntegrationContextFactory", useNamedArgs: true, params: [action: Closure], 
+	doc: """
+	Creates a new Spring Integration Message Flow 
+	"""
+	method name: "filter", type: "org.springframework.integration.dsl.groovy.Filter", useNamedArgs: true, params: [name:String,action: Closure],
+	doc: """
+	Generates a Filter
+	"""
+	method name: "route", type: "org.springframework.integration.dsl.groovy.Router", useNamedArgs: true, params: [name:String,action: Closure],
+	doc: """
+	Generates a Router
+	"""
+	method name: "handle", type: "org.springframework.integration.dsl.groovy.ServiceActivator", useNamedArgs: true, params: [name:String,action: Closure],
+	doc: """
+	Generates a ServiceActivator
+	"""
+	method name: "transform", type: "org.springframework.integration.dsl.groovy.Transformer", useNamedArgs: true, params: [name:String,action: Closure],
+	doc: """
+	Generates a Transformer
+	"""
+}

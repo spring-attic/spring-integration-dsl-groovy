@@ -1,0 +1,107 @@
+/*
+ * Copyright 2002-2012 the original author or authors.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package org.springframework.integration.dsl.groovy.builder;
+import org.junit.Test
+ 
+import org.springframework.integration.dsl.groovy.RouterComposition
+import org.springframework.integration.dsl.groovy.RouterCondition
+import org.springframework.integration.dsl.groovy.ServiceActivator
+import static org.junit.Assert.*
+/**
+ * @author David Turanski
+ *
+ */
+ 
+public class RouterUsageTests {
+	IntegrationBuilder builder = new IntegrationBuilder()
+
+	@Test
+	void testSimpleRouter() {
+		builder.messageFlow {
+			route('myRouter', evaluate: { val -> println "route function: $val" } ) 
+			{
+				when('bar') {
+					handle(action:{
+					})
+				}
+			}
+		}
+	 
+
+
+		assert(builder.integrationContext.messageFlows.size == 1)
+
+		def messageFlow = builder.integrationContext.messageFlows[0]
+
+		def router = messageFlow.components[0]
+		assert router instanceof RouterComposition
+		assert(router.components.size == 1)
+
+		def routerCondition = router.components[0]
+		assert(routerCondition instanceof RouterCondition)
+		assert(routerCondition.components.size == 1)
+
+		def sa = routerCondition.components[0]
+		assert (sa instanceof ServiceActivator)
+	}
+
+	@Test
+	void testNamedRouterWithOtherwise () {
+		builder.messageFlow {
+			route('myRouter', evaluate: { val -> println "route function: $val" }) {
+				when('bar') {
+					handle(action:{
+					})
+				}
+				otherwise {
+				}
+			}
+		}
+	}
+
+	@Test
+	void testRouterWithInvalidOtherwise () {
+		try {
+			builder.messageFlow {
+				route('myRouter', evaluate: { val -> println "route function: $val" }) {
+					otherwise {
+					}
+					when('bar') {
+						handle(action:{
+						})
+					}
+				}
+			}
+			fail("should throw assertion error")
+		} catch (AssertionError e) {
+		}
+	}
+	@Test
+	void testChannelMappedRouter() {
+		builder.messageFlow {
+			route('myRouter',evaluate: { Map headers -> headers.foo }) {
+				map(bar:'barChannel',baz:'bazChannel')
+			}
+		}
+
+		def messageFlow = builder.integrationContext.messageFlows[0]
+
+		def router = messageFlow.components[0]
+		assert router instanceof RouterComposition
+		assert(router.components.size == 0)
+
+		assert router.channelMap
+
+		assert router.channelMap == [bar:'barChannel',baz:'bazChannel']
+	}
+}
