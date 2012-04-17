@@ -72,7 +72,7 @@ class ClosureInvokingMessageProcessor<T> implements MessageProcessor<T> {
 			result =  this.closure.doCall(message.payload)
 		}
 		
-		assert !result || result.class == T.class, "expected closure to yield a result of type ${T.class}"
+		assert !result || T.class.isAssignableFrom(result.class), "expected closure to yield a result of type ${T.class}"
 		
 		result
 		

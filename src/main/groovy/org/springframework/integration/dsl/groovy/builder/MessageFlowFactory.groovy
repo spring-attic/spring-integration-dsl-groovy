@@ -16,6 +16,7 @@ import groovy.util.AbstractFactory
 import groovy.util.FactoryBuilderSupport
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
+import org.springframework.integration.dsl.groovy.IntegrationContext
 import org.springframework.integration.dsl.groovy.MessageFlow
 /**
  * @author David Turanski
@@ -28,25 +29,39 @@ class MessageFlowFactory extends AbstractFactory {
 	 */
 	def newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
 	throws InstantiationException, IllegalAccessException {
-		
-		assert !(attributes.containsKey('name') && value), "messageFlow cannot accept both a default value and a 'name' attribute" 
-		
+
+		assert !(attributes.containsKey('name') && value), "messageFlow cannot accept both a default value and a 'name' attribute"
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("creating new MessageFlow $value")
 		}
-		
+
 		attributes = attributes ?: [:]
-		
+
 		if (!attributes.containsKey('name') && value){
 			attributes.name = value
 		}
-		if (!attributes.containsKey('inputChannel') && value){
-			attributes.inputChannel = "${value}#inputChannel"
-		}
-		
 
-		new MessageFlow(attributes)
-	
+		def messageFlow = new MessageFlow(attributes)
+
+		if (!messageFlow.inputChannel) {
+			messageFlow.inputChannel = "${messageFlow.name}#inputChannel"
+		}
+
+		if (!messageFlow.outputChannel) {
+			messageFlow.outputChannel = "${messageFlow.name}#outputChannel"
+		}
+
+		messageFlow.metaClass.send = {msgOrPayload ->
+			builder.integrationContext.send(delegate.inputChannel,msgOrPayload)
+		}
+
+		messageFlow.metaClass.sendAndReceive = {msgOrPayload ->
+			builder.integrationContext.sendAndReceive(delegate.inputChannel,delegate.outputChannel,msgOrPayload)
+		}
+
+
+		messageFlow
 	}
 
 	boolean isLeaf() {
@@ -55,26 +70,20 @@ class MessageFlowFactory extends AbstractFactory {
 
 	@Override
 	void onNodeCompleted( FactoryBuilderSupport builder, Object parent, Object messageFlow ) {
-		
-		//Validate inputChannel
-		
-		if (!messageFlow.inputChannel) {
-			assert messageFlow.components[0].hasProperty('inputChannel') && messageFlow.components[0].inputChannel, 
-			"Either the messageFlow or its initial component ${messageFlow.components[0]} must provide an 'inputChannel' attribute"   
-			messageFlow.inputChannel = messageFlow.components[0].inputChannel
-		}
-		
-		
-		
-		if (parent == null) {
-			builder.integrationContext.messageFlows << messageFlow
+
+		parent = parent ?: builder.integrationContext
+		parent.add(messageFlow)
+
+		if (parent instanceof MessageFlow){
+			if (logger.isDebugEnabled()) {
+				logger.debug("creating nested message flow ${messageFlow.name} parent: ${parent.name}")
+			}
+		} else if (parent instanceof IntegrationContext) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("adding message flow ${messageFlow.name} to integration context")
+			}
 		} else {
-			assert parent instanceof MessageFlow
-		
-			parent.add(messageFlow)
-			
-			logger.debug("creating nested message flow ${messageFlow.name} parent: ${parent.name}")
+			throw new IllegalArgumentException("parent must be of type IntegrationContext or MessageFlow")
 		}
-		
 	}
 }

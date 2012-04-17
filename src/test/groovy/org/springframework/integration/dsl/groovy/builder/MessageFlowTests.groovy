@@ -30,7 +30,6 @@ public class MessageFlowTests {
 	}
 	
 	
-	
 	@Test
 	void testNamedFlows() {
 		builder.messageFlow(name:'flow1',inputChannel:'input1')
@@ -52,4 +51,54 @@ public class MessageFlowTests {
 		} catch (Error e) {
 		} 
 	}
+	
+	@Test 
+	void testSimpleChain() {
+		def flow = builder.messageFlow(inputChannel:'inputChannel') {
+			filter(evaluate:{it == "World"})
+			transform(evaluate:{"Hello " + it})
+			handle(evaluate:{println "****************** $it ***************" })
+		}
+		
+		flow.send("World")
+		assert flow.sendAndReceive("World") == null
+		
+	}
+	
+	@Test
+	void testMultipleFlows() {
+		def flow1 = builder.messageFlow(outputChannel:'outputChannel1') {
+			transform(evaluate:{it.toUpperCase()})
+		}
+		def flow2 = builder.messageFlow(inputChannel:'outputChannel1') {
+			filter(evaluate:{it.class == String})
+			transform(evaluate:{it.toLowerCase()})
+		}
+		
+		assert builder.integrationContext.sendAndReceive(flow1.inputChannel, flow2.outputChannel, "hElLo")=="hello"
+		
+	}
+	
+	@Test
+	void testMultipleFlows2() {
+		def flow1
+		def flow2
+		
+		def ic = builder.doWithSpringIntegration {
+			flow1 = messageFlow(outputChannel:'flow2inputChannel') {
+				transform(evaluate:{it.toUpperCase()})
+			}
+			flow2 = messageFlow(inputChannel:'flow2inputChannel') {
+				filter(evaluate:{it.class == String})
+				transform(evaluate:{it.toLowerCase()})
+			}
+			handle(inputChannel:flow2.outputChannel,evaluate:{println it}) 
+			
+		}	
+		
+		ic.send(flow1.inputChannel,"hello")
+		
+	}
+	
+	
 }

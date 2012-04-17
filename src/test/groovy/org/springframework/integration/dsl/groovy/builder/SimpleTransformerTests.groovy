@@ -22,37 +22,14 @@ class SimpleTransformerTests {
 	IntegrationBuilder builder = new IntegrationBuilder()
 	
 	@Test
-	void testCreateTransformer() {
-		//TODO - Probably don't need this
-		builder.config {
-				channel('inputChannel')
-				pubSubChannel('outputChannel')
+	void testTransformer() {
+		def flow = builder.messageFlow {
+			transform('myTransformer', evaluate:{it.toUpperCase()})
 		}
-		
-		builder.messageFlow {
-			transform('myTransformer',inputChannel:'inputChannel', 
-				evaluate:{payload.toUpperCase()})
-		}
-		
-		builder.createApplicationContext()
+			
+		def result = flow.sendAndReceive("hello")	
+		assert result == "HELLO"
 	}
 	
-	//@Test
-	void testChannels() {
-		builder.messageFlow {
-			pubSubChannel('pubSub') {
-				subscribe(){
-					transform()
-					route(outputChannel:'outputChannel')
-					
-				}
-				subscribe(){
-					
-				}
-			}
-			channel('outputChannel') {
-				log(evaluate:{payload})
-			}
-		}
-	}
+	
 }

@@ -10,26 +10,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.springframework.integration.dsl.groovy.fluent
+package org.springframework.integration.dsl.groovy.builder.dom
 
 /**
  * @author David Turanski
  *
  */
+class IntegrationXmlBuilder {
 
- 
-
-IntegrationDSL.evaluate(
-"""
-  foo {
-	println "this is foo"
-  } 
-  transform() using {payload -> payload.toUpperCase() }
-  route()
-"""
-)
-
-
-IntegrationDSL.evaluate {
-	route().onPayloadType(String).where(name:'myRouter')
 }

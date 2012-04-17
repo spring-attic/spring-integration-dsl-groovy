@@ -12,8 +12,11 @@
  */
 package org.springframework.integration.dsl.groovy.builder
 
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.Script;
 import groovy.util.AbstractFactory
 import groovy.util.FactoryBuilderSupport
+import java.io.InputStream
 
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
@@ -41,15 +44,20 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		super(true)
 		this.integrationContext = new IntegrationContext()
 	}
+	
+	public IntegrationContext getIntegrationContext() {
+		this.integrationContext
+	}
 
 	@Override
 	def registerObjectFactories() {
 		registerFactory "config", new ConfigFactory()
 		registerFactory "messageFlow", new MessageFlowFactory()
-		registerFactory "filter", new EndpointFactory(Filter)
-		registerFactory "transform", new EndpointFactory(Transformer)
+		registerFactory "doWithSpringIntegration", new IntegrationContextFactory()
+		registerFactory "filter", new FilterFactory()
+		registerFactory "transform", new TransformerFactory()
 		registerFactory "route", new RouterCompositionFactory()
-		registerFactory "handle", new EndpointFactory(ServiceActivator)
+		registerFactory "handle", new ServiceActivatorFactory()
 		registerFactory "when", new RouterConditionFactory()
 		registerFactory "otherwise", new RouterConditionFactory()
 		registerFactory "channel", new ChannelFactory()
@@ -72,6 +80,12 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 	MessageFlow[] getMessageFlows() {
 		this.integrationContext.messageFlows
 	}
+	
+	public Object build(InputStream is) {
+		def script = new GroovyClassLoader().parseClass(is).newInstance()
+		this.build(script)
+	}	
+	
 }
 
 abstract class IntegrationComponentFactory extends AbstractFactory {
@@ -118,7 +132,3 @@ class ConfigFactory extends IntegrationComponentFactory {
 		builder.integrationContext.config = config
 	}
 }
-
-
-
-

@@ -11,12 +11,23 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.springframework.integration.dsl.groovy
+import groovy.xml.StreamingMarkupBuilder
+import groovy.xml.XmlUtil
 import java.lang.IllegalStateException
 
+import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext
 import org.springframework.context.support.GenericApplicationContext
+import org.springframework.context.support.GenericXmlApplicationContext
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.integration.channel.PublishSubscribeChannel
 import org.springframework.integration.channel.QueueChannel
+import org.springframework.integration.core.MessageHandler
+import org.springframework.integration.core.SubscribableChannel
 import org.springframework.integration.dsl.groovy.bean.TransformerBeanBuilder
+import org.springframework.integration.dsl.groovy.builder.dom.IntegrationMarkupSupport
+import org.springframework.integration.message.GenericMessage
 import org.springframework.integration.support.MessageBuilder
 import org.springframework.integration.Message
 import org.springframework.integration.MessageChannel
@@ -30,45 +41,110 @@ import org.springframework.integration.MessagingException
  * @author David Turanski
  *
  */
-class IntegrationContext {
+class IntegrationContext extends BaseIntegrationComposition {
 
 	private logger = LogFactory.getLog(this.getClass())
-	private messageFlows = []
 	private config
+	private applicationContext
+
 
 	def IntegrationContext() {
 		if (logger.isDebugEnabled()) logger.debug("Creating new IntegrationContext")
 	}
 
-	ApplicationContext createApplicationContext(ApplicationContext parentContext = null) {
-		def applicationContext = new GenericApplicationContext()
-	
-		messageFlows.each {messageFlow ->
-			messageFlow.components.each {component->
-					logger.debug("instantiating component " + component)
-					buildBeanForComponent(applicationContext,component)
-			}
-		}	
-		applicationContext.refresh()
-		applicationContext
+	def send(String inputChannelName, Object msgOrPayload) {
+		def ac = createApplicationContext()
+		def inputChannel = ac.getBean(inputChannelName)
+		doSend(inputChannel,msgOrPayload)
 	}
-	
-	
-	private buildBeanForComponent(applicationContext,component) {
-		if (component instanceof Transformer) {
-			new TransformerBeanBuilder().build(applicationContext, component)
+
+
+	def sendAndReceive(String inputChannelName,String outputChannelName, Object msgOrPayload) {
+		final result
+		def ac = createApplicationContext()
+		def inputChannel = ac.getBean(inputChannelName)
+		def outputChannel = ac.getBean(outputChannelName)
+
+
+		if (outputChannel instanceof SubscribableChannel) {
+			if (outputChannel instanceof PublishSubscribeChannel || !outputChannel.dispatcher.handlerCount ) {
+				outputChannel.subscribe(new MessageHandler() {
+							void handleMessage(Message msg) {
+								result = msg.payload
+							}
+						})
+			}
 		}
-		else if (component instanceof SimpleEndpoint){
-			logger.debug("building a simple endpoint $component")
-			if (!component.inputChannel){
-				logger.debug("need to wire an input channel")
-			} 
+
+		doSend(inputChannel,msgOrPayload)
+		result
+	}
+
+	def getMessageFlows() {
+		components.findAll{it instanceof MessageFlow}
+	}
+
+
+	private def doSend(MessageChannel inputChannel, Object msgOrPayload) {
+		if (msgOrPayload instanceof Message) {
+			inputChannel.send(msgOrPayload)
 		} else {
-			logger.debug("building a bean for type ${component.class}")
+			inputChannel.send(new GenericMessage(msgOrPayload))
 		}
+	}
+
+
+	ApplicationContext createApplicationContext(ApplicationContext parentContext = null) {
+		if (!applicationContext){
+			applicationContext = new  GenericXmlApplicationContext()
+			if (parentContext){
+				applicationContext.parentContext = parentContext
+			}
+
+			def xmlBuilder = new StreamingMarkupBuilder()
+			def integrationMarkupSupport = new IntegrationMarkupSupport()
+			def writer = xmlBuilder.bind { builder->
+				namespaces << IntegrationMarkupSupport.coreNamespaces()
+				beans( integrationMarkupSupport.schemaLocations() ) {
+					components.each {component ->
+						if (component instanceof MessageFlow) {
+							'si:channel'(id:component.inputChannel)
+							'si:channel'(id:component.outputChannel)
+
+							'si:chain'('input-channel':component.inputChannel,
+									'output-channel':component.outputChannel) {
+									component.components.each {comp->
+										logger.debug("instantiating component " + comp)
+										integrationMarkupSupport.createEndpoint(applicationContext,builder,comp)
+									}
+							}
+						}
+						else if (component instanceof SimpleEndpoint) {
+							'si:channel'(id:component.inputChannel)
+							if (component.outputChannel) {
+								'si:channel'(id:component.outputChannel)
+							}
+							integrationMarkupSupport.createEndpoint(applicationContext,builder,component)
+						}
+					}
+				}
+			}
+
+			//def stringWriter = new StringWriter()
+			//writer.writeTo(stringWriter)
+
+			def xml =  XmlUtil.serialize(writer)
+
+			if (logger.isDebugEnabled()) {
+				logger.debug(xml)
+			}
+
+			applicationContext.load(new ByteArrayResource(xml.getBytes() ))
+			applicationContext.refresh()
+		}
+		applicationContext
 	}
 }
 
 class IntegrationConfig extends BaseIntegrationComposition {
-	
 }

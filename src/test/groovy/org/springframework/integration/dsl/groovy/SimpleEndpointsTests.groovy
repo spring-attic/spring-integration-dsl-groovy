@@ -12,9 +12,9 @@
  */
 package org.springframework.integration.dsl.groovy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.*
 import org.junit.Test
-import org.springframework.integration.dsl.groovy.builder.EndpointFactory;
+import org.springframework.integration.dsl.groovy.builder.FilterFactory
 /**
  * @author David Turanski
  *
@@ -34,9 +34,9 @@ class SimpleEndpointsTests {
 	
 	@Test
 	void testEndpointFactory(){
-		def factory = new EndpointFactory(Router)
+		def factory = new FilterFactory()
 		
-		def router = factory.newInstance(null,null, null,[:])
-		assert router.class == Router
+		def filter = factory.newInstance(null,null, null,[:])
+		assert filter.class == Filter
 	}
 }

@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
-import org.springframework.integration.dsl.groovy.SimpleEndpoint;
+import org.springframework.integration.dsl.groovy.*
  
 
 /**
@@ -28,13 +28,7 @@ import org.springframework.integration.dsl.groovy.SimpleEndpoint;
  *
  */
 
-class EndpointFactory extends IntegrationComponentFactory {
- 
-	private Class requiredType
-
-	EndpointFactory(Class requiredType){
-		this.requiredType = requiredType
-	}
+abstract class EndpointFactory extends IntegrationComponentFactory {
 
 	/* (non-Javadoc)
 	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
@@ -48,9 +42,6 @@ class EndpointFactory extends IntegrationComponentFactory {
 		
 		if (!attributes.containsKey('name') && value){
 			attributes.name = value
-		}
-		if (!attributes.containsKey('inputChannel') && value){
-			attributes.inputChannel ="${value}#inputChannel"
 		}
 		
 		if (attributes.evaluate){
@@ -70,6 +61,14 @@ class EndpointFactory extends IntegrationComponentFactory {
 
 	@Override
 	public void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
+		if (parent instanceof MessageFlow) {
+			assert !(child.inputChannel || child.outputChannel),
+			  "channel names are not permitted in child of a MessageFlow: $child"
+		}
+		
+		else {
+			child.inputChannel = child.inputChannel ?: "${child.name}#inputChannel" 
+		}
 		
 		
 		if (parent.respondsTo("add")){
@@ -89,14 +88,27 @@ class EndpointFactory extends IntegrationComponentFactory {
 	
 
 
+	protected abstract SimpleEndpoint endpointInstance(Map attributes) 
+}
+
+public class TransformerFactory extends EndpointFactory {
+	@Override
 	protected SimpleEndpoint endpointInstance(Map attributes) {
-		SimpleEndpoint endpoint =  requiredType.newInstance(attributes)
-		if (logger.isDebugEnabled()){
-			logger.debug("created new ${endpoint.class.name} $endpoint")
-		}
-		endpoint
+		return new Transformer(attributes)
 	}
-	
-	
+}
+
+public class FilterFactory extends EndpointFactory {
+		@Override
+		protected SimpleEndpoint endpointInstance(Map attributes) {	 
+			return new Filter(attributes)
+		}	
+}
+
+public class ServiceActivatorFactory extends EndpointFactory {
+	@Override
+	protected SimpleEndpoint endpointInstance(Map attributes) {
+		return new ServiceActivator(attributes)
+	}
 }
 

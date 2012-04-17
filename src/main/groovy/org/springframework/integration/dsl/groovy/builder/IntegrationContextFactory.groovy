@@ -10,30 +10,23 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.springframework.integration.dsl.groovy
+package org.springframework.integration.dsl.groovy.builder
+
+import java.util.Map;
+
+import groovy.util.AbstractFactory
+import groovy.util.FactoryBuilderSupport;
+
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 /**
  * @author David Turanski
  *
  */
-class MessageFlow extends BaseIntegrationComposition {
-	def inputChannel
-	def outputChannel
-	def name
-	
-	MessageFlow(){
-		name = "\$mfl_" +  UUID.randomUUID().toString().substring(0, 8)
-	}
-	//For Java compatibility
-	public String getOutputChannel() {
-		outputChannel
-	}
-	
-	public String getInputChannel() {
-		inputChannel
-	}
-	
-	public String getName() {
-		name
+class IntegrationContextFactory extends AbstractFactory { 
+	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
+			throws InstantiationException, IllegalAccessException {
+		return builder.integrationContext;
 	}
 }

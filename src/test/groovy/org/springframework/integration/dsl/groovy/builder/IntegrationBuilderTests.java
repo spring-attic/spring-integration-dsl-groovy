@@ -12,10 +12,34 @@
  */
 package org.springframework.integration.dsl.groovy.builder;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.ByteArrayInputStream;
+
+import org.codehaus.groovy.control.CompilationFailedException;
+import org.junit.Test;
+import org.springframework.integration.dsl.groovy.MessageFlow;
+
 /**
  * @author David Turanski
  *
  */
 public class IntegrationBuilderTests {
-
+    IntegrationBuilder builder = new IntegrationBuilder();
+    
+    @Test 
+    public void test() throws CompilationFailedException, InstantiationException, IllegalAccessException {
+    	String flowScript1 = "messageFlow(outputChannel:'outputChannel1') {transform(evaluate:{it.toUpperCase()})}";
+     
+    	MessageFlow flow1 = (MessageFlow)builder.build(new ByteArrayInputStream(flowScript1.getBytes()));
+    	
+    	String flowScript2 = ("messageFlow(inputChannel:'outputChannel1'){ filter(evaluate:{it.class == String})\ntransform(evaluate:{it.toLowerCase()})}");
+    		
+    	MessageFlow flow2 = (MessageFlow)builder.build(new ByteArrayInputStream(flowScript2.getBytes()));
+    	
+		Object response = builder.getIntegrationContext().sendAndReceive(flow1.getInputChannel(), flow2.getOutputChannel(),"hello");
+		
+		assertEquals("hello",response);
+		
+    }
 }

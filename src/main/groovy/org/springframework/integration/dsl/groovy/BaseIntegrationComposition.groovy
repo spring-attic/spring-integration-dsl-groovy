@@ -20,9 +20,14 @@ import org.springframework.integration.util.ClassUtils;
  *
  */
 
-protected abstract class IntegrationComponent {
+protected abstract class IntegrationComponent   {
 	protected logger = LogFactory.getLog(this.class)
 	protected String name
+	protected componentProperties = [:]
+	
+	void propertyMissing(String name, Object val) {
+		componentProperties[name]=val
+	}
 }
 
 
