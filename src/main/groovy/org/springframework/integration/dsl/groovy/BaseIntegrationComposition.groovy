@@ -20,7 +20,7 @@ import org.springframework.integration.util.ClassUtils;
  *
  */
 
-protected abstract class IntegrationComponent   {
+abstract class IntegrationComponent   {
 	protected logger = LogFactory.getLog(this.class)
 	protected String name
 	protected componentProperties = [:]
@@ -31,7 +31,7 @@ protected abstract class IntegrationComponent   {
 }
 
 
-protected class BaseIntegrationComposition extends IntegrationComponent {
+class BaseIntegrationComposition extends IntegrationComponent {
 	protected BaseIntegrationComposition parentComposition;
 	protected components = [];
 	
@@ -77,7 +77,3 @@ class RouterComposition extends BaseIntegrationComposition {
 	   action
    }
 }
-
-
-
-

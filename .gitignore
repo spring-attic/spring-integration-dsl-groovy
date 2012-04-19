@@ -2,6 +2,7 @@
 .project
 target
 out
+build
 .settings
 .idea
 .gradle

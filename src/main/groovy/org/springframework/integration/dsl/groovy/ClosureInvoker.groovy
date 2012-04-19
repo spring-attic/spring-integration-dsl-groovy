@@ -21,11 +21,11 @@ class ClosureInvoker {
 }
 
 class ClosureInvokingTransformer implements org.springframework.integration.transformer.Transformer {
-	private final ClosureInvokingMessageProcessor<Object> messageProcessor
+	private final ClosureInvokingMessageProcessor messageProcessor
 	 
 
 	ClosureInvokingTransformer(Closure closure){
-		this.messageProcessor = new ClosureInvokingMessageProcessor<Object>(closure)
+		this.messageProcessor = new ClosureInvokingMessageProcessor(closure)
 		 
 	}
 
@@ -46,7 +46,7 @@ class ClosureInvokingTransformer implements org.springframework.integration.tran
  * @param <T>
  */
 
-class ClosureInvokingMessageProcessor<T> implements MessageProcessor<T> {
+class ClosureInvokingMessageProcessor  {
 	private Class parameterType
 	private Closure closure
 
@@ -55,10 +55,8 @@ class ClosureInvokingMessageProcessor<T> implements MessageProcessor<T> {
 		this.closure = closure.clone()
 		this.parameterType = closure.getParameterTypes()[0]
 	}
-	/* (non-Javadoc)
-	 * @see org.springframework.integration.handler.MessageProcessor#processMessage(org.springframework.integration.Message)
-	 */
-	public T processMessage(Message message) {
+	
+	public Object processMessage(Message message) {
 		Object result = null
 		if (parameterType == Message) {
 			result =  this.closure.doCall(message)
@@ -71,9 +69,7 @@ class ClosureInvokingMessageProcessor<T> implements MessageProcessor<T> {
 		else {
 			result =  this.closure.doCall(message.payload)
 		}
-		
-		assert !result || T.class.isAssignableFrom(result.class), "expected closure to yield a result of type ${T.class}"
-		
+			
 		result
 		
 	}
