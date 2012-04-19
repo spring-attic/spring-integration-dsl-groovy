@@ -12,21 +12,30 @@
  */
 package org.springframework.integration.dsl.groovy.builder
 
-import java.util.Map;
-
-import groovy.util.AbstractFactory
 import groovy.util.FactoryBuilderSupport;
 
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
+import java.util.Map;
+import org.springframework.integration.dsl.groovy.FlowExecution
+import org.springframework.integration.dsl.groovy.MessageFlow
 
 /**
  * @author David Turanski
  *
  */
-class IntegrationContextFactory extends IntegrationComponentFactory { 
+class FlowExecutionFactory extends IntegrationComponentFactory {
+
 	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-			throws InstantiationException, IllegalAccessException {
-		return builder.integrationContext;
+	throws InstantiationException, IllegalAccessException {
+		return new FlowExecution(value);
+	}
+
+	@Override
+	void setParent( FactoryBuilderSupport builder, Object parent, Object flowExecution ) {
+
+	    assert parent instanceof MessageFlow, 'MessageFlow excecution must be a child of MessageFlow'
+		parent.add(flowExecution)
+
+	 
 	}
 }
+

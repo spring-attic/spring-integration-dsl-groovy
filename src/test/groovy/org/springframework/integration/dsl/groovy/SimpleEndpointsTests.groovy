@@ -25,9 +25,6 @@ class SimpleEndpointsTests {
 		def transformer = new Transformer();
 		assert transformer.toString().startsWith('$xfmr_')
 		
-		def enricher = new Enricher(name:"foo");
-		assert enricher.toString() == "foo"
-		
 		def bridge = new MessagingBridge(target:null)
 		assert bridge.name.startsWith(bridge.defaultNamePrefix())
 	}

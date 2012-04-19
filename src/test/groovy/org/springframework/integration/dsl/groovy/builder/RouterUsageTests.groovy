@@ -27,25 +27,25 @@ public class RouterUsageTests {
 
 	@Test
 	void testSimpleRouter() {
-		builder.messageFlow {
-			route('myRouter', evaluate: { val -> println "route function: $val" } ) 
+		def flow = builder.messageFlow {
+			//Must return String, etc...
+			route('myRouter', evaluate: { it == "Hello" ? 'foo' : 'bar' } ) 
 			{
+				when('foo') {
+					handle(action:{payload -> payload.toUpperCase()})
+				}
+				
 				when('bar') {
-					handle(action:{
-					})
+					handle(action:{payload -> payload.toLowerCase()})
 				}
 			}
 		}
-	 
 
+		assert builder.messageFlows.size() == 1
 
-		assert(builder.integrationContext.messageFlows.size == 1)
-
-		def messageFlow = builder.integrationContext.messageFlows[0]
-
-		def router = messageFlow.components[0]
+		def router = flow.components[0]
 		assert router instanceof RouterComposition
-		assert(router.components.size == 1)
+		assert(router.components.size == 2)
 
 		def routerCondition = router.components[0]
 		assert(routerCondition instanceof RouterCondition)
@@ -53,6 +53,27 @@ public class RouterUsageTests {
 
 		def sa = routerCondition.components[0]
 		assert (sa instanceof ServiceActivator)
+		
+		assert flow.sendAndReceive("Hello") == "HELLO"
+		assert flow.sendAndReceive("SOMETHING") == "something"
+	}
+	
+	@Test
+	void testSimpleRouterWithOtherwise() {
+		def flow = builder.messageFlow {
+			route('myRouter', evaluate: { if (it == "Hello" ) 'foo' } )
+			{
+				when('foo') {
+					handle(action:{payload -> payload.toUpperCase()})
+				}
+				
+				otherwise {
+					handle(action:{payload -> payload.toLowerCase()})
+				}
+			}
+		}
+		assert flow.sendAndReceive("Hello") == "HELLO"
+		assert flow.sendAndReceive("SOMETHING") == "something"
 	}
 
 	@Test

@@ -33,7 +33,7 @@ class MessageFlowFactory extends AbstractFactory {
 		assert !(attributes.containsKey('name') && value), "messageFlow cannot accept both a default value and a 'name' attribute"
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("creating new MessageFlow $value")
+			logger.debug("creating new MessageFlow " + (value? value : ""))
 		}
 
 		attributes = attributes ?: [:]
@@ -45,20 +45,19 @@ class MessageFlowFactory extends AbstractFactory {
 		def messageFlow = new MessageFlow(attributes)
 
 		if (!messageFlow.inputChannel) {
-			messageFlow.inputChannel = "${messageFlow.name}#inputChannel"
+			messageFlow.inputChannel = "${messageFlow.name}.inputChannel"
 		}
 
-		if (!messageFlow.outputChannel) {
-			messageFlow.outputChannel = "${messageFlow.name}#outputChannel"
-		}
-
+		//TODO: Move this into MessageFlow with explicit IntegrationContext dependencies?
 		messageFlow.metaClass.send = {msgOrPayload ->
 			builder.integrationContext.send(delegate.inputChannel,msgOrPayload)
 		}
 
-		messageFlow.metaClass.sendAndReceive = {msgOrPayload ->
-			builder.integrationContext.sendAndReceive(delegate.inputChannel,delegate.outputChannel,msgOrPayload)
+		messageFlow.metaClass.sendAndReceive = {msgOrPayload, long timeout=1000  ->
+			builder.integrationContext.sendAndReceive(delegate.inputChannel ,msgOrPayload, timeout)
 		}
+		
+
 
 
 		messageFlow

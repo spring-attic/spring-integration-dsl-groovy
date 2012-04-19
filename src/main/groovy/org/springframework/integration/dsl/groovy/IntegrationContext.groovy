@@ -11,8 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.springframework.integration.dsl.groovy
-import groovy.xml.StreamingMarkupBuilder
-import groovy.xml.XmlUtil
+
 import java.lang.IllegalStateException
 
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
@@ -25,7 +24,6 @@ import org.springframework.integration.channel.PublishSubscribeChannel
 import org.springframework.integration.channel.QueueChannel
 import org.springframework.integration.core.MessageHandler
 import org.springframework.integration.core.SubscribableChannel
-import org.springframework.integration.dsl.groovy.bean.TransformerBeanBuilder
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationMarkupSupport
 import org.springframework.integration.message.GenericMessage
 import org.springframework.integration.support.MessageBuilder
@@ -43,56 +41,34 @@ import org.springframework.integration.MessagingException
  */
 class IntegrationContext extends BaseIntegrationComposition {
 
-	private logger = LogFactory.getLog(this.getClass())
-	private config
+	private logger = LogFactory.getLog(IntegrationContext)
 	private applicationContext
-
-
-	def IntegrationContext() {
-		if (logger.isDebugEnabled()) logger.debug("Creating new IntegrationContext")
-	}
 
 	def send(String inputChannelName, Object msgOrPayload) {
 		def ac = createApplicationContext()
 		def inputChannel = ac.getBean(inputChannelName)
 		doSend(inputChannel,msgOrPayload)
 	}
-
-
-	def sendAndReceive(String inputChannelName,String outputChannelName, Object msgOrPayload) {
-		final result
-		def ac = createApplicationContext()
-		def inputChannel = ac.getBean(inputChannelName)
-		def outputChannel = ac.getBean(outputChannelName)
-
-
-		if (outputChannel instanceof SubscribableChannel) {
-			if (outputChannel instanceof PublishSubscribeChannel || !outputChannel.dispatcher.handlerCount ) {
-				outputChannel.subscribe(new MessageHandler() {
-							void handleMessage(Message msg) {
-								result = msg.payload
-							}
-						})
-			}
-		}
-
-		doSend(inputChannel,msgOrPayload)
-		result
-	}
-
+	//TODO: Add errorFlow
+	def sendAndReceive(String inputChannelName, Object msgOrPayload, long timeout = 0) {
+	   def result
+	   def ac = createApplicationContext()
+	   def inputChannel = ac.getBean(inputChannelName)
+	   def replyChannel = new QueueChannel()
+	   def messageToSend = MessageBuilder.withPayload(msgOrPayload).setReplyChannel(replyChannel).build()
+	   inputChannel.send(messageToSend)
+	   if (timeout){
+		   result = replyChannel.receive(timeout)
+	   } else {
+	   	   result = replyChannel.receive()
+	   }
+	   
+	   return (msgOrPayload instanceof Message) ? result : result?.payload   
+	} 
+	
 	def getMessageFlows() {
 		components.findAll{it instanceof MessageFlow}
 	}
-
-
-	private def doSend(MessageChannel inputChannel, Object msgOrPayload) {
-		if (msgOrPayload instanceof Message) {
-			inputChannel.send(msgOrPayload)
-		} else {
-			inputChannel.send(new GenericMessage(msgOrPayload))
-		}
-	}
-
 
 	ApplicationContext createApplicationContext(ApplicationContext parentContext = null) {
 		if (!applicationContext){
@@ -100,51 +76,27 @@ class IntegrationContext extends BaseIntegrationComposition {
 			if (parentContext){
 				applicationContext.parentContext = parentContext
 			}
-
-			def xmlBuilder = new StreamingMarkupBuilder()
+			
 			def integrationMarkupSupport = new IntegrationMarkupSupport()
-			def writer = xmlBuilder.bind { builder->
-				namespaces << IntegrationMarkupSupport.coreNamespaces()
-				beans( integrationMarkupSupport.schemaLocations() ) {
-					components.each {component ->
-						if (component instanceof MessageFlow) {
-							'si:channel'(id:component.inputChannel)
-							'si:channel'(id:component.outputChannel)
 
-							'si:chain'('input-channel':component.inputChannel,
-									'output-channel':component.outputChannel) {
-									component.components.each {comp->
-										logger.debug("instantiating component " + comp)
-										integrationMarkupSupport.createEndpoint(applicationContext,builder,comp)
-									}
-							}
-						}
-						else if (component instanceof SimpleEndpoint) {
-							'si:channel'(id:component.inputChannel)
-							if (component.outputChannel) {
-								'si:channel'(id:component.outputChannel)
-							}
-							integrationMarkupSupport.createEndpoint(applicationContext,builder,component)
-						}
-					}
-				}
-			}
-
-			//def stringWriter = new StringWriter()
-			//writer.writeTo(stringWriter)
-
-			def xml =  XmlUtil.serialize(writer)
-
-			if (logger.isDebugEnabled()) {
-				logger.debug(xml)
-			}
+		    def xml = integrationMarkupSupport.translateToXML(this)
 
 			applicationContext.load(new ByteArrayResource(xml.getBytes() ))
 			applicationContext.refresh()
 		}
 		applicationContext
 	}
+	
+	private def doSend(MessageChannel inputChannel, Object msgOrPayload) {
+		if (msgOrPayload instanceof Message) {
+			inputChannel.send(msgOrPayload)
+		} else {
+			inputChannel.send(new GenericMessage(msgOrPayload))
+		}
+	}
+	
 }
+
 
 class IntegrationConfig extends BaseIntegrationComposition {
 }

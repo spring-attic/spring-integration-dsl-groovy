@@ -69,7 +69,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		registerFactory "httpPost", stubFactory
 		registerFactory "httpGet", stubFactory
 		registerFactory "poll", stubFactory
-		registerFactory "call", stubFactory
+		registerFactory "exec", new FlowExecutionFactory()
 		registerFactory "map", new ChannelMapFactory()
 	}
 

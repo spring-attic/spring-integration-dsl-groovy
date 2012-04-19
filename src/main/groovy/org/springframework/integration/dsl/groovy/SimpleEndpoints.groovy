@@ -17,19 +17,9 @@ package org.springframework.integration.dsl.groovy;
  *
  */
 class SimpleEndpoint extends IntegrationComponent {
-	Object target
+ 
 	Closure action
 	String inputChannel
-	String outputChannel
-
-	SimpleEndpoint(String name, Object target){
-		this()
-		if (name) {
-			this.name = name
-		}
-	
-		this.target=target
-	}
 	
 	SimpleEndpoint(){
 		name = defaultNamePrefix() + "_" + UUID.randomUUID().toString().substring(0, 8)
@@ -46,49 +36,50 @@ class SimpleEndpoint extends IntegrationComponent {
 	}
 }
 
-class ServiceActivator extends SimpleEndpoint {
+class MessageProducingEndpoint extends SimpleEndpoint {
+	static requiresReply = true
+	String outputChannel
+}
+
+class ServiceActivator extends MessageProducingEndpoint {
+	static requiresReply = false
 	protected String defaultNamePrefix(){
 		'$sa'
 	}
 }
 
-class MessagingBridge extends SimpleEndpoint {
+class MessagingBridge extends MessageProducingEndpoint {
 	protected String defaultNamePrefix(){
 		'$br'
 	}
 }
 
-class Enricher extends SimpleEndpoint {
-	protected String defaultNamePrefix(){
-		'$enr'
-	}
-}
 
-class Transformer extends SimpleEndpoint {
+class Transformer extends MessageProducingEndpoint {
 	protected String defaultNamePrefix(){
 		'$xfmr'
 	}
 }
 
-class Filter extends SimpleEndpoint {
+class Filter extends MessageProducingEndpoint {
 	String discardChannel
 	protected String defaultNamePrefix(){
 		'$flt'
 	}
 }
-
+//TODO: Is this a simple endpoint
 class Router extends SimpleEndpoint {
+	String defaultOutputChannel
 	protected String defaultNamePrefix(){
 		'$rtr'
 	}
 }
  
-class Splitter extends SimpleEndpoint {
+class Splitter extends MessageProducingEndpoint {
 	protected String defaultNamePrefix(){
 		'$splt'
 	}
 }
-
 
 
 

@@ -39,7 +39,7 @@ public class IntegrationBuilderUsageTests {
 	
 	@Test
 	void test1() {
-		new File("src/test/resources/").withInputStream {input->
+		new File("src/test/resources/messageflow1.groovy").withInputStream {input->
 			script = new GroovyClassLoader().parseClass(input).newInstance()
 		}
 		def eip = builder.build(script)
@@ -55,7 +55,7 @@ public class IntegrationBuilderUsageTests {
 	
 	@Test 
 	void testChannels() {
-		builder.config {
+		builder.doWithSpringIntegration {
 			 channel('input'){
 			 	interceptor(){
 					 onPreSend(){}

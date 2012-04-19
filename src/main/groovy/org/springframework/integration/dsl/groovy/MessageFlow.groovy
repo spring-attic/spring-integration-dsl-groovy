@@ -37,3 +37,13 @@ class MessageFlow extends BaseIntegrationComposition {
 		name
 	}
 }
+
+class FlowExecution extends MessageProducingEndpoint { 
+	def messageFlow
+	FlowExecution(MessageFlow messageFlow) {
+		this.messageFlow = messageFlow
+		inputChannel = messageFlow.inputChannel
+		outputChannel = messageFlow.outputChannel
+		name = messageFlow.name
+	}
+}

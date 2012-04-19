@@ -31,8 +31,7 @@ protected abstract class IntegrationComponent   {
 }
 
 
-protected class BaseIntegrationComposition {
-	protected logger = LogFactory.getLog(this.getClass());
+protected class BaseIntegrationComposition extends IntegrationComponent {
 	protected BaseIntegrationComposition parentComposition;
 	protected components = [];
 	
@@ -48,16 +47,6 @@ protected class BaseIntegrationComposition {
 	}
 }
 
-class SendingIntegrationComposition extends BaseIntegrationComposition {
-
-}
-
- 
-class SendingEndpointComposition extends SendingIntegrationComposition  {
-	def methodMissing(String name, args) {
-		logger.debug("invoked $name")
-	}
-}
 
 abstract class RouterCondition extends BaseIntegrationComposition {
 	def channel
@@ -68,13 +57,25 @@ class WhenCondition extends RouterCondition {
 }
 
 class OtherwiseCondition extends RouterCondition {
+	def name
+	OtherwiseCondition(){
+		name = '$otherwise' + '_' + UUID.randomUUID().toString().substring(0, 8) 
+	}
 }
 
 class RouterComposition extends BaseIntegrationComposition {
    String inputChannel
    String name
    def channelMap
-   Closure evaluate
+   Closure action
+   
+   void setEvaluate(closure) {
+	   action = closure
+   }
+   
+   def getEvaluate() {
+	   action
+   }
 }
 
 

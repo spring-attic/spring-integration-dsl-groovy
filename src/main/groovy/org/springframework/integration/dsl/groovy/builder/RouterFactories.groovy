@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
+import org.springframework.integration.dsl.groovy.MessageFlow
 import org.springframework.integration.dsl.groovy.OtherwiseCondition
 import org.springframework.integration.dsl.groovy.Router
 import org.springframework.integration.dsl.groovy.RouterComposition
@@ -42,9 +43,6 @@ class RouterCompositionFactory extends IntegrationComponentFactory {
 		
 		if (!attributes.containsKey('name') && value){
 			attributes.name = value
-		}
-		if (!attributes.containsKey('inputChannel') && value){
-			attributes.inputChannel = "${value}#inputChannel"
 		}
 		
 	 
@@ -78,10 +76,14 @@ class RouterCompositionFactory extends IntegrationComponentFactory {
 	}
 	
 	@Override
-	void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
-		if (logger.isDebugEnabled()){
-			logger.debug("setParent parent ${parent} child $child")
+	void setParent(FactoryBuilderSupport builder, Object parent, Object child) {		
+		if (parent instanceof MessageFlow) {
 		}
+		else {
+			child.inputChannel = child.inputChannel ?: "${child.name}.inputChannel"
+		}
+		
+		
 		assert parent instanceof BaseIntegrationComposition
 		parent.add(child)
 		

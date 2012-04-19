@@ -10,12 +10,22 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.springframework.integration.dsl.groovy.builder.dom
+package org.springframework.integration.router
+import java.util.List;
+
+import org.springframework.integration.Message;
+import org.springframework.integration.dsl.groovy.ClosureInvokingMessageProcessor;
+import org.springframework.integration.handler.MessageProcessor;
+import org.springframework.integration.router.AbstractMessageProcessingRouter
+import org.springframework.util.Assert;
 
 /**
  * @author David Turanski
  *
  */
-class IntegrationXmlBuilder {
-
+class ClosureInvokingRouter extends AbstractMessageProcessingRouter {
+	
+	ClosureInvokingRouter(ClosureInvokingMessageProcessor messageProcessor) {
+		super(messageProcessor)
+	}
 }

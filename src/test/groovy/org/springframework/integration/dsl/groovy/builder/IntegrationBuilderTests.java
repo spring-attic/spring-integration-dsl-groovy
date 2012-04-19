@@ -35,9 +35,9 @@ public class IntegrationBuilderTests {
     	
     	String flowScript2 = ("messageFlow(inputChannel:'outputChannel1'){ filter(evaluate:{it.class == String})\ntransform(evaluate:{it.toLowerCase()})}");
     		
-    	MessageFlow flow2 = (MessageFlow)builder.build(new ByteArrayInputStream(flowScript2.getBytes()));
+    	builder.build(new ByteArrayInputStream(flowScript2.getBytes()));
     	
-		Object response = builder.getIntegrationContext().sendAndReceive(flow1.getInputChannel(), flow2.getOutputChannel(),"hello");
+		Object response = builder.getIntegrationContext().sendAndReceive(flow1.getInputChannel(),"hello");
 		
 		assertEquals("hello",response);
 		

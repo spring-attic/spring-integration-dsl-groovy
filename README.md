@@ -53,10 +53,6 @@ messageFlow(inputChannel:'inputC',outputChannel:'outputC') {
 	 handle(inputChannel:'discardChannel',evaluate:{println it})
 }
 
-
-
-
-
 //Alternate Ideas  
  -- Explicit chain
 def ic = builder.doWithSpringIntegration  {
@@ -122,6 +118,18 @@ messageFlow {
 	
 	}
 }
+
+
+//Routing 3
+route(evaluate {Message m ->
+   if (m.headers['foo'] == 'bar') {
+   	return 'bar#inputChannel'
+   } 
+   return 'foo#inputChannel'
+})
+
+handle('foo',evaluate:{})
+handle('bar',evaluate:{})
 
 
 //Nested flows

@@ -62,12 +62,10 @@ abstract class EndpointFactory extends IntegrationComponentFactory {
 	@Override
 	public void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
 		if (parent instanceof MessageFlow) {
-			assert !(child.inputChannel || child.outputChannel),
-			  "channel names are not permitted in child of a MessageFlow: $child"
-		}
-		
+	        
+		}	
 		else {
-			child.inputChannel = child.inputChannel ?: "${child.name}#inputChannel" 
+			child.inputChannel = child.inputChannel ?: "${child.name}.inputChannel" 
 		}
 		
 		
@@ -80,14 +78,7 @@ abstract class EndpointFactory extends IntegrationComponentFactory {
 			logger.warn("attempted to invoke 'add' method on parent")
 		}
 	}
-
-	@Override
-	public void setChild(FactoryBuilderSupport builder, Object parent, Object child) {
-		logger.debug("setChild parent ${parent} child $child")
-	}
 	
-
-
 	protected abstract SimpleEndpoint endpointInstance(Map attributes) 
 }
 
