@@ -1,8 +1,9 @@
 package org.springframework.integration.dsl.groovy
 
 import org.springframework.integration.Message
-import org.springframework.integration.handler.MessageProcessor
 import org.springframework.integration.support.MessageBuilder
+import org.apache.commons.logging.LogFactory
+import org.apache.commons.logging.Log
 
 class ClosureInvoker {
 	private final closure
@@ -26,7 +27,6 @@ class ClosureInvokingTransformer implements org.springframework.integration.tran
 
 	ClosureInvokingTransformer(Closure closure){
 		this.messageProcessor = new ClosureInvokingMessageProcessor(closure)
-		 
 	}
 
 	/* (non-Javadoc)
@@ -47,6 +47,7 @@ class ClosureInvokingTransformer implements org.springframework.integration.tran
  */
 
 class ClosureInvokingMessageProcessor  {
+    private static Log logger = LogFactory.getLog(ClosureInvokingMessageProcessor)
 	private Class parameterType
 	private Closure closure
 
@@ -57,16 +58,26 @@ class ClosureInvokingMessageProcessor  {
 	}
 	
 	public Object processMessage(Message message) {
+	
 		Object result = null
 		if (parameterType == Message) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("invoking closure on message")
+			}
 			result =  this.closure.doCall(message)
 		}
 
 		else if (parameterType == Map && !(message.payload instanceof Map)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("invoking closure on message headers")
+			}
 			result =  this.closure.doCall(message.headers)
 		}
 
 		else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("invoking closure on message payload")
+			}
 			result =  this.closure.doCall(message.payload)
 		}
 			

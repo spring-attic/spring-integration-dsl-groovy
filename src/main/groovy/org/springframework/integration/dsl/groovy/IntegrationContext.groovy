@@ -47,7 +47,10 @@ class IntegrationContext extends BaseIntegrationComposition {
 	def send(String inputChannelName, Object msgOrPayload) {
 		def ac = createApplicationContext()
 		def inputChannel = ac.getBean(inputChannelName)
-		doSend(inputChannel,msgOrPayload)
+		def messageToSend = (msgOrPayload instanceof Message) ? msgOrPayload : 
+			new GenericMessage(msgOrPayload)
+		inputChannel.send(messageToSend)
+		
 	}
 	//TODO: Add errorFlow
 	def sendAndReceive(String inputChannelName, Object msgOrPayload, long timeout = 0) {
@@ -55,8 +58,12 @@ class IntegrationContext extends BaseIntegrationComposition {
 	   def ac = createApplicationContext()
 	   def inputChannel = ac.getBean(inputChannelName)
 	   def replyChannel = new QueueChannel()
-	   def messageToSend = MessageBuilder.withPayload(msgOrPayload).setReplyChannel(replyChannel).build()
+	   
+	   def messageToSend = (msgOrPayload instanceof Message) ? 
+	   	MessageBuilder.fromMessage(msgOrPayload).setReplyChannel(replyChannel).build() : 
+	   	MessageBuilder.withPayload(msgOrPayload).setReplyChannel(replyChannel).build()
 	   inputChannel.send(messageToSend)
+	   
 	   if (timeout){
 		   result = replyChannel.receive(timeout)
 	   } else {
@@ -86,15 +93,6 @@ class IntegrationContext extends BaseIntegrationComposition {
 		}
 		applicationContext
 	}
-	
-	private def doSend(MessageChannel inputChannel, Object msgOrPayload) {
-		if (msgOrPayload instanceof Message) {
-			inputChannel.send(msgOrPayload)
-		} else {
-			inputChannel.send(new GenericMessage(msgOrPayload))
-		}
-	}
-	
 }
 
 

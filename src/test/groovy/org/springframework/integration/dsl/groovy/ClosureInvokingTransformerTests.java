@@ -92,7 +92,7 @@ public class ClosureInvokingTransformerTests {
 		cefb.afterPropertiesSet();
 		cefb.start();
 		
-		Message message = new GenericMessage("hello");
+		Message<String> message = new GenericMessage<String>("hello");
 		channel.send(message);
 	}
 }

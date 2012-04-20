@@ -104,7 +104,7 @@ public class MessageFlowTests {
 	}
 	
 	@Test
-	void testSubFlow() {
+	void testExecSubFlow() {
 		def mainflow
 		def ic = builder.doWithSpringIntegration {
 			def subflow = messageFlow('sub'){
@@ -224,5 +224,20 @@ public class MessageFlowTests {
 		}
 		
 		assert mainflow.sendAndReceive("Hello") == "HELLOONEtwo"		
+	}
+	
+	@Test 
+	void testNestedFlows() {
+		def flow = builder.messageFlow {
+			handle( action:{payload -> payload.toUpperCase()})
+			messageFlow {
+				transform(evaluate:{it*2})
+				messageFlow {
+					transform(evaluate:{payload->payload.toLowerCase()})
+				}
+			}
+		}
+		
+		assert flow.sendAndReceive("Hello") == "hellohello"
 	}
 }

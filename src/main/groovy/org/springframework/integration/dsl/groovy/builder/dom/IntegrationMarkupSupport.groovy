@@ -130,6 +130,9 @@ class IntegrationMarkupSupport {
 		else if (endpoint.class == ServiceActivator) {
 			builder.'si:service-activator'(attributes)
 		}
+		else if (endpoint.class == Bridge) {
+			builder.'si:bridge'(attributes)
+		}
 		else if (endpoint.class == RouterComposition) {
 			builder.'si:router'(attributes) {
 				if (closure)closure.call()
@@ -174,6 +177,10 @@ class IntegrationMarkupSupport {
 			else if (component instanceof RouterComposition) {
 				buildRouter(builder,applicationContext, component)
 			}
+			else if (component instanceof MessageFlow) {
+				resolveMessageFlowChannels(component)
+				buildMessageFlow(builder, applicationContext, component)
+			}
 
 			previousComponent = component
 		}
@@ -199,7 +206,7 @@ class IntegrationMarkupSupport {
 
 
 				if (component instanceof MessageProducingEndpoint ) {
-					if (component != last) {
+					if (component != last && component.linkToNext) {
 						component.outputChannel = outputChannel = component.outputChannel ?: channelName(component,messageFlow.components[i+1])
 						//If component is Flow execution in the midst of a messageFlow, it requires an outputChannel
 						if (component instanceof FlowExecution ) {
@@ -231,6 +238,9 @@ class IntegrationMarkupSupport {
 			otherwise.components.first().inputChannel  = "${otherwise.name}.inputChannel" 
         }
 		createEndpoint(builder, applicationContext, routerComposition) {
+			routerComposition.channelMap?.each {value,channel ->
+				"si:mapping"(value:value, channel:channel)
+			}
 
 			routerComposition.components.each {component ->
 				if (logger.isDebugEnabled()){
@@ -239,10 +249,6 @@ class IntegrationMarkupSupport {
 
 				if (component instanceof WhenCondition) {
 					"si:mapping"(value:component.value, channel:component.components.first().inputChannel)
-				}
-		
-				else if (component instanceof Map){
-
 				}
 			}
 		}

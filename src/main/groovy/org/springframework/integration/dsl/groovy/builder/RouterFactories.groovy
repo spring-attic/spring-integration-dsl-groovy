@@ -60,9 +60,7 @@ class RouterCompositionFactory extends IntegrationComponentFactory {
 
 	@Override
 	void onNodeCompleted( FactoryBuilderSupport builder, Object parent, Object routerComposition ) {
-		if (!routerComposition.channelMap){
-			assert routerComposition.components.size >= 1, 'router contains no conditions'
-		} else {
+		if (routerComposition.channelMap){
 			assert routerComposition.components.empty, 'router cannot include both a channel map and conditions'
 		}
 		

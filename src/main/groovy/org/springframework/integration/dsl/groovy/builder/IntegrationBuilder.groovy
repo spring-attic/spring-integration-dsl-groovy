@@ -54,12 +54,22 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		registerFactory "config", new ConfigFactory()
 		registerFactory "messageFlow", new MessageFlowFactory()
 		registerFactory "doWithSpringIntegration", new IntegrationContextFactory()
+		/*
+		 * Simple endpoints
+		 */
 		registerFactory "filter", new FilterFactory()
 		registerFactory "transform", new TransformerFactory()
-		registerFactory "route", new RouterCompositionFactory()
 		registerFactory "handle", new ServiceActivatorFactory()
+		registerFactory "bridge", new BridgeFactory()
+		/*
+		 * Router 
+		 */
+		registerFactory "route", new RouterCompositionFactory()
 		registerFactory "when", new RouterConditionFactory()
 		registerFactory "otherwise", new RouterConditionFactory()
+		registerFactory "map", new ChannelMapFactory()
+		
+		
 		registerFactory "channel", new ChannelFactory()
 		registerFactory "pubSubChannel", new ChannelFactory()
 		registerFactory "pollableChannel", new ChannelFactory()
@@ -70,7 +80,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		registerFactory "httpGet", stubFactory
 		registerFactory "poll", stubFactory
 		registerFactory "exec", new FlowExecutionFactory()
-		registerFactory "map", new ChannelMapFactory()
+		
 	}
 
 	ApplicationContext createApplicationContext(ApplicationContext parentContext=null) {

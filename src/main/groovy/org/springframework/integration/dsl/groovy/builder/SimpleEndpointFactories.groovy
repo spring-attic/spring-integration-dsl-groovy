@@ -103,3 +103,10 @@ public class ServiceActivatorFactory extends EndpointFactory {
 	}
 }
 
+public class BridgeFactory extends EndpointFactory {
+	@Override
+	protected SimpleEndpoint endpointInstance(Map attributes) {
+		return new Bridge(attributes)
+	}
+}
+

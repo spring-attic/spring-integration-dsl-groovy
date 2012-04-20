@@ -76,5 +76,15 @@ public class IntegrationBuilderUsageTests {
 		}
 	}
 	
+	@Test
+	void testBridge() {
+		def ic = builder.doWithSpringIntegration {
+			 transform('t1',outputChannel:'t1.out',evaluate:{it.toUpperCase()})
+			 bridge(inputChannel:'t1.out', outputChannel:'bridge.out')
+			 transform('t2',inputChannel:'bridge.out',evaluate:{it*2})
+		}
+		
+		assert ic.sendAndReceive('t1.inputChannel','Hello') == "HELLOHELLO"
+	}
 	
 }

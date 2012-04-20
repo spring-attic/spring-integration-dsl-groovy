@@ -17,8 +17,6 @@ package org.springframework.integration.dsl.groovy;
  *
  */
 class SimpleEndpoint extends IntegrationComponent {
- 
-	Closure action
 	String inputChannel
 	
 	SimpleEndpoint(){
@@ -37,11 +35,13 @@ class SimpleEndpoint extends IntegrationComponent {
 }
 
 class MessageProducingEndpoint extends SimpleEndpoint {
+	boolean linkToNext = true
 	static requiresReply = true
 	String outputChannel
 }
 
 class ServiceActivator extends MessageProducingEndpoint {
+	Closure action
 	static requiresReply = false
 	protected String defaultNamePrefix(){
 		'$sa'
@@ -56,12 +56,14 @@ class MessagingBridge extends MessageProducingEndpoint {
 
 
 class Transformer extends MessageProducingEndpoint {
+	Closure action
 	protected String defaultNamePrefix(){
 		'$xfmr'
 	}
 }
 
 class Filter extends MessageProducingEndpoint {
+	Closure action
 	String discardChannel
 	protected String defaultNamePrefix(){
 		'$flt'
@@ -69,6 +71,7 @@ class Filter extends MessageProducingEndpoint {
 }
 //TODO: Is this a simple endpoint
 class Router extends SimpleEndpoint {
+	Closure action
 	String defaultOutputChannel
 	protected String defaultNamePrefix(){
 		'$rtr'
@@ -76,10 +79,16 @@ class Router extends SimpleEndpoint {
 }
  
 class Splitter extends MessageProducingEndpoint {
+	Closure action
 	protected String defaultNamePrefix(){
 		'$splt'
 	}
 }
 
+class Bridge extends MessageProducingEndpoint {
+	protected String defaultNamePrefix(){
+		'$brdg'
+	}
+}
 
 

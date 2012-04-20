@@ -12,29 +12,58 @@
  */
 package org.springframework.integration.dsl.groovy.builder;
 import org.junit.Test
- 
+
 import org.springframework.integration.dsl.groovy.RouterComposition
 import org.springframework.integration.dsl.groovy.RouterCondition
 import org.springframework.integration.dsl.groovy.ServiceActivator
 import static org.junit.Assert.*
+
+import org.springframework.integration.support.MessageBuilder
 /**
  * @author David Turanski
  *
  */
- 
+
 public class RouterUsageTests {
 	IntegrationBuilder builder = new IntegrationBuilder()
 
 	@Test
 	void testSimpleRouter() {
+		 def integrationContext = builder.doWithSpringIntegration {
+			//Must return String, String[] etc...
+			route('myRouter', evaluate: { it == "Hello" ? 'upper.inputChannel' : 'lower.inputChannel' } )	
+			handle('upper', action:{payload -> payload.toUpperCase()})
+			handle('lower', action:{payload -> payload.toLowerCase()})
+		}
+		 
+		 assert integrationContext.sendAndReceive('myRouter.inputChannel',"Hello") == "HELLO"
+		 assert integrationContext.sendAndReceive('myRouter.inputChannel',"GoodBye") == "goodbye"
+	}
+	
+	
+	@Test
+	void testRecipientListRouter() {
+		 def count = 0
+		 def integrationContext = builder.doWithSpringIntegration {
+			route('myRouter', evaluate: { ['upper.inputChannel' , 'lower.inputChannel'] } )
+			handle('upper', action:{count ++; null})
+			handle('lower', action:{count ++; null})
+		}
+		 
+		 integrationContext.send('myRouter.inputChannel',"Hello") 
+		 assert count == 2
+	}
+	
+	@Test
+	void testRouterWhen() {
 		def flow = builder.messageFlow {
-			//Must return String, etc...
-			route('myRouter', evaluate: { it == "Hello" ? 'foo' : 'bar' } ) 
+		 
+			route('myRouter', evaluate: { it == "Hello" ? 'foo' : 'bar' } )
 			{
 				when('foo') {
 					handle(action:{payload -> payload.toUpperCase()})
 				}
-				
+
 				when('bar') {
 					handle(action:{payload -> payload.toLowerCase()})
 				}
@@ -53,20 +82,20 @@ public class RouterUsageTests {
 
 		def sa = routerCondition.components[0]
 		assert (sa instanceof ServiceActivator)
-		
+
 		assert flow.sendAndReceive("Hello") == "HELLO"
 		assert flow.sendAndReceive("SOMETHING") == "something"
 	}
-	
+
 	@Test
-	void testSimpleRouterWithOtherwise() {
+	void testRouterWithOtherwise() {
 		def flow = builder.messageFlow {
 			route('myRouter', evaluate: { if (it == "Hello" ) 'foo' } )
 			{
 				when('foo') {
 					handle(action:{payload -> payload.toUpperCase()})
 				}
-				
+
 				otherwise {
 					handle(action:{payload -> payload.toLowerCase()})
 				}
@@ -77,17 +106,31 @@ public class RouterUsageTests {
 	}
 
 	@Test
-	void testNamedRouterWithOtherwise () {
-		builder.messageFlow {
-			route('myRouter', evaluate: { val -> println "route function: $val" }) {
-				when('bar') {
-					handle(action:{
-					})
+	/*
+	 *  
+	 */
+	void testMidstreamRouter() {
+		def flow = builder.messageFlow {
+			route('myRouter', evaluate: { if (it == "Hello" ) 'foo' } )
+			{
+				when('foo') {
+					handle(outputChannel:'foo.out', action:{payload -> payload.toUpperCase()})
 				}
+
 				otherwise {
+					handle(outputChannel:'default.out', action:{payload -> payload.toLowerCase()})
 				}
 			}
+			messageFlow(inputChannel:'foo.out') {
+				transform(evaluate:{it[0..1]})
+			}
+			messageFlow(inputChannel:'default.out') {
+				transform(evaluate:{it*2})
+			}
 		}
+
+		assert flow.sendAndReceive("Hello") == "HE"
+		assert flow.sendAndReceive("SOMETHING") == "somethingsomething"
 	}
 
 	@Test
@@ -107,22 +150,31 @@ public class RouterUsageTests {
 		} catch (AssertionError e) {
 		}
 	}
+
 	@Test
 	void testChannelMappedRouter() {
-		builder.messageFlow {
+		def flow = builder.messageFlow {
 			route('myRouter',evaluate: { Map headers -> headers.foo }) {
 				map(bar:'barChannel',baz:'bazChannel')
 			}
+			transform(inputChannel:'barChannel',evaluate:{it[0..1]},linkToNext:false)
+		 
+			transform(inputChannel:'bazChannel',evaluate:{it*2})
 		}
 
-		def messageFlow = builder.integrationContext.messageFlows[0]
-
-		def router = messageFlow.components[0]
+		def router = flow.components[0]
 		assert router instanceof RouterComposition
 		assert(router.components.size == 0)
-
+		
 		assert router.channelMap
-
 		assert router.channelMap == [bar:'barChannel',baz:'bazChannel']
+		
+		
+		def message = MessageBuilder.withPayload("Hello").copyHeaders([foo:'bar']).build()
+		println message
+		assert flow.sendAndReceive(message).payload == "He"
+		
+		message = MessageBuilder.withPayload("SOMETHING").copyHeaders([foo:'baz']).build()
+		assert flow.sendAndReceive(message).payload == "SOMETHINGSOMETHING"
 	}
 }
