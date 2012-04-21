@@ -171,7 +171,6 @@ public class RouterUsageTests {
 		
 		
 		def message = MessageBuilder.withPayload("Hello").copyHeaders([foo:'bar']).build()
-		println message
 		assert flow.sendAndReceive(message).payload == "He"
 		
 		message = MessageBuilder.withPayload("SOMETHING").copyHeaders([foo:'baz']).build()
