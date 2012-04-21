@@ -29,10 +29,7 @@ import org.springframework.integration.dsl.groovy.*
  */
 
 abstract class EndpointFactory extends IntegrationComponentFactory {
-
-	/* (non-Javadoc)
-	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
-	 */
+	
 	@Override
 	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
 	throws InstantiationException, IllegalAccessException {

@@ -25,35 +25,11 @@ import org.springframework.integration.dsl.groovy.*
 
 /**
  * @author David Turanski
- * Translates DSL to Spring XML
+ * Translates Spring Integration DSL model to Spring XML
  */
 class IntegrationMarkupSupport {
-	private logger = LogFactory.getLog(IntegrationMarkupSupport)
-
-	def schemaLocations = "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd "+
-	"http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd"
-
-	static coreNamespaces() {
-		['': 'http://www.springframework.org/schema/beans',
-					xsi: 'http://www.w3.org/2001/XMLSchema-instance',
-					si: 'http://www.springframework.org/schema/integration'
-				]
-	}
-
-	def addIntegrationNamespace(prefix) {
-		def namespace = "http://www.springframework.org/schema/integration/$prefix"
-		addSchemaLocation(namespace,namespace+"/spring-integration-${prefix}.xsd")
-		[prefix:namespace]
-	}
-
-	def schemaLocations() {
-		['xsi:schemaLocation':schemaLocations]
-	}
-
-	def addSchemaLocation(namespace, xsd) {
-		schemaLocations += " $namespace $xsd"
-	}
-
+	private Log logger = LogFactory.getLog(IntegrationMarkupSupport)
+	private IntegrationNamespaceSupport namespaceSupport = new IntegrationNamespaceSupport()
 	/**
 	 * Translate DSL context to XML	
 	 * @param integrationContext
@@ -61,12 +37,15 @@ class IntegrationMarkupSupport {
 	 */
 	def translateToXML(integrationContext) {
 
+		resolveXMLBeanNamespaces(integrationContext.components.findAll {it instanceof XMLNamespace} )
+
 		integrationContext.messageFlows?.each {messageFlow -> resolveMessageFlowChannels(messageFlow) }
 
 		def xmlBuilder = new StreamingMarkupBuilder()
 		def writer = xmlBuilder.bind { builder ->
-			namespaces <<  coreNamespaces()
-			beans(schemaLocations() ) {
+			namespaces <<  namespaceSupport.namespaceDeclarations
+			println namespaceSupport.namespaceDeclarations
+			beans(namespaceSupport.schemaLocationDeclaration() ) {
 				integrationContext.components.each {component ->
 					if (component instanceof MessageFlow) {
 						if (component.outputChannel) {
@@ -87,6 +66,11 @@ class IntegrationMarkupSupport {
 					else if (component instanceof RouterComposition) {
 						buildRouter(builder, integrationContext.applicationContext, component)
 					}
+					else if (component instanceof XMLBean){
+						Closure c = component.defn.dehydrate()
+						c.delegate = builder
+						c.call()
+					}
 				}
 			}
 		}
@@ -100,11 +84,12 @@ class IntegrationMarkupSupport {
 	}
 
 	private createEndpoint(builder, applicationContext, endpoint, Closure closure = null) {
+		def siPrefix = namespaceSupport.integrationNamespacePrefix
 		def name = endpoint.name
 		assert endpoint.name, 'name cannot be null'
 
 		if (closure) {
-			closure.setDelegate(builder)
+			closure.delegate = builder
 		}
 
 		def attributes = buildAttributes(endpoint)
@@ -122,19 +107,19 @@ class IntegrationMarkupSupport {
 			BeanDefinitionReaderUtils.registerBeanDefinition(bdh, (BeanDefinitionRegistry) applicationContext)
 		}
 		if (endpoint.class == Transformer) {
-			builder.'si:transformer'(attributes)
+			builder."$siPrefix:transformer"(attributes)
 		}
 		else if (endpoint.class == Filter) {
-			builder.'si:filter'(attributes)
+			builder."$siPrefix:filter"(attributes)
 		}
 		else if (endpoint.class == ServiceActivator) {
-			builder.'si:service-activator'(attributes)
+			builder."$siPrefix:service-activator"(attributes)
 		}
 		else if (endpoint.class == Bridge) {
-			builder.'si:bridge'(attributes)
+			builder."$siPrefix:bridge"(attributes)
 		}
 		else if (endpoint.class == RouterComposition) {
-			builder.'si:router'(attributes) {
+			builder."$siPrefix:router"(attributes) {
 				if (closure)closure.call()
 			}
 		}
@@ -228,18 +213,19 @@ class IntegrationMarkupSupport {
 	}
 
 	private buildRouter(builder, applicationContext, RouterComposition routerComposition) {
+		def siPrefix = namespaceSupport.integrationNamespacePrefix
 		if (logger.isDebugEnabled()){
 			logger.debug("Building router composition")
 		}
-		
+
 		def otherwise = routerComposition.components.find{it instanceof OtherwiseCondition}
-        if (otherwise){
-			routerComposition."default-output-channel" = 
-			otherwise.components.first().inputChannel  = "${otherwise.name}.inputChannel" 
-        }
+		if (otherwise){
+			routerComposition."default-output-channel" =
+					otherwise.components.first().inputChannel  = "${otherwise.name}.inputChannel"
+		}
 		createEndpoint(builder, applicationContext, routerComposition) {
 			routerComposition.channelMap?.each {value,channel ->
-				"si:mapping"(value:value, channel:channel)
+				"$siPrefix:mapping"(value:value, channel:channel)
 			}
 
 			routerComposition.components.each {component ->
@@ -248,22 +234,35 @@ class IntegrationMarkupSupport {
 				}
 
 				if (component instanceof WhenCondition) {
-					"si:mapping"(value:component.value, channel:component.components.first().inputChannel)
+					"$siPrefix:mapping"(value:component.value, channel:component.components.first().inputChannel)
 				}
 			}
 		}
-			
+
 		routerComposition.components.findAll{it instanceof RouterCondition}.each {component ->
 			buildMessageFlow(builder,applicationContext,component)
-		}	
+		}
+	}
+
+	private resolveXMLBeanNamespaces(xmlNamespaces) {
+		xmlNamespaces?.each { namespace->
+			namespace.name.split(',').each { ns->
+				if (logger.isDebugEnabled()) {
+					logger.debug("adding namespace for $ns")
+				}
+				namespaceSupport.addDefaultNamespace(ns)
+			}
+		}
 	}
 
 	private createBridge(builder,inputChannel,outputChannel){
-		builder.'si:bridge'('input-channel':inputChannel,'output-channel':outputChannel)
+		def siPrefix = namespaceSupport.integrationNamespacePrefix
+		builder."$siPrefix:bridge"('input-channel':inputChannel,'output-channel':outputChannel)
 	}
 
 	private createChannel(builder, channelName) {
-		builder.'si:channel'(id:channelName)
+		def siPrefix = namespaceSupport.integrationNamespacePrefix
+		builder."$siPrefix:channel"(id:channelName)
 	}
 
 	private String channelName(from,to){

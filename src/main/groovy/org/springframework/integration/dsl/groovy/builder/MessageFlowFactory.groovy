@@ -22,11 +22,8 @@ import org.springframework.integration.dsl.groovy.MessageFlow
  * @author David Turanski
  *
  */
-class MessageFlowFactory extends AbstractFactory {
-	private static Log logger = LogFactory.getLog(MessageFlowFactory.class)
-	/* (non-Javadoc)
-	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
-	 */
+class MessageFlowFactory extends IntegrationComponentFactory {
+	
 	def newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
 	throws InstantiationException, IllegalAccessException {
 

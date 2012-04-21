@@ -8,12 +8,9 @@ Multiple message flows may be created.
 
 MessageFlow is backed by a chain: Provides convenience methods, send(obj), sendAndReceive(obj)
 
-
-
-
 Message Flow examples
 
-messageFlow(inputChannel:'inputC',outputChannel:'outputC') {
+    messageFlow(inputChannel:'inputC',outputChannel:'outputC') {
 	 transform(evaluate:{payload->payload.toUpperCase()})
 	 filter(evaluate:{payload-> payload=="HELLO"})
 	 handle(evaluate:{payload->payload})
@@ -21,7 +18,7 @@ messageFlow(inputChannel:'inputC',outputChannel:'outputC') {
 
 // More complex example
 
-doWithSpringIntegration {
+    doWithSpringIntegration {
 		messageFlow(outputChannel:'outputChannel1') {
 			transform(evaluate:{it.toUpperCase()})
 		}
@@ -31,9 +28,9 @@ doWithSpringIntegration {
 		}
 		
 		handle(inputChannel:flow2.outputChannel,evaluate:{println it})
-}
+    }
 
-def integrationContext = doWithSpringIntegration {builder->
+    def integrationContext = doWithSpringIntegration {builder->
    		
    		def flow1 = builder.messageFlow(outputChannel:'outputChannel1') {
 			transform(evaluate:{it.toUpperCase()})
@@ -44,9 +41,9 @@ def integrationContext = doWithSpringIntegration {builder->
 		}
 		
 		handle(inputChannel:flow2.outputChannel,evaluate:{println it})
-}
+    }
 
-messageFlow(inputChannel:'inputC',outputChannel:'outputC') {
+    messageFlow(inputChannel:'inputC',outputChannel:'outputC') {
 	 transform(evaluate:{payload->payload.toUpperCase()})
 	 filter(evaluate:{payload-> payload=="HELLO"},outputChannel:'toHandler',discardChannel:'discardChannel')
 	 handle(inputChannel:'toHandler', evaluate:{payload})
@@ -55,26 +52,26 @@ messageFlow(inputChannel:'inputC',outputChannel:'outputC') {
 
 //Alternate Ideas  
  -- Explicit chain
-def ic = builder.doWithSpringIntegration  {
+    def ic = builder.doWithSpringIntegration  {
 	chain(inputChannel:'inputC',outputChannel:'outputC') {
 	 transform(evaluate:{payload->payload.toUpperCase()})
 	 filter(evaluate:{payload-> payload=="HELLO"})
 	 handle(evaluate:{payload})
 	}
-}
+    }
 
-def reply=ic.sendAndReceive('inputC')
+    def reply=ic.sendAndReceive('inputC')
 
 
 
-messageFlow(inputChannel:'inputC',outputChannel:'outputC') {
+    messageFlow(inputChannel:'inputC',outputChannel:'outputC') {
 	 transform(evaluate:{payload->payload.toUpperCase()})
 	 filter(evaluate:{payload-> payload=="HELLO"})
 	 handle(evaluate:{payload})
-}
+    }
 
 //Inline Routing
-messageFlow {
+    messageFlow {
 	route(evaluate:{condition}){
 		when(value1) {
 			//chain
@@ -83,10 +80,10 @@ messageFlow {
 			//chain
 		}
 	}
-}
+    }
 
 //Routing 1
-messageFlow {
+    messageFlow {
 	route(evaluate:{condition}){
 		when(value1,channel:'output1') 
 		when(value2,channel:'output2')
@@ -96,10 +93,10 @@ messageFlow {
 	transform(inputChannel:'output1',evaluate:{transformation1})
 	transform(inputChannel:'output2',evaluate:{transformation2})
 	transform(inputChannel:'output3',evaluate:{transformation3})
-}
+    }
 
 //Routing 2
-messageFlow {
+    messageFlow {
 	route(evaluate:{condition}){
 		when(value1,channel:'output1') 
 		when(value2,channel:'output2')
@@ -121,31 +118,31 @@ messageFlow {
 
 
 //Routing 3
-route(evaluate {Message m ->
-   if (m.headers['foo'] == 'bar') {
-   	return 'bar#inputChannel'
-   } 
-   return 'foo#inputChannel'
-})
+    route(evaluate {Message m ->
+       if (m.headers['foo'] == 'bar') {
+   	return 'bar.inputChannel'
+       } 
+      return 'foo.inputChannel'
+    })
 
-handle('foo',evaluate:{})
-handle('bar',evaluate:{})
+    handle('foo',evaluate:{})
+    handle('bar',evaluate:{})
 
 
 //Nested flows
-messageFlow('subflow'){
-}
+    messageFlow('subflow'){
+    }
 
-messageFlow('main'){
-   transform(evaluate:{payload->payload.toUpperCase()})
-   filter(evaluate:{payload-> payload=="HELLO"},outputChannel:'subflow')
-}
+    messageFlow('main'){
+       transform(evaluate:{payload->payload.toUpperCase()})
+       filter(evaluate:{payload-> payload=="HELLO"},outputChannel:'subflow')
+    }
 
-messageFlow('main'){
-   transform(evaluate:{payload->payload.toUpperCase()})
-   filter(evaluate:{payload-> payload=="HELLO"})
-   call('subflow')
-}
+    messageFlow('main'){
+       transform(evaluate:{payload->payload.toUpperCase()})
+       filter(evaluate:{payload-> payload=="HELLO"})
+       call('subflow')
+    }
 
 //Channel usage:
 
@@ -167,4 +164,16 @@ messageFlow('main'){
 			}
 		}
 	}
+// Do in XML
+
+    doWithSpringIntegration {
+	 
+	springXml(def:{
+	   'int-jms:inbound-adapter'('input-channel':'inputChannel')
+	   'jms:destination'(...)
+	})
+	
+    }
+
+
 

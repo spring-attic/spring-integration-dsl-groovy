@@ -69,6 +69,12 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		registerFactory "otherwise", new RouterConditionFactory()
 		registerFactory "map", new ChannelMapFactory()
 		
+		/*
+		 * XML Bean 
+		 */
+		registerFactory "springXml", new XMLBeanFactory()
+		registerFactory "namespaces", new XMLNamespaceFactory()
+	
 		
 		registerFactory "channel", new ChannelFactory()
 		registerFactory "pubSubChannel", new ChannelFactory()
