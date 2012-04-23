@@ -44,18 +44,8 @@ class MessageFlowFactory extends IntegrationComponentFactory {
 		if (!messageFlow.inputChannel) {
 			messageFlow.inputChannel = "${messageFlow.name}.inputChannel"
 		}
-
-		//TODO: Move this into MessageFlow with explicit IntegrationContext dependencies?
-		messageFlow.metaClass.send = {msgOrPayload ->
-			builder.integrationContext.send(delegate.inputChannel,msgOrPayload)
-		}
-
-		messageFlow.metaClass.sendAndReceive = {msgOrPayload, long timeout=1000  ->
-			builder.integrationContext.sendAndReceive(delegate.inputChannel ,msgOrPayload, timeout)
-		}
 		
-
-
+		messageFlow.integrationContext = builder.integrationContext
 
 		messageFlow
 	}

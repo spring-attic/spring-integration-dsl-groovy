@@ -20,22 +20,31 @@ class MessageFlow extends BaseIntegrationComposition {
 	def inputChannel
 	def outputChannel
 	def name
+	IntegrationContext integrationContext
 	
 	MessageFlow(){
 		name = "\$mfl_" +  UUID.randomUUID().toString().substring(0, 8)
 	}
 	//For Java compatibility
-	public String getOutputChannel() {
+	String getOutputChannel() {
 		outputChannel
 	}
 	
-	public String getInputChannel() {
+	String getInputChannel() {
 		inputChannel
 	}
 	
-	public String getName() {
+	String getName() {
 		name
 	}
+	
+	void send(msgOrPayload){
+		integrationContext.send(inputChannel,msgOrPayload)
+	}
+	
+	def sendAndReceive(msgOrPayload,timeout=1000) {
+		integrationContext.sendAndReceive(inputChannel,msgOrPayload,timeout)
+	} 
 }
 
 class FlowExecution extends MessageProducingEndpoint { 

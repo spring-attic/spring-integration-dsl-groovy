@@ -73,9 +73,14 @@ class IntegrationContext extends BaseIntegrationComposition {
 	   return (msgOrPayload instanceof Message) ? result : result?.payload   
 	} 
 	
-	def getMessageFlows() {
+	List<MessageFlow> getMessageFlows() {
 		components.findAll{it instanceof MessageFlow}
 	}
+	
+	MessageFlow getMessageFlowByName(String name){
+		messageFlows.find {it.name = name}
+	}
+	
 
 	ApplicationContext createApplicationContext(ApplicationContext parentContext = null) {
 		if (!applicationContext){
