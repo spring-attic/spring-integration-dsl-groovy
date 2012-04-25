@@ -21,18 +21,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.integration.dsl.groovy.Channel
 import org.springframework.integration.dsl.groovy.IntegrationConfig
-import org.springframework.integration.dsl.groovy.PollableChannel
+import org.springframework.integration.dsl.groovy.IntegrationContext
+import org.springframework.integration.dsl.groovy.MessageFlow
 import org.springframework.integration.dsl.groovy.PubSubChannel
+import org.springframework.integration.dsl.groovy.QueueChannel
 
  
 /**
  *
  * @author David Turanski
  */
-class ChannelFactory  extends AbstractFactory {
-	private static Log logger = LogFactory.getLog(ChannelFactory.class)
-
-
+class ChannelFactory  extends IntegrationComponentFactory {
 	/* (non-Javadoc)
 	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
 	 */
@@ -41,18 +40,27 @@ class ChannelFactory  extends AbstractFactory {
 		if (logger.isDebugEnabled()){
 			logger.debug("newInstance name: $name value:$value attr:$attributes")
 		}
+		
+	    attributes = defaultAttributes(name,value,attributes) 
+		
 		switch(name){
 		  case 'channel': 
-			return new Channel(name:value)
+			return new Channel(attributes)
 		  case 'pubSubChannel':
-		  	return new PubSubChannel(name:value)
-		  case 'pollableChannel':
-		   return new PollableChannel(name:value)
+		  	return new PubSubChannel(attributes)
+		  case 'queueChannel':
+		   return new QueueChannel(attributes)
 		}
 	}
 	
 	public void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
-		//assert parent instanceof IntegrationConfig, "The parent of 'channel' must be 'config'"		
+		if (parent instanceof MessageFlow) {
+			parent.integrationContext.add(child)
+		} else if (parent instanceof IntegrationContext) {
+			parent.add(child)
+		} else {
+			throw new IllegalStateException("${child.builderName} cannot be a child of ${parent.builderName}")
+		}
 	}
 }
 

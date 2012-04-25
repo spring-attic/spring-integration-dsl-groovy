@@ -26,8 +26,8 @@ class MessageFlowFactory extends IntegrationComponentFactory {
 	
 	def newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
 	throws InstantiationException, IllegalAccessException {
-
-		assert !(attributes.containsKey('name') && value), "messageFlow cannot accept both a default value and a 'name' attribute"
+		
+		attributes = defaultAttributes(name, value, attributes)
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("creating new MessageFlow " + (value? value : ""))

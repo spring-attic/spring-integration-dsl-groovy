@@ -49,7 +49,7 @@ public class IntegrationMarkupSupportTests {
 		handle('sa2',inputChannel:'toHandler', evaluate:{payload})
 	   }
 	   
-	   integrationMarkupSupport.resolveMessageFlowChannels(flow)
+	   integrationMarkupSupport.xmlBuilder(flow).resolveMessageFlowChannels(flow)
 	   
 	   def component
 	   

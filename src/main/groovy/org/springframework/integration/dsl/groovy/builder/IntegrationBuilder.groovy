@@ -78,13 +78,14 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		
 		registerFactory "channel", new ChannelFactory()
 		registerFactory "pubSubChannel", new ChannelFactory()
-		registerFactory "pollableChannel", new ChannelFactory()
+		registerFactory "queueChannel", new ChannelFactory()
+		
 		registerFactory "interceptor", new ChannelInterceptorFactory()
 		registerFactory "onPreSend", new ChannelInterceptorFactory()
 		registerFactory "jmsListen", stubFactory
 		registerFactory "httpPost", stubFactory
 		registerFactory "httpGet", stubFactory
-		registerFactory "poll", stubFactory
+		registerFactory "poll", new PollerFactory()
 		registerFactory "exec", new FlowExecutionFactory()
 		
 	}
@@ -106,6 +107,19 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 
 abstract class IntegrationComponentFactory extends AbstractFactory {
 	protected Log logger = LogFactory.getLog(this.class)
+	
+	protected defaultAttributes(name, value, attributes) {
+		assert !(attributes.containsKey('name') && value), "$name cannot accept both a default value and a 'name' attribute"
+		
+		attributes = attributes ?: [:]
+		attributes.builderName = name
+		
+		if (!attributes.containsKey('name') && value){
+			attributes.name = value
+		}
+		
+		attributes
+	}
 }
 
 class StubFactory extends AbstractFactory {

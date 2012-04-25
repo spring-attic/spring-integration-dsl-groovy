@@ -24,6 +24,7 @@ abstract class IntegrationComponent   {
 	protected logger = LogFactory.getLog(this.class)
 	protected String name
 	protected componentProperties = [:]
+	protected String builderName
 	
 	void propertyMissing(String name, Object val) {
 		componentProperties[name]=val

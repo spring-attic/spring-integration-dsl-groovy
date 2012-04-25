@@ -46,35 +46,6 @@ public class IntegrationBuilderUsageTests {
 		println(eip);
 	}
 	
-	@Test 
-	void testSimpleServiceActivator() {
-		builder.messageFlow('flow1') {
-			handle(action:{})
-		}
-	}
-	
-	@Test 
-	void testChannels() {
-		builder.doWithSpringIntegration {
-			 channel('input'){
-			 	interceptor(){
-					 onPreSend(){}
-				 }
-			 }
-			 channel('output'){
-				 
-			 }
-		}
-	}
-	
-	@Test 
-	void testNestedMessageFlows() {
-		builder.messageFlow('main') {
-			messageFlow('subFlow'){
-				transform(evaluate:{payload->payload.toLowerCase()})
-			}
-		}
-	}
 	
 	@Test
 	void testBridge() {

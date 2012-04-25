@@ -29,28 +29,14 @@ import org.apache.commons.logging.Log
  *
  */
 class RouterCompositionFactory extends IntegrationComponentFactory {
-	//private routerFactory = new EndpointFactory(Router)
-	/* (non-Javadoc)
-	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
-	 */
+	 
 	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
 	throws InstantiationException, IllegalAccessException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("creating router for name: $name value: $value attributes: $attributes")
-		}
+ 
+       attributes = defaultAttributes(name, value, attributes)
 		
-		attributes = attributes ?: [:]
-		
-		if (!attributes.containsKey('name') && value){
-			attributes.name = value
-		}
-		
-	 
 		def routerComposition = new RouterComposition(attributes)
-		
-		
-
-	 	    
+			
 		if (logger.isDebugEnabled()) {
 			logger.debug("created router composition for name: $name value: $value attributes: $attributes")
 		}

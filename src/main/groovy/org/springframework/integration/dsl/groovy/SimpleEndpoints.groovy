@@ -18,6 +18,7 @@ package org.springframework.integration.dsl.groovy;
  */
 class SimpleEndpoint extends IntegrationComponent {
 	String inputChannel
+	def poller
 	
 	SimpleEndpoint(){
 		name = defaultNamePrefix() + "_" + UUID.randomUUID().toString().substring(0, 8)

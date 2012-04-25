@@ -34,13 +34,8 @@ abstract class EndpointFactory extends IntegrationComponentFactory {
 	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
 	throws InstantiationException, IllegalAccessException {
 		logger.debug("newInstance name: $name value:$value attr:$attributes")
-
-		attributes = attributes ?: [:]
-		
-		if (!attributes.containsKey('name') && value){
-			attributes.name = value
-		}
-		
+			
+	   attributes = defaultAttributes(name, value, attributes)
 		if (attributes.evaluate){
 			attributes.action = attributes.evaluate
 			attributes.remove('evaluate')
@@ -49,11 +44,6 @@ abstract class EndpointFactory extends IntegrationComponentFactory {
 		logger.debug("newInstance name: $name value:$value attr:$attributes")
 
 		return endpointInstance(attributes);
-	}
-	
-	@Override
-	public boolean isLeaf() {
-		true
 	}
 
 	@Override

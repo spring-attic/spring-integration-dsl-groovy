@@ -16,18 +16,6 @@ package org.springframework.integration.dsl.groovy
  * @author David Turanski
  *
  */
-abstract class AbstractChannel extends IntegrationComponent {
-
-}
-
-class Channel extends AbstractChannel {
-	
-}
-
-class PubSubChannel extends AbstractChannel {
-
-}
-
-class QueueChannel extends AbstractChannel {
+class Poller extends IntegrationComponent {
 
 }
