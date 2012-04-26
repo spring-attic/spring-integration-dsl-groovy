@@ -216,18 +216,17 @@ Since the IntegrationBuilder builds an XMLApplicationContext, it is necessary to
 
         doWithSpringIntegration {
 		namespaces('int-http')
-		springXml(defn:{
+		springXml {
 			'int-http:inbound-channel-adapter'(
 			 id:'httpChannelAdapter', 
 			channel:'requests',
 			  'supported-methods':'PUT, DELETE')
 			'si:channel'(id:'requests')
-		  })
+		  }
 	}
 		
 	builder.createApplicationContext()
 
-The namespaces() method takes a comma delimited list of standard Spring namespace prefixes. If a prefix starts with 'int-' it will generate the required XML namespace declarations required for any of the referenced components. Otherwise, it will be interpreted as a Core Spring namespace, e.g., 'jms','jmx','aop'. 
+The namespaces() method takes a comma delimited list of standard Spring namespace prefixes. If a prefix starts with 'int-' it will generate the required XML namespace declarations required for any of the referenced components. Otherwise, it will be interpreted as a Core Spring namespace, e.g., 'jms','jmx','aop'. The standard namespace for the core Spring Integration components is 'si' and is automatically included. 
 
-The springXml method, again uses a named attribute, 'defn' for the spring configuration so as not to confuse the builder. The standard namespace for the core Spring Integration components is 'si' and is automatically included. 
-    
+The springXml node requires a closure which is delagated to the XML MarkupBuilder. 

@@ -28,13 +28,13 @@ class XMLBeanTests {
 	void testXMLBeans() {
 		builder.doWithSpringIntegration {
 			namespaces('int-http')
-			springXml(defn:{
+			springXml {
 				'int-http:inbound-channel-adapter'(
 					id:'httpChannelAdapter', 
 					channel:'requests',
 				   'supported-methods':'PUT, DELETE')
 				'si:channel'(id:'requests')
-			})
+			}
 		}
 		
 		builder.createApplicationContext()	

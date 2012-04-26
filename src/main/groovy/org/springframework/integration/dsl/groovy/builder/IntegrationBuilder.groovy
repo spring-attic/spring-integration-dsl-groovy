@@ -48,6 +48,28 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 	public IntegrationContext getIntegrationContext() {
 		this.integrationContext
 	}
+	
+	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see groovy.util.FactoryBuilderSupport#setClosureDelegate(groovy.lang.Closure, java.lang.Object)
+	 */
+	protected void setClosureDelegate(Closure closure,
+		Object node) {
+		
+		/*
+		 * Disable builder processing of the Spring XML closure. Save for later processing 
+		 * by the XML builder
+		 */
+		
+		if (node.builderName == "springXml"){
+			node.beanDefinitions = closure.dehydrate()
+			closure.setResolveStrategy(Closure.DELEGATE_ONLY)
+			closure.delegate = new ClosureEater()
+		} else {
+			closure.delegate = this
+		}
+	}
 
 	@Override
 	def registerObjectFactories() {
@@ -103,6 +125,12 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		this.build(script)
 	}	
 	
+	
+	
+}
+
+class ClosureEater {
+	def methodMissing(String name, args){}
 }
 
 abstract class IntegrationComponentFactory extends AbstractFactory {

@@ -25,20 +25,19 @@ import org.springframework.integration.dsl.groovy.XMLBean
 class XMLBeanFactory extends IntegrationComponentFactory {
 
 	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-			throws InstantiationException, IllegalAccessException {			
-		assert attributes.containsKey('defn'), "The 'defn' attribute is required for $name. It's value is a closure containing Spring XML bean definitions"
-		return new XMLBean(attributes);
-	}
-			
-	@Override
-	void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
-		assert parent instanceof BaseIntegrationComposition
-		parent.add(child)		
+			throws InstantiationException, IllegalAccessException {	
+		return new XMLBean(builderName:name);
 	}
 	
 	@Override
 	boolean isLeaf() {
-		true
+		return false
+	}
+					
+	@Override
+	void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
+		assert parent instanceof BaseIntegrationComposition
+		parent.add(child)		
 	}
 
 }

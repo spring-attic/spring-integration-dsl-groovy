@@ -79,7 +79,7 @@ class IntegrationMarkupSupport {
 			beans(namespaceSupport.schemaLocationDeclaration() ) {
 				integrationContext.components.each {component ->
 					if (component instanceof XMLBean){
-						Closure c = component.defn.dehydrate()
+						Closure c = component.beanDefinitions
 						c.delegate = builder
 						c.call()
 					} 
