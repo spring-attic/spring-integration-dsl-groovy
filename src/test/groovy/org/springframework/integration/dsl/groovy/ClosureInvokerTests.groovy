@@ -24,34 +24,20 @@ import org.springframework.integration.message.GenericMessage
  *
  */
 class ClosureInvokerTests extends GroovyObjectSupport {
-	@Test
-	void testClosureInvoker() {
-		def closureInvoker = new ClosureInvoker({"hello"})
-		assertEquals("hello",closureInvoker.invoke("hello"));
-	}
-	
-	@Test
-	void testTypeSafeInvocation() {
-		try {
-		def closureInvoker = new ClosureInvoker({String it-> println it})
-        	closureInvoker.typeSafeInvoke(1)
-			fail('should throw an exception')
-		} catch (e){
-		}
-	}
+	 
 	
 	@Test
 	void testSimpleMessageInvocation() {
 		def messageClosureInvoker =  getSimpleMessageInvoker()
 		Message message = new GenericMessage("hello")
-		assertEquals("hello",messageClosureInvoker.transform(message).payload)
+		assertEquals("hello",messageClosureInvoker.processMessage(message))
 	}
 	
 	@Test
 	void testSimpleMessagePayloadInvocation() {
 		def messageClosureInvoker = getSimpleMessagePayloadInvoker()
 		Message message = new GenericMessage("hello")
-		assertEquals("HELLO",messageClosureInvoker.transform(message).payload)
+		assertEquals("HELLO",messageClosureInvoker.processMessage(message))
 	}
 	
 	@Test
@@ -61,21 +47,21 @@ class ClosureInvokerTests extends GroovyObjectSupport {
 		.withPayload("hello")
 		.copyHeaders([foo:'foo',bar:'bar'])
 		.build()
-		assertEquals("foobar",messageClosureInvoker.transform(message).payload)
+		assertEquals("foobar",messageClosureInvoker.processMessage(message))
 	}
 	
 	//These also invoked from a Java Test 
 	
-	static org.springframework.integration.transformer.Transformer getSimpleMessageInvoker() {
-		new ClosureInvokingTransformer({Message m-> m.payload})
+	static ClosureInvokingMessageProcessor getSimpleMessageInvoker() {
+		new ClosureInvokingMessageProcessor({Message m-> m.payload})
 	} 
 	
-	static org.springframework.integration.transformer.Transformer getSimpleMessagePayloadInvoker() {
-		new ClosureInvokingTransformer({payload-> payload.toUpperCase()})
+	static ClosureInvokingMessageProcessor getSimpleMessagePayloadInvoker() {
+		new ClosureInvokingMessageProcessor({payload-> payload.toUpperCase()})
 	}
 	
-	static org.springframework.integration.transformer.Transformer getSimpleMessageHeaderInvoker() {
-		new ClosureInvokingTransformer({Map headers-> headers.foo + headers.bar})
+	static ClosureInvokingMessageProcessor getSimpleMessageHeaderInvoker() {
+		new ClosureInvokingMessageProcessor({Map headers-> headers.foo + headers.bar})
 	}
 	
 }

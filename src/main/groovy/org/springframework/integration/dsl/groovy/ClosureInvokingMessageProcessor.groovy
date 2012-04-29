@@ -5,57 +5,22 @@ import org.springframework.integration.support.MessageBuilder
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
 
-class ClosureInvoker {
-	private final closure
-
-	ClosureInvoker(Closure closure){
-		this.closure = closure.clone()
-	}
-
-	public Object invoke(Object... args) {
-		closure.call(args)
-	}
-
-	public Object typeSafeInvoke(Object... args) {
-		closure.doCall(args)
-	}
-}
-
-class ClosureInvokingTransformer implements org.springframework.integration.transformer.Transformer {
-	private final ClosureInvokingMessageProcessor messageProcessor
-	 
-
-	ClosureInvokingTransformer(Closure closure){
-		this.messageProcessor = new ClosureInvokingMessageProcessor(closure)
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.integration.transformer.Transformer#transform(org.springframework.integration.Message)
-	 */
-	public Message<?> transform(Message<?> message) {
-		Object result = this.messageProcessor.processMessage(message)
-		return (result==null) ? null:
-		MessageBuilder.withPayload(result).copyHeaders(message.headers).build()
-	}
-}
-
 /**
  * 
  * @author David Turanski
  *
- * @param <T>
  */
-
 class ClosureInvokingMessageProcessor  {
-    private static Log logger = LogFactory.getLog(ClosureInvokingMessageProcessor)
+    protected  Log logger = LogFactory.getLog(this.class)
 	private Class parameterType
-	private Closure closure
+	protected Closure closure
 
 	ClosureInvokingMessageProcessor(Closure closure){
 		assert closure.getParameterTypes().size() == 1, 'Closure must specify exactly one parameter'
 		this.closure = closure.clone()
 		this.parameterType = closure.getParameterTypes()[0]
 	}
+	
 	
 	public Object processMessage(Message message) {
 	
@@ -85,4 +50,15 @@ class ClosureInvokingMessageProcessor  {
 		
 	}
 }
+
+class ClosureInvokingReleaseStrategy extends ClosureInvokingMessageProcessor {
+	ClosureInvokingReleaseStrategy(Closure closure) {
+		super(closure)
+	}
+	
+	public Boolean canRelease(List<?> items){
+		this.closure.doCall(items)
+	}
+}
+
 

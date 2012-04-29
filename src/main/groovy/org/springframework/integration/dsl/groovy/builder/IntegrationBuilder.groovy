@@ -12,11 +12,13 @@
  */
 package org.springframework.integration.dsl.groovy.builder
 
+import groovy.lang.Closure;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.Script;
 import groovy.util.AbstractFactory
 import groovy.util.FactoryBuilderSupport
 import java.io.InputStream
+import java.util.Collection;
 
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
@@ -26,29 +28,50 @@ import org.springframework.integration.dsl.groovy.IntegrationConfig
 import org.springframework.integration.dsl.groovy.IntegrationContext
 import org.springframework.integration.dsl.groovy.Filter
 import org.springframework.integration.dsl.groovy.ServiceActivator
+import org.springframework.integration.dsl.groovy.Splitter
 import org.springframework.integration.dsl.groovy.Transformer
 import org.springframework.integration.dsl.groovy.MessageFlow
+import org.codehaus.groovy.runtime.DefaultGroovyMethods
 
 /**
+ * Workaround for DefaultGroovyMethods.split()
+ * @see IntegrationBuilder.dispathNodeCall()
  * @author David Turanski
  *
  */
+ class IntegrationBuilderCategory {
+	 /**
+	  * Overrrides the DefaultGroovyMethods.split() with no parameters 
+	  * @param self
+	  * @param closure
+	  * @return the result of builder invoking split with an empty string parameter
+	  */
+	 public static Object split(Object self, Closure closure){ 
+		self.delegate.split('')
+	 }
+ }
 
-
+ /**
+ *
+ * @author David Turanski
+ *
+ */
 class IntegrationBuilder extends FactoryBuilderSupport {
 	private static Log logger = LogFactory.getLog(IntegrationBuilder.class)
 	private static stubFactory = new StubFactory()
 	private IntegrationContext integrationContext;
-
+	
 	IntegrationBuilder() {
 		super(true)
 		this.integrationContext = new IntegrationContext()
 	}
 	
+	
+	
 	public IntegrationContext getIntegrationContext() {
 		this.integrationContext
 	}
-	
+	 
 	@Override
 	/*
 	 * (non-Javadoc)
@@ -83,6 +106,8 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		registerFactory "transform", new TransformerFactory()
 		registerFactory "handle", new ServiceActivatorFactory()
 		registerFactory "bridge", new BridgeFactory()
+		registerFactory "split", new SplitterFactory()
+		registerFactory "aggregate", new AggregatorFactory()
 		/*
 		 * Router 
 		 */
@@ -110,6 +135,13 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		registerFactory "poll", new PollerFactory()
 		registerFactory "exec", new FlowExecutionFactory()
 		
+	}
+	
+	@Override
+	protected dispathNodeCall(name, args){
+		use (IntegrationBuilderCategory) {
+			super.dispathNodeCall(name,args)
+		}
 	}
 
 	ApplicationContext createApplicationContext(ApplicationContext parentContext=null) {

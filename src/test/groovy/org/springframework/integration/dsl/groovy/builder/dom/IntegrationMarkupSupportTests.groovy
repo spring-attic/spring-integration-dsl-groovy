@@ -26,7 +26,6 @@ import org.springframework.integration.MessageChannel
 import org.springframework.integration.MessagingException
 import org.springframework.integration.core.MessageHandler
 import org.springframework.integration.core.SubscribableChannel
-import org.springframework.integration.dsl.groovy.ClosureInvokingTransformer
 import org.springframework.integration.message.GenericMessage
 import org.springframework.integration.dsl.groovy.Transformer
 import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder

@@ -25,6 +25,7 @@ abstract class IntegrationComponent   {
 	protected String name
 	protected componentProperties = [:]
 	protected String builderName
+	protected static nameSpace
 	
 	void propertyMissing(String name, Object val) {
 		componentProperties[name]=val

@@ -208,6 +208,27 @@ otherwise() creates a default output channel on the router
 		}
 	}
 
+# Aggregator
+The aggregator supports releaseStrategy and correlationStrategy closures. Additionally, the aggregator itself may be backed by a closure:
+
+ 		def flow = builder.messageFlow(outputChannel:'queueChannel') {
+		   queueChannel('queueChannel')
+		   split()
+		   aggregate(
+			     releaseStrategy:{ list-> (list.size() == 2 ) },
+			     correlationStrategy:{it % 2 ? 'even' : 'odd' })
+		}
+
+		def ac = builder.integrationContext.createApplicationContext()
+		def queueChannel = ac.getBean('queueChannel')
+		flow.send([1, 2, 3, 4])
+
+		def result = queueChannel.receive()
+		assert result.payload == [1,3]
+		result = queueChannel.receive()
+		assert result.payload == [2,4]
+		
+
 # Native Spring Configuration
 As the number of Spring Integration components continuest to grow, it will be difficult for the DSL to keep up to provide first class support. For this reason, it is possible to create XML builder markup directly in the IntegrationBuilder(). 
 Note it is also possible to invoke createApplicationContext(ApplicationContext parentContext) to provide additional Spring resources.  

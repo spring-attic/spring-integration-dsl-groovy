@@ -43,19 +43,18 @@ class SimpleEndpointXmlBuilder extends IntegrationComponentXmlBuilder {
 			closure.delegate = builder
 		}
 		
-		channelBuilder.createDirectChannelIfNotDefined(builder, endpoint.inputChannel)
-		
 		if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel ) {
 			 channelBuilder.createDirectChannelIfNotDefined(builder,endpoint.outputChannel)
 		}
 
 		def attributes = buildAttributes(endpoint)
-		if (endpoint.hasProperty('action')) {
+		if (endpoint.hasProperty('action') && endpoint.action) {
 			assert !(attributes.containsKey('ref')), 'endoint cannot provide a bean reference and a closure'
 			attributes.method='processMessage'
 			def beanName = "${name}#closureInvokingHandler"
 			attributes.ref = beanName
-
+         
+			
 			BeanDefinitionBuilder  handlerBuilder =
 					BeanDefinitionBuilder.genericBeanDefinition(ClosureInvokingMessageProcessor)
 			handlerBuilder.addConstructorArgValue(endpoint.action)
@@ -75,8 +74,43 @@ class SimpleEndpointXmlBuilder extends IntegrationComponentXmlBuilder {
 		else if (endpoint.class == Bridge) {
 			buildEndpoint(builder,endpoint,attributes,"bridge")
 		}
+		else if (endpoint.class == Splitter) {
+			buildEndpoint(builder,endpoint,attributes,"splitter")
+		}
 		else if (endpoint.class == RouterComposition) {
 			buildEndpoint(builder,endpoint,attributes,"router",closure)
+		}
+		else if (endpoint.class == Aggregator) {
+			if (endpoint.releaseStrategy){
+				assert !(attributes.containsKey('release-strategy')), 'endoint cannot provide a release-strategy reference and a closure'
+				attributes.'release-strategy-method'='canRelease'
+				def beanName = "${endpoint.name}#releaseStrategyHandler"
+				attributes.'release-strategy' = beanName
+			 
+				
+				BeanDefinitionBuilder  handlerBuilder =
+						BeanDefinitionBuilder.genericBeanDefinition(ClosureInvokingReleaseStrategy)
+				handlerBuilder.addConstructorArgValue(endpoint.releaseStrategy)
+				def bdh = new BeanDefinitionHolder(handlerBuilder.getBeanDefinition(),beanName)
+				BeanDefinitionReaderUtils.registerBeanDefinition(bdh, (BeanDefinitionRegistry) applicationContext)
+				
+			}
+			if (endpoint.correlationStrategy){
+				assert !(attributes.containsKey('correlation-strategy')), 'endoint cannot provide a correlation-strategy reference and a closure'
+				attributes.'correlation-strategy-method'='processMessage'
+				def beanName = "${endpoint.name}#correlationStrategyHandler"
+				attributes.'correlation-strategy' = beanName
+			 
+				
+				BeanDefinitionBuilder  handlerBuilder =
+						BeanDefinitionBuilder.genericBeanDefinition(ClosureInvokingMessageProcessor)
+				handlerBuilder.addConstructorArgValue(endpoint.correlationStrategy)
+				def bdh = new BeanDefinitionHolder(handlerBuilder.getBeanDefinition(),beanName)
+				BeanDefinitionReaderUtils.registerBeanDefinition(bdh, (BeanDefinitionRegistry) applicationContext)
+				
+			}
+			
+			buildEndpoint(builder,endpoint,attributes,"aggregator")
 		}
 	}
 	

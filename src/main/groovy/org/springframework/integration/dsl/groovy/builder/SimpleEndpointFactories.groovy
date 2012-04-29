@@ -97,3 +97,18 @@ public class BridgeFactory extends EndpointFactory {
 	}
 }
 
+public class SplitterFactory extends EndpointFactory {
+	@Override
+	protected SimpleEndpoint endpointInstance(Map attributes) {
+		return new Splitter(attributes)
+	}
+}
+
+public class AggregatorFactory extends EndpointFactory {
+	@Override
+	protected SimpleEndpoint endpointInstance(Map attributes) {
+		return new Aggregator(attributes)
+	}
+}
+
+

@@ -86,6 +86,15 @@ class Splitter extends MessageProducingEndpoint {
 	}
 }
 
+class Aggregator extends MessageProducingEndpoint {
+	Closure action
+	Closure releaseStrategy
+	Closure correlationStrategy
+	protected String defaultNamePrefix(){
+		'$aggr'
+	}
+}
+
 class Bridge extends MessageProducingEndpoint {
 	protected String defaultNamePrefix(){
 		'$brdg'
