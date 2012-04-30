@@ -1,46 +1,91 @@
 description = 'Spring Integration Groovy DSL'
 
-group = 'org.springframework.integration'
+apply plugin: 'base'
 
-apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'idea'
-sourceCompatibility=1.5
-targetCompatibility=1.5
+allprojects {
+  group = 'org.springframework.integration'
 
-repositories {
+  repositories {
     mavenCentral()
+    maven { url 'https://repo.springsource.org/libs-staging-local'}
     maven { url 'http://repo.springsource.org/libs-milestone' }
     maven { url 'https://repo.springsource.org/libs-snapshot'}
     maven { url 'https://repo.springsource.org/libs-release'}
+  }
 }
 
-dependencies {    
-    // dependent libraries
-    compile 'org.springframework.integration:spring-integration-core:2.1.0.RELEASE'
-	groovy 'org.codehaus.groovy:groovy-all:1.8.6'
-  //  compile ('org.springframework.integration:spring-integration-http:2.1.0.RELEASE'){ optional = true }
-  //  compile ('org.springframework.integration:spring-integration-jms:2.1.0.RELEASE'){ optional = true }	
-  //  compile ("org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1") { provided = true }
-  //  compile("org.codehaus.jackson:jackson-mapper-asl:1.9.2") { optional = true }
-    
-    // libraries only needed for test
-    testCompile "log4j:log4j:1.2.16"
-    testCompile "junit:junit:4.8.1"
-	testCompile 'org.springframework.integration:spring-integration-http:2.1.0.RELEASE'
-	testCompile 'javax.servlet:servlet-api:2.5'
-  
-  //  testCompile ("org.apache.activemq:activemq-core:5.3.0") {
-  //       exclude group: 'org.springframework', module: 'spring-context'
-  //  }
-}
+subprojects { subproject ->
+   apply plugin: 'groovy'
+   apply plugin: 'maven'
+   apply plugin: 'eclipse'
+   sourceCompatibility=1.5
+   targetCompatibility=1.5 
+   
+   junitVersion = '4.8.2'
+   log4jVersion = '1.2.12'
+   mockitoVersion = '1.9.0'
+   springIntegrationVersion = '2.1.1.RELEASE'
 
-task sourcesJar(type: Jar) {
+   install {
+      repositories.mavenInstaller {
+          customizePom(pom, subproject)
+      }
+   }
+
+  task sourcesJar(type: Jar) {
     classifier = 'sources'
+  }
+
+   artifacts {
+    archives sourcesJar
+   }
+
+  // dependencies that are common across all java projects
+   dependencies {
+
+    groovy 'org.codehaus.groovy:groovy-all:1.8.6'
+
+    testCompile "junit:junit-dep:$junitVersion"
+    testCompile "log4j:log4j:$log4jVersion"
+    testCompile "org.mockito:mockito-all:$mockitoVersion"
+  }
 }
 
-artifacts {
-    archives sourcesJar
+project('spring-integration-groovy-dsl-core') {
+  description = 'Spring Integration Groovy DSL Core'
+  dependencies {
+    // dependent libraries
+    compile "org.springframework.integration:spring-integration-core:$springIntegrationVersion"
+    testCompile "org.springframework.integration:spring-integration-http:$springIntegrationVersion" 
+    testCompile 'javax.servlet:servlet-api:2.5'
+  }
+}
+
+project('spring-integration-groovy-dsl-jms') {
+  description = 'Spring Integration Groovy DSL JMS'
+  dependencies {
+    compile project(":spring-integration-groovy-dsl-core")
+    compile "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
+    compile "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1" 
+  
+    // libraries only needed for test
+    testCompile ("org.apache.activemq:activemq-core:5.3.0") {
+         exclude group: 'org.springframework', module: 'spring-context'
+    }
+  }
+}
+
+project('spring-integration-groovy-dsl-http') {
+  description = 'Spring Integration Groovy DSL Http'
+  dependencies {
+    compile project(":spring-integration-groovy-dsl-core")
+    compile "org.springframework.integration:spring-integration-http:$springIntegrationVersion"
+  
+    // libraries only needed for test
+    testCompile ("org.apache.activemq:activemq-core:5.3.0") {
+         exclude group: 'org.springframework', module: 'spring-context'
+    }
+  }
 }
 
 task wrapper(type: Wrapper) {
@@ -48,5 +93,68 @@ task wrapper(type: Wrapper) {
     gradleVersion = '1.0-milestone-8'
     distributionUrl = 'http://repo.gradle.org/gradle/distributions-snapshots/gradle-1.0-milestone-8-20120112000036+0100-bin.zip'
     jarFile = '.wrapper/gradle-wrapper.jar'
+}
+
+def customizePom(def pom, def gradleProject) {
+    pom.whenConfigured { generatedPom ->
+        // respect 'optional' and 'provided' dependencies
+        def deps = gradleProject.configurations.runtime.allDependencies
+        def optionalDeps = deps.findAll { dep ->
+            dep.asDynamicObject.hasProperty('optional') && dep.optional
+        }
+        def providedDeps = deps.findAll { dep ->
+            dep.asDynamicObject.hasProperty('provided') && dep.provided
+        }
+        generatedPom.dependencies.each { mavenDep ->
+            mavenDep.optional = optionalDeps.any { optionalDep ->
+                optionalDep.group == mavenDep.groupId &&
+                        optionalDep.name == mavenDep.artifactId &&
+                        optionalDep.version == mavenDep.version
+            }
+            boolean isProvided = providedDeps.any { providedDep ->
+                providedDep.group == mavenDep.groupId &&
+                        providedDep.name == mavenDep.artifactId &&
+                        providedDep.version == mavenDep.version
+            }
+            if (isProvided) {
+                mavenDep.scope = 'provided'
+            }
+        }
+
+        // eliminate test-scoped dependencies (no need in maven central poms)
+        generatedPom.dependencies.removeAll { dep ->
+            dep.scope == 'test'
+        }
+
+        // add all items necessary for maven central publication
+        generatedPom.project {
+            name = gradleProject.description
+            description = gradleProject.description
+            url = 'https://github.com/dturanski/spring-integration-groovy-dsl'
+            organization {
+                name = 'SpringSource'
+                url = 'http://springsource.org'
+            }
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                url = 'https://github.com/dturanski/spring-integration-groovy-dsl'
+                connection = 'scm:git:git://github.com/dturanski/spring-integration-groovy-dsl'
+                developerConnection = 'scm:git:git://github.com/dturanski/spring-integration-groovy-dsl'
+            }
+            developers {
+                developer {
+                    id = 'dturanski'
+                    name = 'David Turanski'
+                    email = 'dturanski@vmware.com'
+                }
+            }
+        }
+    }
 }
 

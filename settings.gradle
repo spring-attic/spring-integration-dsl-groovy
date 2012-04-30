@@ -1,0 +1,5 @@
+rootProject.name = 'spring-integration-groovy-dsl'
+include 'spring-integration-groovy-dsl-core'
+include 'spring-integration-groovy-dsl-http'
+include 'spring-integration-groovy-dsl-jms'
+ 
