@@ -53,4 +53,9 @@ public class IntegrationBuilderTests {
     	MessageFlow flow1 = ic.getMessageFlowByName("flow1");
     	flow1.send("hello");
     }
+    
+    @Test(expected=ClassNotFoundException.class) 
+    public void testWithInitializers() {
+    	 new IntegrationBuilder(new String[]{"foo"});
+    }
 }

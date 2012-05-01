@@ -36,4 +36,14 @@ class SimpleEndpointsTests {
 		def filter = factory.newInstance(null,null, null,[:])
 		assert filter.class == Filter
 	}
+	
+	@Test
+	void testComponentProperties() {
+		def transformer = new Transformer();
+		transformer.foo = 'foo'
+		if (transformer.foo == 'bar') {
+			
+		}
+		assert transformer.foo == 'foo'
+	}
 }

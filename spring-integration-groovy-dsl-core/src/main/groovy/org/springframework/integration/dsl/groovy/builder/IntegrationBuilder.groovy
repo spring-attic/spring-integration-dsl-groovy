@@ -58,12 +58,28 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods
  */
 class IntegrationBuilder extends FactoryBuilderSupport {
 	private static Log logger = LogFactory.getLog(IntegrationBuilder.class)
-	private static stubFactory = new StubFactory()
-	private IntegrationContext integrationContext;
+	private final IntegrationContext integrationContext;
+	
 	
 	IntegrationBuilder() {
 		super(true)
 		this.integrationContext = new IntegrationContext()
+	}
+	
+	IntegrationBuilder(ArrayList<String> modules) {
+		this(modules as String[])
+	}
+	
+	IntegrationBuilder(String... modules) {
+		this()
+		def moduleSupportInstances = 
+		getIntegrationBuilderModuleSupportInstances(modules)
+		
+		this.integrationContext.moduleSupportInstances = moduleSupportInstances
+		
+		moduleSupportInstances.each { AbstractIntegrationBuilderModuleSupport moduleSupport ->
+			moduleSupport.registerBuilderFactories(this)
+		}
 	}
 	
 	
@@ -96,7 +112,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 
 	@Override
 	def registerObjectFactories() {
-		registerFactory "config", new ConfigFactory()
+		
 		registerFactory "messageFlow", new MessageFlowFactory()
 		registerFactory "doWithSpringIntegration", new IntegrationContextFactory()
 		/*
@@ -129,9 +145,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		
 		registerFactory "interceptor", new ChannelInterceptorFactory()
 		registerFactory "onPreSend", new ChannelInterceptorFactory()
-		registerFactory "jmsListen", stubFactory
-		registerFactory "httpPost", stubFactory
-		registerFactory "httpGet", stubFactory
+	
 		registerFactory "poll", new PollerFactory()
 		registerFactory "exec", new FlowExecutionFactory()
 		
@@ -157,7 +171,17 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		this.build(script)
 	}	
 	
-	
+	private getIntegrationBuilderModuleSupportInstances(String[] modules) {
+		def instances = []
+		modules?.each { module ->
+			def className = "org.springframework.integration.dsl.groovy.${module}.builder.IntegrationBuilderModuleSupport"
+			if (logger.isDebugEnabled()) {
+				logger.debug("checking classpath for $className")
+			} 
+			instances << Class.forName(className).newInstance()
+		}
+		instances
+	}
 	
 }
 
@@ -179,46 +203,5 @@ abstract class IntegrationComponentFactory extends AbstractFactory {
 		}
 		
 		attributes
-	}
-}
-
-class StubFactory extends AbstractFactory {
-	private static Log logger = LogFactory.getLog(StubFactory.class)
-	/* (non-Javadoc)
-	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
-	 */
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
-
-		if (logger.isDebugEnabled()){
-			logger.debug("newInstance name: $name value:$value attr:$attributes")
-		}
-		logger.warn("this factory is not implemented.")
-		// TODO Auto-generated method stub
-		return new Expando();
-	}
-}
-
-class ConfigFactory extends IntegrationComponentFactory {
-	 
-	/* (non-Javadoc)
-	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
-	 */
-	def newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("creating new Config()")
-		}
-		new IntegrationConfig(attributes)
-	}
-
-	boolean isLeaf() {
-		false
-	}
-
-	@Override
-	void onNodeCompleted( FactoryBuilderSupport builder, Object parent, Object config ) {
-		logger.debug("adding $config")
-		builder.integrationContext.config = config
 	}
 }

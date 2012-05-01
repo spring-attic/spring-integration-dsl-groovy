@@ -16,14 +16,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
-import org.springframework.integration.dsl.groovy.MessageFlow
-import org.springframework.integration.dsl.groovy.OtherwiseCondition
 import org.springframework.integration.dsl.groovy.Poller
-import org.springframework.integration.dsl.groovy.Router
-import org.springframework.integration.dsl.groovy.RouterComposition
-import org.springframework.integration.dsl.groovy.RouterCondition
 import org.springframework.integration.dsl.groovy.SimpleEndpoint
-import org.springframework.integration.dsl.groovy.WhenCondition
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
 /**

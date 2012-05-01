@@ -35,7 +35,7 @@ import static org.junit.Assert.*
 
 public class IntegrationMarkupSupportTests {
     
-   def integrationMarkupSupport = new IntegrationMarkupSupport()
+   def integrationMarkupSupport = new IntegrationDomSupport()
    def builder = new IntegrationBuilder()
    
    @Test
@@ -48,7 +48,7 @@ public class IntegrationMarkupSupportTests {
 		handle('sa2',inputChannel:'toHandler', evaluate:{payload})
 	   }
 	   
-	   integrationMarkupSupport.xmlBuilder(flow).resolveMessageFlowChannels(flow)
+	   integrationMarkupSupport.domBuilder(flow).resolveMessageFlowChannels(flow)
 	   
 	   def component
 	   

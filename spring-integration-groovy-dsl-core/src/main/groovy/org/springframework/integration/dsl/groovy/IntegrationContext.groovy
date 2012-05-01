@@ -24,7 +24,8 @@ import org.springframework.integration.channel.PublishSubscribeChannel
 import org.springframework.integration.channel.QueueChannel
 import org.springframework.integration.core.MessageHandler
 import org.springframework.integration.core.SubscribableChannel
-import org.springframework.integration.dsl.groovy.builder.dom.IntegrationMarkupSupport
+import org.springframework.integration.dsl.groovy.builder.AbstractIntegrationBuilderModuleSupport
+import org.springframework.integration.dsl.groovy.builder.dom.IntegrationDomSupport
 import org.springframework.integration.message.GenericMessage
 import org.springframework.integration.support.MessageBuilder
 import org.springframework.integration.Message
@@ -43,6 +44,7 @@ class IntegrationContext extends BaseIntegrationComposition {
 
 	private logger = LogFactory.getLog(IntegrationContext)
 	private applicationContext
+	private List<AbstractIntegrationBuilderModuleSupport> moduleSupportInstances
 
 	def send(String inputChannelName, Object msgOrPayload) {
 		def ac = createApplicationContext()
@@ -89,7 +91,7 @@ class IntegrationContext extends BaseIntegrationComposition {
 				applicationContext.parentContext = parentContext
 			}
 			
-			def integrationMarkupSupport = new IntegrationMarkupSupport()
+			def integrationMarkupSupport = new IntegrationDomSupport(this.moduleSupportInstances)
 
 		    def xml = integrationMarkupSupport.translateToXML(this)
 
