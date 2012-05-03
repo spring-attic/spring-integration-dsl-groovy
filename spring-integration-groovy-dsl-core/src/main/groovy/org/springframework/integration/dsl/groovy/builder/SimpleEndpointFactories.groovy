@@ -31,19 +31,13 @@ import org.springframework.integration.dsl.groovy.*
 abstract class EndpointFactory extends IntegrationComponentFactory {
 	
 	@Override
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
-		logger.debug("newInstance name: $name value:$value attr:$attributes")
-			
-	   attributes = defaultAttributes(name, value, attributes)
-		if (attributes.evaluate){
+	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
+	{			
+	 	if (attributes.evaluate){
 			attributes.action = attributes.evaluate
 			attributes.remove('evaluate')
 		}
-		
-		logger.debug("newInstance name: $name value:$value attr:$attributes")
-
-		return endpointInstance(attributes);
+		endpointInstance(attributes)
 	}
 
 	@Override

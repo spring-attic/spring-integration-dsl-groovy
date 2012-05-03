@@ -25,9 +25,8 @@ import org.springframework.integration.dsl.groovy.XMLNamespace
  */
 class XMLNamespaceFactory extends IntegrationComponentFactory {
 
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-			throws InstantiationException, IllegalAccessException {			
-		assert value, "A value is required for $name. It is a comma delimited list of namespace prefixes"
+	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){			
+		assert value, "A value is required for '$name'. It contains a comma delimited list of namespace prefixes"
 		return new XMLNamespace(name:value);
 	}
 			

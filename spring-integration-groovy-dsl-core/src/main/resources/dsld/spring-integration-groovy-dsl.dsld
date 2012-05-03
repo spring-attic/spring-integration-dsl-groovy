@@ -1,25 +1,36 @@
  
-currentType("org.springframework.integration.dsl.groovy.builder.MessageFlowBuilder").accept {
-	provider = "EIP MessageFlowBuilder DSL"
+contribute(currentType("org.springframework.integration.dsl.groovy.builder.IntegrationBuilder")) {
+	provider = "Spring Integration DSL"
 	
-	method name: "messageFlow", type: "org.springframework.integration.dsl.groovy.builder.IntegrationContextFactory", useNamedArgs: true, params: [action: Closure], 
+	method name: "doWithSpringIntegration", type: "org.springframework.integration.dsl.groovy.IntegrationContext", useNamedArgs: false,
+	doc: """
+	Creates a new Spring Integration Context
+	"""
+	
+	
+	method name: "messageFlow", type: "org.springframework.integration.dsl.groovy.MessageFlow", useNamedArgs: true, params: [inputChannel: String, outputChannel: String], 
 	doc: """
 	Creates a new Spring Integration Message Flow 
 	"""
-	method name: "filter", type: "org.springframework.integration.dsl.groovy.Filter", useNamedArgs: true, params: [name:String,action: Closure],
+	method name: "filter", type: "org.springframework.integration.dsl.groovy.Filter", useNamedArgs: true, params: [name:String,evaluate: Closure],
 	doc: """
-	Generates a Filter
+	Creates a Filter
 	"""
-	method name: "route", type: "org.springframework.integration.dsl.groovy.Router", useNamedArgs: true, params: [name:String,action: Closure],
+	method name: "route", type: "org.springframework.integration.dsl.groovy.RouterComposition", useNamedArgs: true, params: [name:String,evaluate: Closure],
 	doc: """
-	Generates a Router
+	Creates a Router
+    """
+	
+	method name: "bridge", type: "org.springframework.integration.dsl.groovy.Bridge", useNamedArgs: true, params: [inputChannel:String,outputChannel:String],
+	doc: """
+	Creates a Bridge
 	"""
-	method name: "handle", type: "org.springframework.integration.dsl.groovy.ServiceActivator", useNamedArgs: true, params: [name:String,action: Closure],
+	method name: "handle", type: "org.springframework.integration.dsl.groovy.ServiceActivator", useNamedArgs: true, params: [name:String,evaluate: Closure],
 	doc: """
-	Generates a ServiceActivator
+	Creates a ServiceActivator
 	"""
-	method name: "transform", type: "org.springframework.integration.dsl.groovy.Transformer", useNamedArgs: true, params: [name:String,action: Closure],
+	method name: "transform", type: "org.springframework.integration.dsl.groovy.Transformer", useNamedArgs: true, params: [name:String,evaluate: Closure],
 	doc: """
-	Generates a Transformer
+	Creates a Transformer
 	"""
 }

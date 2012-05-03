@@ -23,8 +23,7 @@ import org.springframework.integration.message.GenericMessage
  * @author David Turanski
  *
  */
-class ClosureInvokerTests extends GroovyObjectSupport {
-	 
+class ClosureInvokerTests {
 	
 	@Test
 	void testSimpleMessageInvocation() {

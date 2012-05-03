@@ -22,30 +22,23 @@ import groovy.util.FactoryBuilderSupport
  * @author David Turanski
  *
  */
-public class ChannelMapFactory extends IntegrationComponentFactory {
-
-	/* (non-Javadoc)
-	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
-	 */
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
-		attributes
-	}
+public class ChannelMapFactory extends AbstractFactory {
+	
+   public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
+		   throws InstantiationException, IllegalAccessException {
+	   attributes
+   }
 
 	@Override
 	boolean isLeaf() {
 		true
 	}
 	
-	
 	public void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("set parent parent:${parent.class} child:${child.class}")
-		}
 		assert parent instanceof RouterComposition, "${parent.class} must be a child of " + RouterComposition
-		
-		parent.channelMap = child
-		 
+		parent.channelMap = child 
 	}
+
+
 	
 }

@@ -24,11 +24,10 @@ import org.springframework.integration.dsl.groovy.MessageFlow
  */
 class FlowExecutionFactory extends IntegrationComponentFactory {
 
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
+	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
 		return new FlowExecution(value);
 	}
-
+	
 	@Override
 	void setParent( FactoryBuilderSupport builder, Object parent, Object flowExecution ) {
 

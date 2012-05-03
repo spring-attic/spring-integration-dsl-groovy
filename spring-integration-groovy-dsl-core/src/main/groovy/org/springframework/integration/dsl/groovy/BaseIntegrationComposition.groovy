@@ -13,18 +13,20 @@
 package org.springframework.integration.dsl.groovy
 
 import org.apache.commons.logging.LogFactory
-import org.springframework.integration.util.ClassUtils;
 
 /**
  * @author David Turanski
  *
  */
-
+@Mixin(AttributeValidator)
+@Mixin(ComponentNamer)
 abstract class IntegrationComponent   {
 	protected logger = LogFactory.getLog(this.class)
 	protected String name
 	protected componentProperties = [:]
 	protected String builderName
+	
+	def component
 	
 	def propertyMissing(name) {
 		componentProperties[name]
@@ -32,10 +34,12 @@ abstract class IntegrationComponent   {
 	
 	def propertyMissing(String name, Object val) {	
 		componentProperties[name]=val
-	}
+	}	
 	
+	IntegrationComponent() {
+		component = this
+	}
 }
-
 
 class BaseIntegrationComposition extends IntegrationComponent {
 	protected BaseIntegrationComposition parentComposition;
@@ -65,7 +69,7 @@ class WhenCondition extends RouterCondition {
 class OtherwiseCondition extends RouterCondition {
 	def name
 	OtherwiseCondition(){
-		name = '$otherwise' + '_' + UUID.randomUUID().toString().substring(0, 8) 
+		name = name = defaultName("$otherwise")
 	}
 }
 

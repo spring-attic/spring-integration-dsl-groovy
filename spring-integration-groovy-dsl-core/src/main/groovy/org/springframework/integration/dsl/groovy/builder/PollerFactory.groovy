@@ -26,17 +26,8 @@ import org.apache.commons.logging.Log
  */
 class PollerFactory extends IntegrationComponentFactory {
  
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
- 
-       attributes = defaultAttributes(name, value, attributes)
-		
-		def poller = new Poller(attributes)
-			
-		if (logger.isDebugEnabled()) {
-			logger.debug("created poller attributes: $attributes")
-		}
-		poller
+	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
+		new Poller(attributes)
 	}
 
 	@Override

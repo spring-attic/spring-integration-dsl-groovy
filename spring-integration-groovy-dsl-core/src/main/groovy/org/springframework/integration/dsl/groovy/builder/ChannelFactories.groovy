@@ -19,12 +19,15 @@ import groovy.util.FactoryBuilderSupport;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.integration.dsl.groovy.AbstractChannel
 import org.springframework.integration.dsl.groovy.Channel
+import org.springframework.integration.dsl.groovy.ChannelInterceptor
 import org.springframework.integration.dsl.groovy.IntegrationConfig
 import org.springframework.integration.dsl.groovy.IntegrationContext
 import org.springframework.integration.dsl.groovy.MessageFlow
 import org.springframework.integration.dsl.groovy.PubSubChannel
 import org.springframework.integration.dsl.groovy.QueueChannel
+import org.springframework.integration.dsl.groovy.Wiretap
 
  
 /**
@@ -32,19 +35,12 @@ import org.springframework.integration.dsl.groovy.QueueChannel
  * @author David Turanski
  */
 class ChannelFactory  extends IntegrationComponentFactory {
-	/* (non-Javadoc)
-	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
-	 */
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
-		if (logger.isDebugEnabled()){
-			logger.debug("newInstance name: $name value:$value attr:$attributes")
-		}
-		
-	    attributes = defaultAttributes(name,value,attributes) 
-		
+	
+	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
+	{		
 		switch(name){
 		  case 'channel': 
+		    println "attr:$attributes"
 			return new Channel(attributes)
 		  case 'pubSubChannel':
 		  	return new PubSubChannel(attributes)
@@ -64,19 +60,30 @@ class ChannelFactory  extends IntegrationComponentFactory {
 	}
 }
 
-class ChannelInterceptorFactory extends AbstractFactory {
-	private static Log logger = LogFactory.getLog(ChannelInterceptorFactory.class)
-	/* (non-Javadoc)
-	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
-	 */
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
-
-		if (logger.isDebugEnabled()){
-			logger.debug("newInstance name: $name value:$value attr:$attributes")
+class ChannelInterceptorFactory extends IntegrationComponentFactory {
+	
+	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
+	{
+		if (name == "interceptor") {
+			return new ChannelInterceptor(attributes)
+		} 
+		else if  (name == "wiretap") {
+			return new Wiretap(attributes)
+		} 
+	}
+	
+	public void setParent(FactoryBuilderSupport builder, Object parent, Object channelInterceptor) {
+		if (parent instanceof MessageFlow) {
+			parent.integrationContext.add(channelInterceptor)
+		} else if (parent instanceof IntegrationContext) {
+			parent.add(channelInterceptor)
+		}  else if (parent instanceof AbstractChannel) {
+			channelInterceptor.global = false
+ 	        assert !channelInterceptor.componentProperties.containsKey('pattern'), "'pattern is only valid for global channel interceptors"
+ 		    parent.addChannelInterceptor(channelInterceptor)
+		} else {
+			throw new IllegalStateException("${channelInterceptor.builderName} cannot be a child of ${parent.builderName}")
 		}
-		// TODO Auto-generated method stub
-		return name;
 	}
 }
 

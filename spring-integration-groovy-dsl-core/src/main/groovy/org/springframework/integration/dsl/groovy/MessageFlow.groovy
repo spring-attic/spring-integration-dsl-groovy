@@ -23,7 +23,7 @@ class MessageFlow extends BaseIntegrationComposition {
 	IntegrationContext integrationContext
 	
 	MessageFlow(){
-		name = "\$mfl_" +  UUID.randomUUID().toString().substring(0, 8)
+		name = defaultName('$mfl')
 	}
 	//For Java compatibility
 	String getOutputChannel() {

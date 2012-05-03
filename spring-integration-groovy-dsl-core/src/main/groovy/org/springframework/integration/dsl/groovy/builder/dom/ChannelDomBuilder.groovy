@@ -14,16 +14,11 @@ package org.springframework.integration.dsl.groovy.builder.dom
 
 import org.springframework.context.ApplicationContext
 import org.springframework.integration.dsl.groovy.Channel
-import org.springframework.integration.dsl.groovy.FlowExecution
-import org.springframework.integration.dsl.groovy.MessageFlow
-import org.springframework.integration.dsl.groovy.MessageProducingEndpoint
-import org.springframework.integration.dsl.groovy.OtherwiseCondition
 import org.springframework.integration.dsl.groovy.PubSubChannel
 import org.springframework.integration.dsl.groovy.QueueChannel
-import org.springframework.integration.dsl.groovy.RouterComposition
-import org.springframework.integration.dsl.groovy.RouterCondition
-import org.springframework.integration.dsl.groovy.SimpleEndpoint
-import org.springframework.integration.dsl.groovy.WhenCondition
+import org.springframework.integration.dsl.groovy.ChannelInterceptor
+import org.springframework.integration.dsl.groovy.Wiretap
+ 
 
 
 /**
@@ -44,16 +39,36 @@ class ChannelDomBuilder extends IntegrationComponentDomBuilder {
    @Override 
    public void build(builder, ApplicationContext applicationContext, Object channel, Closure closure) {
 		if (channel instanceof Channel) {
-			builder."$siPrefix:channel"([id:channel.name] << channel.componentProperties)
+			builder."$siPrefix:channel"([id:channel.name] << channel.componentProperties) {
+				addChannelInterceptors(builder, applicationContext, channel, closure)
+			}
 		} else if (channel instanceof PubSubChannel) {
-			builder."$siPrefix:publish-subscribe-channel"([id:channel.name] << channel.componentProperties)
+			builder."$siPrefix:publish-subscribe-channel"([id:channel.name] << channel.componentProperties){
+				addChannelInterceptors(builder, applicationContext, channel, closure)
+			}
 		} else if (channel instanceof QueueChannel) {
 			builder."$siPrefix:channel"(id:channel.name) {	 
 				"$siPrefix:queue"(channel.componentProperties)
+				addChannelInterceptors(builder, applicationContext, channel, closure)
 			}
 		}
 		declaredChannels << channel.name
 	}
+   
+   private addChannelInterceptors(builder, ApplicationContext applicationContext, Object channel, Closure closure){
+	   if (channel.channelInterceptors){
+		   def ciBuilder = integrationDomSupport.domBuilder(ChannelInterceptor.class.name)
+		   builder."$siPrefix:interceptors"{
+			   channel.channelInterceptors.each {
+				   if (it instanceof Wiretap){
+					   "$siPrefix:wire-tap"(channel:it.channel)
+				   } else {
+				   		ciBuilder.build(builder,applicationContext, it, closure)
+				   }
+			   }
+		   }
+	   }
+   }
    
    /**
     * Declares a direct channel if not defined already

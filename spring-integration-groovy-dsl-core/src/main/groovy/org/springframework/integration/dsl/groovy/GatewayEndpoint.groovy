@@ -17,13 +17,14 @@ package org.springframework.integration.dsl.groovy
  *
  */
 class GatewayEndpoint extends IntegrationComponent {
+	static mutuallyExclusiveAttributes=[['requestChannel','request-channel'],['replyChannel','reply-channel']]
 	String requestChannel
 	String replyChannel
 	Boolean linkToNext = true
 	String name
 	
 	GatewayEndpoint(){
-		name = defaultNamePrefix() + "_" + UUID.randomUUID().toString().substring(0, 8)
+		name = name = defaultName(defaultNamePrefix())
 	}
 	
 	protected String defaultNamePrefix(){

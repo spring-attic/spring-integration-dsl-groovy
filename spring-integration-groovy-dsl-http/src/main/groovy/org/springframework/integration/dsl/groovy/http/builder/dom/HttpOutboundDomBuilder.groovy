@@ -12,13 +12,11 @@
  */
 package org.springframework.integration.dsl.groovy.http.builder.dom
 
-import groovy.lang.Closure;
-
 import org.springframework.beans.factory.config.BeanDefinitionHolder
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContext
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationComponentDomBuilder
 import org.springframework.integration.dsl.groovy.ClosureInvokingMessageProcessor
 
@@ -63,7 +61,7 @@ class HttpOutboundDomBuilder extends IntegrationComponentDomBuilder {
 
 		builder.'int-http:outbound-gateway'(component.componentProperties) {
 			if (urlExpression){
-				def beanName = "${component.name}closureInvokingHandler"
+				def beanName = "${component.name}_closureInvokingHandler"
 				BeanDefinitionBuilder  handlerBuilder =
 						BeanDefinitionBuilder.genericBeanDefinition(ClosureInvokingMessageProcessor)
 				handlerBuilder.addConstructorArgValue(urlExpression)

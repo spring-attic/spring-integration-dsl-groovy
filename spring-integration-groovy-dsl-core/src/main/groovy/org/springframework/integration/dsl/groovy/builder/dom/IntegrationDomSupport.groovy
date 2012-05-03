@@ -54,6 +54,8 @@ class IntegrationDomSupport {
 		domBuilders["org.springframework.integration.dsl.groovy.MessageFlow"]=new MessageFlowDomBuilder(this)
 		domBuilders["org.springframework.integration.dsl.groovy.RouterComposition"]=new RouterDomBuilder(this)
 		domBuilders["org.springframework.integration.dsl.groovy.Poller"]=new GenericDomBuilder(this,'poller')
+		domBuilders["org.springframework.integration.dsl.groovy.ChannelInterceptor"]=new ChannelInterceptorDomBuilder(this)
+		domBuilders["org.springframework.integration.dsl.groovy.Wiretap"]=new GenericDomBuilder(this,'wire-tap')
 	}
 
 	def domBuilder(Object component) {

@@ -17,7 +17,13 @@ package org.springframework.integration.dsl.groovy
  *
  */
 abstract class AbstractChannel extends IntegrationComponent {
-
+	Class dataType
+	protected List<ChannelInterceptor> channelInterceptors 
+	
+	void addChannelInterceptor(channelInterceptor){
+		channelInterceptors = channelInterceptors?:[]
+		channelInterceptors << channelInterceptor
+	}
 }
 
 class Channel extends AbstractChannel {

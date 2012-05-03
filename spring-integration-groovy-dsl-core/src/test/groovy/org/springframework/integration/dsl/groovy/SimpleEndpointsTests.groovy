@@ -33,7 +33,7 @@ class SimpleEndpointsTests {
 	void testEndpointFactory(){
 		def factory = new FilterFactory()
 		
-		def filter = factory.newInstance(null,null, null,[:])
+		def filter = factory.newInstance(null,'filter', null,[action:{}])
 		assert filter.class == Filter
 	}
 	

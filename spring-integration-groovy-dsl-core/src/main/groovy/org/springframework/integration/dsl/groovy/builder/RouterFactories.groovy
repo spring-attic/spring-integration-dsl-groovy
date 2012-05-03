@@ -30,18 +30,8 @@ import org.apache.commons.logging.Log
  */
 class RouterCompositionFactory extends IntegrationComponentFactory {
 	 
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
- 
-       attributes = defaultAttributes(name, value, attributes)
-		
-		def routerComposition = new RouterComposition(attributes)
-			
-		if (logger.isDebugEnabled()) {
-			logger.debug("created router composition for name: $name value: $value attributes: $attributes")
-		}
-		
-		routerComposition
+	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){		
+		new RouterComposition(attributes)
 	}
 
 	@Override
@@ -66,50 +56,36 @@ class RouterCompositionFactory extends IntegrationComponentFactory {
 		else {
 			child.inputChannel = child.inputChannel ?: "${child.name}.inputChannel"
 		}
-		
-		
 		assert parent instanceof BaseIntegrationComposition
 		parent.add(child)
-		
 	}
 }
 
 
 class RouterConditionFactory extends IntegrationComponentFactory  {
-	 
+	
+   public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
+	   validate(name,value,attributes)
+	   def routerCondition
+	   if (name == "when"){
+		   routerCondition =  new WhenCondition(attributes);
+		   routerCondition.value=value
+	   } else if (name=="otherwise") {
+
+		   if (attributes.containsKey('channel')){
+			   routerCondition =  new OtherwiseCondition(attributes)
+		   } else {
+			   routerCondition =  new OtherwiseCondition(channel:value)
+		   }
+	   }
+	   routerCondition
+   }
 	public void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("set parent parent:${parent.class} child:${child.class}")
 		}
-		assert parent.class == RouterComposition.class, "${parent.class} must be a child of " + RouterComposition.class
-		
-		parent.add(child)
-		 
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
-	 */
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("creating router condition for $name $value $attributes")
-		}
-		validate(name,value,attributes)
-		def routerCondition
-		if (name == "when"){
-			routerCondition =  new WhenCondition(attributes);
-			routerCondition.value=value
-		} else if (name=="otherwise") {
-
-			if (attributes.containsKey('channel')){
-				routerCondition =  new OtherwiseCondition(attributes)
-			} else {
-				routerCondition =  new OtherwiseCondition(channel:value)
-			}
-		}
-		routerCondition
+		assert parent instanceof RouterComposition, "${parent.class} must be a child of " + RouterComposition	
+		parent.add(child)		
 	}
 
 	private validate(name,value,attributes) {

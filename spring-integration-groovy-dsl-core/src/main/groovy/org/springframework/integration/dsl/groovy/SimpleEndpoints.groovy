@@ -17,11 +17,12 @@ package org.springframework.integration.dsl.groovy;
  *
  */
 class SimpleEndpoint extends IntegrationComponent {
+	static mutuallyExclusiveAttributes=[['inputChannel','input-channel'],['ref','action','evaluate']]
 	String inputChannel
 	def poller
 	
 	SimpleEndpoint(){
-		name = defaultNamePrefix() + "_" + UUID.randomUUID().toString().substring(0, 8)
+		name = defaultName(defaultNamePrefix())
 	}
 	
 
@@ -36,12 +37,15 @@ class SimpleEndpoint extends IntegrationComponent {
 }
 
 class MessageProducingEndpoint extends SimpleEndpoint {
-	boolean linkToNext = true
+	static mutuallyExclusiveAttributes= SimpleEndpoint.mutuallyExclusiveAttributes << [['outputChannel','output-channel']]
+	
 	static requiresReply = true
+	boolean linkToNext = true
 	String outputChannel
 }
 
 class ServiceActivator extends MessageProducingEndpoint {
+	static attributesRequiresOneOf = ['ref','action','evaluate']
 	Closure action
 	static requiresReply = false
 	protected String defaultNamePrefix(){
@@ -57,6 +61,7 @@ class MessagingBridge extends MessageProducingEndpoint {
 
 
 class Transformer extends MessageProducingEndpoint {
+	static attributesRequiresOneOf = ['ref','action','evaluate']
 	Closure action
 	protected String defaultNamePrefix(){
 		'$xfmr'
@@ -64,13 +69,14 @@ class Transformer extends MessageProducingEndpoint {
 }
 
 class Filter extends MessageProducingEndpoint {
+	static attributesRequiresOneOf = ['ref','action','evaluate']
 	Closure action
 	String discardChannel
 	protected String defaultNamePrefix(){
 		'$flt'
 	}
 }
-//TODO: Is this a simple endpoint
+
 class Router extends SimpleEndpoint {
 	Closure action
 	String defaultOutputChannel

@@ -25,8 +25,7 @@ import org.apache.commons.logging.LogFactory
  *
  */
 class IntegrationContextFactory extends IntegrationComponentFactory { 
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-			throws InstantiationException, IllegalAccessException {
+	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
 		return builder.integrationContext;
 	}
 }

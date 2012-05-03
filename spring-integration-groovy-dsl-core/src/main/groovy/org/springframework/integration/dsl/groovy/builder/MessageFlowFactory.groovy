@@ -24,29 +24,12 @@ import org.springframework.integration.dsl.groovy.MessageFlow
  */
 class MessageFlowFactory extends IntegrationComponentFactory {
 	
-	def newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
-		
-		attributes = defaultAttributes(name, value, attributes)
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("creating new MessageFlow " + (value? value : ""))
-		}
-
-		attributes = attributes ?: [:]
-
-		if (!attributes.containsKey('name') && value){
-			attributes.name = value
-		}
-
+	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
 		def messageFlow = new MessageFlow(attributes)
-
 		if (!messageFlow.inputChannel) {
 			messageFlow.inputChannel = "${messageFlow.name}.inputChannel"
 		}
-		
 		messageFlow.integrationContext = builder.integrationContext
-
 		messageFlow
 	}
 

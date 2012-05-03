@@ -26,11 +26,7 @@ import org.apache.commons.logging.Log
  */
 class HttpOutboundFactory extends IntegrationComponentFactory {
  
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
-	throws InstantiationException, IllegalAccessException {
-       attributes = defaultAttributes(name, value, attributes)	
-	   assert attributes.containsKey('url'), "attribute 'url is required for $name"
-
+	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
 	   new HttpOutbound(attributes)
 	}
 

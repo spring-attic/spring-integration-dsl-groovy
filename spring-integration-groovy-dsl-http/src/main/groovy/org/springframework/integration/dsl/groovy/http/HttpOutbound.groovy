@@ -19,12 +19,13 @@ import org.springframework.integration.dsl.groovy.GatewayEndpoint
  *
  */
 class HttpOutbound extends GatewayEndpoint {
+	static requiredAttributes = ['url']
 	Class responseType
 	HttpOutbound() {
 		super()
 	}
 	
 	protected String defaultNamePrefix(){
-		"httpOBGW"
+		'$httpOBGW'
 	}
 }
