@@ -28,11 +28,7 @@ class IntegrationComponentTests {
 	    assert validationContext.errorMessage == "'test' is missing the following required attributes:baz, bag"
 		
 		 validationContext = test.validateAttributes(['bar':'valbar','barx':'valbarx'])
-		 assert validationContext.errorMessage == \
-"'test' is missing the following required attributes:baz, bag\n'test' contains the following invalid attributes:barx"
-		 
-		validationContext = test.validateAttributes(['bar':'valbar','baz':'valbaz','bag':'valbag','barx':'valbarx'])
-		assert validationContext.errorMessage == "'test' contains the following invalid attributes:barx" 
+		 assert validationContext.errorMessage == "'test' is missing the following required attributes:baz, bag"
 	}
 	
 	@Test 
@@ -42,7 +38,7 @@ class IntegrationComponentTests {
 		assert !validationContext.hasErrors ,'should be valid'
 		
 		validationContext = test.validateAttributes(['bar':'valbar','baz':'valbaz','bazx':'valbazx'])
-		assert validationContext.errorMessage == "'test2' contains the following invalid attributes:bazx"
+		assert !validationContext.hasErrors ,'should be valid'
 	}
 	
 	@Test
@@ -69,7 +65,6 @@ class IntegrationComponentTests {
 
 class TestComponent extends IntegrationComponent {
 	static requiredAttributes = ['bar','baz','bag']
-	static invalidAttributes = ['barx','bazx','bagx']
 	TestComponent() {	 
 		builderName = 'test'
 	}
@@ -77,7 +72,6 @@ class TestComponent extends IntegrationComponent {
 
 class TestComponent2 extends IntegrationComponent {
 	static attributesRequiresAnyOf = ['bar','baz','bag']
-	static invalidAttributes = ['barx','bazx','bagx']
 	static mutuallyExclusiveAttributes = [['foo1','foo2','foo3'],['foo4','foo5']]
 	TestComponent2() {
 		builderName = 'test2'

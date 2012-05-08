@@ -51,7 +51,7 @@ subprojects { subproject ->
   }
 }
 
-project('spring-integration-groovy-dsl-core') {
+project('spring-integration-dsl-groovy-core') {
   description = 'Spring Integration Groovy DSL Core'
   dependencies {
     // dependent libraries
@@ -61,10 +61,10 @@ project('spring-integration-groovy-dsl-core') {
   }
 }
 
-project('spring-integration-groovy-dsl-jms') {
+project('spring-integration-dsl-groovy-jms') {
   description = 'Spring Integration Groovy DSL JMS'
   dependencies {
-    compile project(":spring-integration-groovy-dsl-core")
+    compile project(":spring-integration-dsl-groovy-core")
     compile "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
     compile "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1" 
   
@@ -75,10 +75,10 @@ project('spring-integration-groovy-dsl-jms') {
   }
 }
 
-project('spring-integration-groovy-dsl-http') {
+project('spring-integration-dsl-groovy-http') {
   description = 'Spring Integration Groovy DSL Http'
   dependencies {
-    compile project(":spring-integration-groovy-dsl-core")
+    compile project(":spring-integration-dsl-groovy-core")
     compile "org.springframework.integration:spring-integration-http:$springIntegrationVersion"
   
     // libraries only needed for test
@@ -130,7 +130,7 @@ def customizePom(def pom, def gradleProject) {
         generatedPom.project {
             name = gradleProject.description
             description = gradleProject.description
-            url = 'https://github.com/dturanski/spring-integration-groovy-dsl'
+            url = 'https://github.com/SpringSource/spring-integration-dsl-groovy'
             organization {
                 name = 'SpringSource'
                 url = 'http://springsource.org'
@@ -144,8 +144,8 @@ def customizePom(def pom, def gradleProject) {
             }
             scm {
                 url = 'https://github.com/dturanski/spring-integration-groovy-dsl'
-                connection = 'scm:git:git://github.com/dturanski/spring-integration-groovy-dsl'
-                developerConnection = 'scm:git:git://github.com/dturanski/spring-integration-groovy-dsl'
+                connection = 'scm:git:git://github.com/SpringSource/spring-integration-groovy-dsl'
+                developerConnection = 'scm:git:git://github.com/SpringSource/spring-integration-dsl-groovy'
             }
             developers {
                 developer {

@@ -64,14 +64,6 @@ class AttributeValidator {
 			{ !attributes || !attributes.containsKey(it) }
 		)
 		
-		errorMsg = validateAgainstSimpleList(
-				errorMsg,
-				attributes,
-				'invalidAttributes', 
-				"'$builderName' contains the following invalid attributes:",
-				{ attributes?.containsKey(it) }
-			)
-
 		if (errorMsg){
 			validationContext.hasErrors = true
 			validationContext.errorMessage = errorMsg
