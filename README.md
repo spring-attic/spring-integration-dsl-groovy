@@ -15,7 +15,7 @@ This project implements a Groovy DSL for Spring Integration. Coming on the heels
 
 ## Implementation
 
-The DSL uses Groovy Builder pattern so the syntax will be familiar to Groovyists. The IntegrationBuilder uses the [FactoryBuilderSupport](http://groovy.codehaus.org/FactoryBuilderSupport) framework to create a Spring Integration domain model which is translated directly to Spring XML to create an XMLApplicationContext via the builder's createApplicationContext() method. The main benefit of delegating to an XMLApplicationContext is that Spring Integration already has implemented many namespace parsers that perform all the necessary validation and bean creation. This code is tightly coupled to XML bean definitions and would otherwise need to be entirely replicated for the DSL. Another advantage is that if logging is set to DEBUG, you can see the generated XML on the console which will give you more insight into how the DSL is interpretting things. Finally it makes it very easy for the IntegrationBuilder to inject XML builder markup, providing maximum flexibility.
+The DSL uses Groovy Builder pattern so the syntax will be familiar to Groovyists. The IntegrationBuilder uses the [FactoryBuilderSupport](http://groovy.codehaus.org/FactoryBuilderSupport) framework to create a Spring Integration domain model which is translated directly to Spring XML to create an XMLApplicationContext. The main benefit of delegating to an XMLApplicationContext is that Spring Integration already has implemented many namespace parsers that perform all the necessary validation and bean creation. This code is tightly coupled to XML bean definitions and would otherwise need to be entirely replicated for the DSL. Another advantage is that if logging is set to DEBUG, you can see the generated XML on the console which will give you more insight into how the DSL is interpretting things. Finally it makes it very easy for the IntegrationBuilder to inject XML builder markup, providing maximum flexibility.
 
 # Examples
 
@@ -219,7 +219,7 @@ The aggregator supports releaseStrategy and correlationStrategy closures. Additi
 			     correlationStrategy:{it % 2 ? 'even' : 'odd' })
 		}
 
-		def ac = builder.integrationContext.createApplicationContext()
+		def ac = builder.applicationContext
 		def queueChannel = ac.getBean('queueChannel')
 		flow.send([1, 2, 3, 4])
 
@@ -246,7 +246,6 @@ Since the IntegrationBuilder builds an XMLApplicationContext, it is necessary to
 		  }
 	}
 		
-	builder.createApplicationContext()
 
 The namespaces() method takes a comma delimited list of standard Spring namespace prefixes. If a prefix starts with 'int-' it will generate the required XML namespace declarations required for any of the referenced components. Otherwise, it will be interpreted as a Core Spring namespace, e.g., 'jms','jmx','aop'. The standard namespace for the core Spring Integration components is 'si' and is automatically included. 
 
