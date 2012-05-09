@@ -33,6 +33,7 @@ public class IntegrationBuilderTests {
     
     @Test 
     public void testInvokeFlowFromJava() throws CompilationFailedException, InstantiationException, IllegalAccessException {
+        builder.setAutoCreateApplicationContext(false);
     	String flowScript1 = "messageFlow(outputChannel:'outputChannel1') {transform(evaluate:{it.toUpperCase()})}";
      
     	MessageFlow flow1 = (MessageFlow)builder.build(new ByteArrayInputStream(flowScript1.getBytes()));

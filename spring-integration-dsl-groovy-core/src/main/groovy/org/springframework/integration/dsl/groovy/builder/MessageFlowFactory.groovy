@@ -23,7 +23,7 @@ import org.springframework.integration.dsl.groovy.MessageFlow
  *
  */
 class MessageFlowFactory extends IntegrationComponentFactory {
-	
+
 	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
 		def messageFlow = new MessageFlow(attributes)
 		if (!messageFlow.inputChannel) {
@@ -40,19 +40,28 @@ class MessageFlowFactory extends IntegrationComponentFactory {
 	@Override
 	void onNodeCompleted( FactoryBuilderSupport builder, Object parent, Object messageFlow ) {
 
-		parent = parent ?: builder.integrationContext
-		parent.add(messageFlow)
-
-		if (parent instanceof MessageFlow){
+		if (!parent){
 			if (logger.isDebugEnabled()) {
-				logger.debug("creating nested message flow ${messageFlow.name} parent: ${parent.name}")
+				logger.debug("adding root message flow ${messageFlow.name} to integration context")
 			}
-		} else if (parent instanceof IntegrationContext) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("adding message flow ${messageFlow.name} to integration context")
+			builder.integrationContext.add(messageFlow)
+			if (builder.autoCreateApplicationContext) {
+				builder.integrationContext.createApplicationContext(builder.parentContext)
 			}
 		} else {
-			throw new IllegalArgumentException("parent must be of type IntegrationContext or MessageFlow")
+
+			if (parent instanceof MessageFlow){
+				if (logger.isDebugEnabled()) {
+					logger.debug("creating nested message flow ${messageFlow.name} parent: ${parent.name}")
+				}
+			} else if (parent instanceof IntegrationContext) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("adding message flow ${messageFlow.name} to integration context")
+				}
+			} else {
+				throw new IllegalArgumentException("parent must be of type IntegrationContext or MessageFlow")
+			}
+			parent.add(messageFlow)
 		}
 	}
 }

@@ -36,7 +36,5 @@ class XMLBeanTests {
 				'si:channel'(id:'requests')
 			}
 		}
-		
-		builder.createApplicationContext()	
 	}
 }

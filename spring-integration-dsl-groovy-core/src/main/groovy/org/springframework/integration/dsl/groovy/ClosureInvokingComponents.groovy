@@ -25,7 +25,6 @@ class ClosureInvokingMessageProcessor  {
 
 
 	public Object processMessage(Message message) {
-
 		Object result = null
 		if (parameterType == Message) {
 			if (logger.isDebugEnabled()) {
@@ -45,12 +44,35 @@ class ClosureInvokingMessageProcessor  {
 			if (logger.isDebugEnabled()) {
 				logger.debug("invoking closure on message payload")
 			}
+			
 			result =  this.closure.doCall(message.payload)
+			 
 		}
 
 		result
 	}
 }
+
+/**
+ * 
+ * @author David Turanski
+ *
+ */
+class ClosureInvokingListProcessor extends ClosureInvokingMessageProcessor {
+	ClosureInvokingListProcessor(Closure closure) {
+		super(closure)
+	}
+    
+	def processList(List list){
+		if (logger.isDebugEnabled()) {
+			logger.debug("invoking closure on list $list")
+		}
+		def result = this.closure.doCall(list)
+		result
+	}	
+}
+
+
 /**
  * 
  * @author David Turanski

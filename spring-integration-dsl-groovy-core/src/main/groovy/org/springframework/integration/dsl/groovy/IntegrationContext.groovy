@@ -83,6 +83,10 @@ class IntegrationContext extends BaseIntegrationComposition {
 		messageFlows.find {it.name = name}
 	}
 	
+	ApplicationContext getApplicationContext() {
+		this.applicationContext
+	}
+	
 
 	ApplicationContext createApplicationContext(ApplicationContext parentContext = null) {
 		if (!applicationContext){

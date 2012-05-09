@@ -14,6 +14,7 @@ package org.springframework.integration.dsl.groovy.builder
 import org.junit.Test
 import org.springframework.integration.dsl.groovy.FlowExecution
 import static org.junit.Assert.*
+
 /**
  * @author David Turanski
  *
@@ -23,6 +24,7 @@ public class MessageFlowTests {
 	
 	@Test 
 	void testDefaultFlowValues() {
+		builder.setAutoCreateApplicationContext(false)
 		builder.messageFlow('input1')
 		
 		def messageFlow = builder.messageFlows[0]
@@ -33,6 +35,7 @@ public class MessageFlowTests {
 	
 	@Test
 	void testNamedFlows() {
+		builder.setAutoCreateApplicationContext(false)
 		builder.messageFlow(name:'flow1',inputChannel:'input1')
 		builder.messageFlow('flow2',inputChannel:'input1')
 		
@@ -68,6 +71,7 @@ public class MessageFlowTests {
 	
 	@Test
 	void testMultipleFlows() {
+		builder.setAutoCreateApplicationContext(false)
 		def flow1 = builder.messageFlow('flow1',outputChannel:'outputChannel1') {
 			transform(evaluate:{it.toUpperCase()})
 		}

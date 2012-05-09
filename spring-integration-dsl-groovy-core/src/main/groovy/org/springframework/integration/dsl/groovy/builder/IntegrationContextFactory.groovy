@@ -28,4 +28,11 @@ class IntegrationContextFactory extends IntegrationComponentFactory {
 	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
 		return builder.integrationContext;
 	}
+	
+	@Override
+	void onNodeCompleted( FactoryBuilderSupport builder, Object parent, Object integrationContext ) {
+		if (builder.autoCreateApplicationContext) {
+			integrationContext.createApplicationContext(builder.parentContext)
+		}
+	}
 }

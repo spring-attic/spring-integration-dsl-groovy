@@ -77,14 +77,6 @@ class Filter extends MessageProducingEndpoint {
 	}
 }
 
-class Router extends SimpleEndpoint {
-	Closure action
-	String defaultOutputChannel
-	protected String defaultNamePrefix(){
-		'$rtr'
-	}
-}
- 
 class Splitter extends MessageProducingEndpoint {
 	Closure action
 	protected String defaultNamePrefix(){

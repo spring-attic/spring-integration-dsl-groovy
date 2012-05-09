@@ -59,16 +59,19 @@ class IntegrationBuilderCategory {
  */
 class IntegrationBuilder extends FactoryBuilderSupport {
 	private static Log logger = LogFactory.getLog(IntegrationBuilder.class)
-	private final IntegrationContext integrationContext;
-
-
-	IntegrationBuilder() {
+	private final IntegrationContext integrationContext
+    private final ApplicationContext parentContext
+	private boolean autoCreateApplicationContext = true
+	
+	IntegrationBuilder(ApplicationContext parentContext = null) {
 		super(true)
 		this.integrationContext = new IntegrationContext()
+		this.parentContext = parentContext
 	}
 
-	IntegrationBuilder(ArrayList<String> modules) {
+	IntegrationBuilder(ArrayList<String> modules, ApplicationContext parentContext = null) {
 		this(modules as String[])
+		this.parentContext = parentContext
 	}
 
 	IntegrationBuilder(String... modules) {
@@ -83,7 +86,13 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		}
 	}
 
-
+    public void setAutoCreateApplicationContext(boolean autoCreateApplicationContext){
+		this.autoCreateApplicationContext = autoCreateApplicationContext
+	}
+	
+	public ApplicationContext getApplicationContext() {
+		this.integrationContext.applicationContext
+	}
 
 	public IntegrationContext getIntegrationContext() {
 		this.integrationContext
@@ -156,10 +165,10 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 			super.dispathNodeCall(name,args)
 		}
 	}
-
-	ApplicationContext createApplicationContext(ApplicationContext parentContext=null) {
-		this.integrationContext.createApplicationContext(parentContext);
-	}
+//
+//	ApplicationContext createApplicationContext(ApplicationContext parentContext=null) {
+//		this.integrationContext.createApplicationContext(parentContext);
+//	}
 
 	MessageFlow[] getMessageFlows() {
 		this.integrationContext.messageFlows
@@ -184,9 +193,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 }
 
 class ClosureEater {
-	def methodMissing(String name, args){
-
-	}
+	def methodMissing(String name, args){}
 }
 
 abstract class IntegrationComponentFactory extends AbstractFactory {

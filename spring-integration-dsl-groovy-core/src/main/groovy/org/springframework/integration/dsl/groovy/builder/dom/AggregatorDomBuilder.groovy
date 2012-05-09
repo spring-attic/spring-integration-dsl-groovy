@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.springframework.integration.dsl.groovy.builder.dom
- 
+
 import org.springframework.beans.factory.config.BeanDefinitionHolder
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils
@@ -20,67 +20,72 @@ import org.springframework.context.ApplicationContext
 
 import org.springframework.integration.dsl.groovy.*
 
-
 /**
  * @author David Turanski
  *
  */
-class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
+class AggregatorDomBuilder extends IntegrationComponentDomBuilder {
 	ChannelDomBuilder channelBuilder
-	
-	SimpleEndpointDomBuilder(IntegrationDomSupport integrationDomSupport){
+
+	AggregatorDomBuilder(IntegrationDomSupport integrationDomSupport){
 		this.integrationDomSupport = integrationDomSupport
 	}
-	
+
 	@Override
 	public void build(Object builder, ApplicationContext applicationContext, Object endpoint, Closure closure) {
-		
+
 		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(new Channel())
 		def name = endpoint.name
 		assert endpoint.name, "name cannot be null for object $endpoint"
 
-		if (closure) {
-			closure.delegate = builder
-		}
-		
 		if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel ) {
-			 channelBuilder.createDirectChannelIfNotDefined(builder,endpoint.outputChannel)
+			channelBuilder.createDirectChannelIfNotDefined(builder,endpoint.outputChannel)
 		}
 
 		def attributes = buildAttributes(endpoint)
 		if (endpoint.hasProperty('action') && endpoint.action) {
 			assert !(attributes.containsKey('ref')), 'endoint cannot provide a bean reference and a closure'
-			attributes.method='processMessage'
+			attributes.method='processList'
 			def beanName = "${name}_closureInvokingHandler"
 			attributes.ref = beanName
-         	
+
 			BeanDefinitionBuilder  handlerBuilder =
-					BeanDefinitionBuilder.genericBeanDefinition(ClosureInvokingMessageProcessor)
+					BeanDefinitionBuilder.genericBeanDefinition(ClosureInvokingListProcessor)
 			handlerBuilder.addConstructorArgValue(endpoint.action)
 			def bdh = new BeanDefinitionHolder(handlerBuilder.getBeanDefinition(),beanName)
 			BeanDefinitionReaderUtils.registerBeanDefinition(bdh, (BeanDefinitionRegistry) applicationContext)
 		}
-		
-		if (endpoint instanceof Transformer) {
-			buildEndpoint(builder,endpoint,attributes,"transformer")
+
+		if (endpoint.releaseStrategy){
+			assert !(attributes.containsKey('release-strategy')), 'endoint cannot provide a release-strategy reference and a closure'
+			attributes.'release-strategy-method'='canRelease'
+			def beanName = "${endpoint.name}#releaseStrategyHandler"
+			attributes.'release-strategy' = beanName
+
+
+			BeanDefinitionBuilder  handlerBuilder =
+					BeanDefinitionBuilder.genericBeanDefinition(ClosureInvokingReleaseStrategy)
+			handlerBuilder.addConstructorArgValue(endpoint.releaseStrategy)
+			def bdh = new BeanDefinitionHolder(handlerBuilder.getBeanDefinition(),beanName)
+			BeanDefinitionReaderUtils.registerBeanDefinition(bdh, (BeanDefinitionRegistry) applicationContext)
 		}
-		else if (endpoint instanceof Filter) {
-			buildEndpoint(builder,endpoint,attributes,"filter")
+		if (endpoint.correlationStrategy){
+			assert !(attributes.containsKey('correlation-strategy')), 'endoint cannot provide a correlation-strategy reference and a closure'
+			attributes.'correlation-strategy-method'='processMessage'
+			def beanName = "${endpoint.name}#correlationStrategyHandler"
+			attributes.'correlation-strategy' = beanName
+
+
+			BeanDefinitionBuilder  handlerBuilder =
+					BeanDefinitionBuilder.genericBeanDefinition(ClosureInvokingMessageProcessor)
+			handlerBuilder.addConstructorArgValue(endpoint.correlationStrategy)
+			def bdh = new BeanDefinitionHolder(handlerBuilder.getBeanDefinition(),beanName)
+			BeanDefinitionReaderUtils.registerBeanDefinition(bdh, (BeanDefinitionRegistry) applicationContext)
 		}
-		else if (endpoint instanceof ServiceActivator) {
-			buildEndpoint(builder,endpoint,attributes,"service-activator")
-		}
-		else if (endpoint instanceof Bridge) {
-			buildEndpoint(builder,endpoint,attributes,"bridge")
-		}
-		else if (endpoint instanceof Splitter) {
-			buildEndpoint(builder,endpoint,attributes,"splitter")
-		}
-		else if (endpoint instanceof RouterComposition) {
-			buildEndpoint(builder,endpoint,attributes,"router",closure)
-		}
+
+		buildEndpoint(builder,endpoint,attributes,"aggregator")
 	}
-	
+
 	private buildEndpoint(builder,endpoint, attributes, methodName ,closure = null ) {
 		builder."$siPrefix:$methodName"(attributes) {
 			if (endpoint.poller) {
@@ -115,9 +120,5 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
 		attributes.id = endpoint.name
 
 		attributes
-	}
-
-	def createBridge(builder,inputChannel,outputChannel){
-		builder."$siPrefix:bridge"('input-channel':inputChannel,'output-channel':outputChannel)
 	}
 }

@@ -12,13 +12,12 @@
  */
 package org.springframework.integration.dsl.groovy.builder
   
-import java.util.Map;
+import java.util.Map
 
-import org.apache.commons.logging.Log;
+import org.apache.commons.logging.Log
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
 import org.springframework.integration.dsl.groovy.MessageFlow
 import org.springframework.integration.dsl.groovy.OtherwiseCondition
-import org.springframework.integration.dsl.groovy.Router
 import org.springframework.integration.dsl.groovy.RouterComposition
 import org.springframework.integration.dsl.groovy.RouterCondition
 import org.springframework.integration.dsl.groovy.WhenCondition

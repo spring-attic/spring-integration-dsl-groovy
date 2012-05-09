@@ -69,4 +69,21 @@ class AggregatorTests {
 		assert result.payload == [2,4]
 	}
 	
+	@Test
+	void testCustomAggregator() {
+		def flow = builder.messageFlow(outputChannel:'queueChannel') {
+			queueChannel('queueChannel')
+			split()
+			aggregate(
+				  action:{ list-> ['list':list] })
+		 }
+ 
+		 def ac = builder.integrationContext.createApplicationContext()
+		 def queueChannel = ac.getBean('queueChannel')
+		 flow.send([1, 2, 3, 4])
+		
+		
+		
+	}
+	
 }

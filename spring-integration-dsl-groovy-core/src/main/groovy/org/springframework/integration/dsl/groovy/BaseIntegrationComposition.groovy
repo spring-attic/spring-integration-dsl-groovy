@@ -41,6 +41,15 @@ abstract class IntegrationComponent   {
 	}
 }
 
+/**
+ * A class used to support core Spring components commonly used in integration such as task executor and task scheduler, etc
+ * @author David Turanski
+ *
+ */
+class CoreSpringComponent extends IntegrationComponent {
+	protected String namespacePrefix
+}
+
 class BaseIntegrationComposition extends IntegrationComponent {
 	protected BaseIntegrationComposition parentComposition;
 	protected components = [];
@@ -69,7 +78,7 @@ class WhenCondition extends RouterCondition {
 class OtherwiseCondition extends RouterCondition {
 	def name
 	OtherwiseCondition(){
-		name = name = defaultName("$otherwise")
+		name = defaultName("$otherwise")
 	}
 }
 
@@ -78,6 +87,10 @@ class RouterComposition extends BaseIntegrationComposition {
    String name
    def channelMap
    Closure action
+   
+   RouterComposition() {
+	   name = defaultName("$rtr")
+   }
    
    void setEvaluate(closure) {
 	   action = closure

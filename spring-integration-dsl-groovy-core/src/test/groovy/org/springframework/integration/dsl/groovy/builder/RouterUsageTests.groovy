@@ -31,13 +31,13 @@ public class RouterUsageTests {
 	void testSimpleRouter() {
 		 def integrationContext = builder.doWithSpringIntegration {
 			//Must return String, String[] etc...
-			route('myRouter', evaluate: { it == "Hello" ? 'upper.inputChannel' : 'lower.inputChannel' } )	
+			route(inputChannel:'inputChannel',evaluate: { it == "Hello" ? 'upper.inputChannel' : 'lower.inputChannel' } )	
 			handle('upper', action:{payload -> payload.toUpperCase()})
 			handle('lower', action:{payload -> payload.toLowerCase()})
 		}
 		 
-		 assert integrationContext.sendAndReceive('myRouter.inputChannel',"Hello") == "HELLO"
-		 assert integrationContext.sendAndReceive('myRouter.inputChannel',"GoodBye") == "goodbye"
+		 assert integrationContext.sendAndReceive('inputChannel',"Hello") == "HELLO"
+		 assert integrationContext.sendAndReceive('inputChannel',"GoodBye") == "goodbye"
 	}
 	
 	

@@ -27,7 +27,7 @@ import org.springframework.integration.dsl.groovy.builder.AbstractIntegrationBui
  */
 class IntegrationDomSupport {
 	private Log logger = LogFactory.getLog(IntegrationDomSupport)
-	private IntegrationNamespaceSupport namespaceSupport = new IntegrationNamespaceSupport()
+	private XMLNamespaceSupport namespaceSupport = new XMLNamespaceSupport()
 
 	/**
 	 * Translate DSL context to XML	
@@ -51,6 +51,7 @@ class IntegrationDomSupport {
     private void registerBuilders() {
 		domBuilders["org.springframework.integration.dsl.groovy.AbstractChannel"]=new ChannelDomBuilder(this)
 		domBuilders["org.springframework.integration.dsl.groovy.SimpleEndpoint"]=new SimpleEndpointDomBuilder(this)
+		domBuilders["org.springframework.integration.dsl.groovy.Aggregator"]=new AggregatorDomBuilder(this)
 		domBuilders["org.springframework.integration.dsl.groovy.MessageFlow"]=new MessageFlowDomBuilder(this)
 		domBuilders["org.springframework.integration.dsl.groovy.RouterComposition"]=new RouterDomBuilder(this)
 		domBuilders["org.springframework.integration.dsl.groovy.Poller"]=new GenericDomBuilder(this,'poller')
@@ -66,17 +67,12 @@ class IntegrationDomSupport {
 		else if (component instanceof AbstractChannel) {
 			builder = domBuilders[AbstractChannel.class.name]
 		} else if (component instanceof SimpleEndpoint) {
-			builder =  domBuilders[SimpleEndpoint.class.name]
+		    builder =  domBuilders[component.class.name] ?: domBuilders[SimpleEndpoint.class.name]
 		} else {
 			builder = domBuilders[component.class.name]
 		}
 		builder
 	}
-	
-	private registerModuleBuilders(String module) {
-		
-	}
-
 
 	def translateToXML(integrationContext) {
 

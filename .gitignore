@@ -7,3 +7,4 @@ build
 .idea
 .gradle
 .externalToolBuilders
+bin
