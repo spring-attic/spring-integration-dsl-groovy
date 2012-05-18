@@ -42,10 +42,10 @@ public class IntegrationMarkupSupportTests {
    void testResolveMessageFlowChannels() {
 	   def flow =   
 	   builder.messageFlow {
-	    transform('t',evaluate:{payload->payload.toUpperCase()})
-	    filter('f',evaluate:{payload-> payload=="HELLO"},outputChannel:'toHandler',discardChannel:'discardChannel')
-	    handle('sa1',inputChannel:'discardChannel',evaluate:{println it})
-		handle('sa2',inputChannel:'toHandler', evaluate:{payload})
+	    transform('t',{payload->payload.toUpperCase()})
+	    filter('f',{payload-> payload=="HELLO"},outputChannel:'toHandler',discardChannel:'discardChannel')
+	    handle('sa1',inputChannel:'discardChannel',{println it})
+		handle('sa2',inputChannel:'toHandler', {payload})
 	   }
 	   
 	   integrationMarkupSupport.domBuilder(flow).resolveMessageFlowChannels(flow)

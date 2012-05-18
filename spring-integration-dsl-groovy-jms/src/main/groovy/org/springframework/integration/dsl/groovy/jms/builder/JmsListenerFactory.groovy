@@ -10,29 +10,30 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.springframework.integration.dsl.groovy.http.builder
-
+package org.springframework.integration.dsl.groovy.jms.builder
+  
 import java.util.Map
 
 import org.apache.commons.logging.Log
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
 import org.springframework.integration.dsl.groovy.builder.IntegrationComponentFactory
-import org.springframework.integration.dsl.groovy.http.HttpOutbound
+import org.springframework.integration.dsl.groovy.jms.JmsListener
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
 /**
  * @author David Turanski
  *
  */
-class HttpOutboundFactory extends IntegrationComponentFactory {
-
+class JmsListenerFactory extends IntegrationComponentFactory {
+ 
 	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
-		new HttpOutbound(attributes)
+	   new JmsListener(attributes)
 	}
 
 	@Override
-	void setParent(FactoryBuilderSupport builder, Object parent, Object httpOutbound) {
-		assert parent instanceof BaseIntegrationComposition, "'${httpOutbound.builderName}' cannot be a child of '${parent.builderName}'"
-		parent.add(httpOutbound)
+	void setParent(FactoryBuilderSupport builder, Object parent, Object jmsListener) {		
+		assert parent instanceof BaseIntegrationComposition, "'${jmsListener.builderName}' cannot be a child of '${parent.builderName}'" 
+		parent.add(jmsListener)
+
 	}
 }

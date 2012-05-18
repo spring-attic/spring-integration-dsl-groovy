@@ -70,7 +70,7 @@ public class ChannelTests {
 		def ic = builder.doWithSpringIntegration {
 			pubSubChannel('flow1.outputChannel')
 			messageFlow('flow1',outputChannel:'flow1.outputChannel') {
-			 transform(evaluate:{payload})
+			 transform {payload}
 			} 
 		}
 		
@@ -85,7 +85,7 @@ public class ChannelTests {
 			
 			messageFlow('flow1',outputChannel:'flow1.outputChannel') {
 			 pubSubChannel('flow1.outputChannel')
-			 transform(evaluate:{payload})
+			 transform {payload}
 			}
 		}
 		

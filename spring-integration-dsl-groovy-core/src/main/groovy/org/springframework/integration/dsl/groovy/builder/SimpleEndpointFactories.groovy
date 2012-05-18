@@ -33,10 +33,6 @@ abstract class EndpointFactory extends IntegrationComponentFactory {
 	@Override
 	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
 	{			
-	 	if (attributes.evaluate){
-			attributes.action = attributes.evaluate
-			attributes.remove('evaluate')
-		}
 		endpointInstance(attributes)
 	}
 
@@ -105,4 +101,31 @@ public class AggregatorFactory extends EndpointFactory {
 	}
 }
 
+public class ActionAwareEndpointFactory extends AbstractFactory {
+    Closure action
+	IntegrationComponentFactory factory
+	ActionAwareEndpointFactory(IntegrationComponentFactory factory, Closure action) {
+		this.action = action
+		this.factory = factory
+	}
+	/* (non-Javadoc)
+	 * @see groovy.util.Factory#newInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
+	 */
+	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
+			throws InstantiationException, IllegalAccessException {
+		// TODO Auto-generated method stub
+		def node = factory.newInstance(builder, name, value, attributes)
+		node.action = action
+		node
+	}
 
+	@Override
+	public void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
+		factory.setParent(builder,parent,child)
+	}
+
+	@Override
+	void onNodeCompleted( FactoryBuilderSupport builder, Object parent, Object child ) {
+		factory.onNodeCompleted(builder,parent,child)
+	}
+}

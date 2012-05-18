@@ -19,43 +19,40 @@ import static org.junit.Assert.*
  */
 /*
  * class MyBinding extends Binding {
-    def builder
-    Object getVariable(String name) {
-        return { Object... args ->  builder.invokeMethod(name,args) }
-    }   
-}
-
-// parse the script and run it against the builder
-new File("foo.groovy").withInputStream { input ->
-    Script s = new GroovyClassLoader().parseClass(input).newInstance()
-    s.binding = new MyBinding(builder:builder)
-    s.run()
-}
+ def builder
+ Object getVariable(String name) {
+ return { Object... args ->  builder.invokeMethod(name,args) }
+ }
+ }
+ // parse the script and run it against the builder
+ new File("foo.groovy").withInputStream { input ->
+ Script s = new GroovyClassLoader().parseClass(input).newInstance()
+ s.binding = new MyBinding(builder:builder)
+ s.run()
+ }
  */
 public class IntegrationBuilderUsageTests {
 	IntegrationBuilder builder = new IntegrationBuilder()
-	
+
 	Script script
-	
+
 	@Test
 	void test1() {
 		new File("src/test/resources/messageflow1.groovy").withInputStream {input->
 			script = new GroovyClassLoader().parseClass(input).newInstance()
 		}
-		def eip = builder.build(script)
-		println(eip);
+		def eip = builder.build(script);
 	}
-	
-	
+
+
 	@Test
 	void testBridge() {
 		def ic = builder.doWithSpringIntegration {
-			 transform('t1',outputChannel:'t1.out',evaluate:{it.toUpperCase()})
-			 bridge(inputChannel:'t1.out', outputChannel:'bridge.out')
-			 transform('t2',inputChannel:'bridge.out',evaluate:{it*2})			 
+			transform('t1',outputChannel:'t1.out',{it.toUpperCase()})
+			bridge(inputChannel:'t1.out', outputChannel:'bridge.out')
+			transform('t2',inputChannel:'bridge.out', {it*2})
 		}
-		
+
 		assert ic.sendAndReceive('t1.inputChannel','Hello') == "HELLOHELLO"
 	}
-	
 }

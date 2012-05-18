@@ -20,31 +20,29 @@ import static org.junit.Assert.*
  * @author David Turanski
  *
  */
- 
+
 public class PollerTests {
 	IntegrationBuilder builder = new IntegrationBuilder()
-	 
+
 	@Test
 	void testRefToTopLevelPoller() {
-		 def ic = builder.doWithSpringIntegration {
-			 poll('cronPoller',cron:"*/10 * * * * MON-FRI")
-			 queueChannel('transformer.inputChannel')
-			 transform('transformer',evaluate:{it},poller:"cronPoller") 
-		 }
-		 
-		 def ac = ic.createApplicationContext()	 
+		def ic = builder.doWithSpringIntegration {
+			poll('cronPoller',cron:"*/10 * * * * MON-FRI")
+			queueChannel('transformer.inputChannel')
+			transform('transformer',{it},poller:"cronPoller")
+		}
+
+		def ac = ic.createApplicationContext()
 	}
-	
+
 	@Test
 	void testInnerPoller() {
-		 def ic = builder.doWithSpringIntegration {
-			
-			 queueChannel('transformer.inputChannel')
-			 transform('transformer',evaluate:{it}){
-				 poll(cron:"*/10 * * * * MON-FRI")
-			 }
-		 }
-		 
-		 def ac = ic.createApplicationContext()
+		def ic = builder.doWithSpringIntegration {
+
+			queueChannel('transformer.inputChannel')
+			transform('transformer',{it}){ poll(cron:"*/10 * * * * MON-FRI") }
+		}
+
+		def ac = ic.createApplicationContext()
 	}
 }

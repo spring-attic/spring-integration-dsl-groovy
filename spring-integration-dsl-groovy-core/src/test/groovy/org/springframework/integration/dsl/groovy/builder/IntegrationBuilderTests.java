@@ -29,34 +29,35 @@ import org.springframework.integration.dsl.groovy.MessageFlow;
  *
  */
 public class IntegrationBuilderTests {
-    IntegrationBuilder builder = new IntegrationBuilder();
-    
-    @Test 
-    public void testInvokeFlowFromJava() throws CompilationFailedException, InstantiationException, IllegalAccessException {
-        builder.setAutoCreateApplicationContext(false);
-    	String flowScript1 = "messageFlow(outputChannel:'outputChannel1') {transform(evaluate:{it.toUpperCase()})}";
-     
-    	MessageFlow flow1 = (MessageFlow)builder.build(new ByteArrayInputStream(flowScript1.getBytes()));
-    	
-    	String flowScript2 = ("messageFlow(inputChannel:'outputChannel1'){ filter(evaluate:{it.class == String})\ntransform(evaluate:{it.toLowerCase()})}");
-    		
-    	builder.build(new ByteArrayInputStream(flowScript2.getBytes()));
-    	
-		Object response = builder.getIntegrationContext().sendAndReceive(flow1.getInputChannel(),"hello");
-		
-		assertEquals("hello",response);
-		
-    }
-    
-    @Test 
-    public void testInvokeFlowFromScript() throws IOException {
-    	IntegrationContext ic = (IntegrationContext) builder.build(new FileInputStream("src/test/resources/messageflow1.groovy"));
-    	MessageFlow flow1 = ic.getMessageFlowByName("flow1");
-    	flow1.send("hello");
-    }
-    
-    @Test(expected=ClassNotFoundException.class) 
-    public void testWithInitializers() {
-    	 new IntegrationBuilder(new String[]{"foo"});
-    }
+	IntegrationBuilder builder = new IntegrationBuilder();
+
+	@Test
+	public void testInvokeFlowFromJava() throws CompilationFailedException, InstantiationException,
+			IllegalAccessException {
+		builder.setAutoCreateApplicationContext(false);
+		String flowScript1 = "messageFlow(outputChannel:'outputChannel1') {transform({it.toUpperCase()})}";
+
+		MessageFlow flow1 = (MessageFlow) builder.build(new ByteArrayInputStream(flowScript1.getBytes()));
+
+		String flowScript2 = ("messageFlow(inputChannel:'outputChannel1'){ filter({it.class == String})\ntransform({it.toLowerCase()})}");
+
+		builder.build(new ByteArrayInputStream(flowScript2.getBytes()));
+
+		Object response = builder.getIntegrationContext().sendAndReceive(flow1.getInputChannel(), "hello");
+
+		assertEquals("hello", response);
+	}
+
+	@Test
+	public void testInvokeFlowFromScript() throws IOException {
+		IntegrationContext ic = (IntegrationContext) builder.build(new FileInputStream(
+				"src/test/resources/messageflow1.groovy"));
+		MessageFlow flow1 = ic.getMessageFlowByName("flow1");
+		flow1.send("hello");
+	}
+
+	@Test(expected = ClassNotFoundException.class)
+	public void testWithInitializers() {
+		new IntegrationBuilder(new String[] { "foo" });
+	}
 }

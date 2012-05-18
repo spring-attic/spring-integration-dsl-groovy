@@ -31,8 +31,6 @@ class HttpOutboundTests {
 			channel('httpReplyChannel')
 			httpGet(requestChannel:'httpRequestChannel',replyChannel:'httpReplyChannel',url:'http://www.foo.com')
 		}
-		
-		builder.createApplicationContext()
 	}
 	
 	@Test

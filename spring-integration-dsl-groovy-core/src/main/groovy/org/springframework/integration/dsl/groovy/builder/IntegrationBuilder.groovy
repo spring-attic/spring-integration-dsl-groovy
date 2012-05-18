@@ -32,11 +32,11 @@ import org.springframework.integration.dsl.groovy.ServiceActivator
 import org.springframework.integration.dsl.groovy.Splitter
 import org.springframework.integration.dsl.groovy.Transformer
 import org.springframework.integration.dsl.groovy.MessageFlow
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
+import org.springframework.integration.dsl.groovy.XMLBean
+import org.codehaus.groovy.runtime.InvokerHelper
 
 /**
  * Workaround for DefaultGroovyMethods.split()
- * @see IntegrationBuilder.dispathNodeCall()
  * @author David Turanski
  *
  */
@@ -45,24 +45,24 @@ class IntegrationBuilderCategory {
 	 * Overrrides the DefaultGroovyMethods.split() with no parameters 
 	 * @param self
 	 * @param closure
-	 * @return the result of builder invoking split with an empty string parameter
+	 * @return the result of builder invoking split
 	 */
 	public static Object split(Object self, Closure closure){
-		self.delegate.split('')
+		self.delegate.splitter([closure] as Object[] )
 	}
 }
 
 /**
- *
+ * Builds a Spring Integration application context from the DSL
  * @author David Turanski
  *
  */
 class IntegrationBuilder extends FactoryBuilderSupport {
 	private static Log logger = LogFactory.getLog(IntegrationBuilder.class)
 	private final IntegrationContext integrationContext
-    private final ApplicationContext parentContext
+	private final ApplicationContext parentContext
 	private boolean autoCreateApplicationContext = true
-	
+
 	IntegrationBuilder(ApplicationContext parentContext = null) {
 		super(true)
 		this.integrationContext = new IntegrationContext()
@@ -86,38 +86,16 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		}
 	}
 
-    public void setAutoCreateApplicationContext(boolean autoCreateApplicationContext){
+	public void setAutoCreateApplicationContext(boolean autoCreateApplicationContext){
 		this.autoCreateApplicationContext = autoCreateApplicationContext
 	}
-	
+
 	public ApplicationContext getApplicationContext() {
 		this.integrationContext.applicationContext
 	}
 
 	public IntegrationContext getIntegrationContext() {
 		this.integrationContext
-	}
-
-	@Override
-	/*
-	 * (non-Javadoc)
-	 * @see groovy.util.FactoryBuilderSupport#setClosureDelegate(groovy.lang.Closure, java.lang.Object)
-	 */
-	protected void setClosureDelegate(Closure closure,
-	Object node) {
-
-		/*
-		 * Disable builder processing of the Spring XML closure. Save for later processing 
-		 * by the XML builder
-		 */
-
-		if (node.builderName == "springXml"){
-			node.beanDefinitions = closure.dehydrate()
-			closure.setResolveStrategy(Closure.DELEGATE_ONLY)
-			closure.delegate = new ClosureEater()
-		} else {
-			closure.delegate = this
-		}
 	}
 
 	@Override
@@ -128,16 +106,15 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		/*
 		 * Simple endpoints
 		 */
-		registerFactory "filter", new FilterFactory()
-		registerFactory "transform", new TransformerFactory()
-		registerFactory "handle", new ServiceActivatorFactory()
+		registerExplicitMethod "filter", this.&filter
+		registerExplicitMethod "transform", this.&transformer
+		registerExplicitMethod "handle", this.&serviceActivator
+		registerExplicitMethod "aggregate", this.&aggregator
 		registerFactory "bridge", new BridgeFactory()
-		registerFactory "split", new SplitterFactory()
-		registerFactory "aggregate", new AggregatorFactory()
 		/*
 		 * Router 
 		 */
-		registerFactory "route", new RouterCompositionFactory()
+		registerExplicitMethod "route", this.&router
 		registerFactory "when", new RouterConditionFactory()
 		registerFactory "otherwise", new RouterConditionFactory()
 		registerFactory "map", new ChannelMapFactory()
@@ -145,7 +122,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		/*
 		 * XML Bean 
 		 */
-		registerFactory "springXml", new XMLBeanFactory()
+		registerExplicitMethod "springXml", this.&springXml
 		registerFactory "namespaces", new XMLNamespaceFactory()
 
 
@@ -165,10 +142,6 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 			super.dispathNodeCall(name,args)
 		}
 	}
-//
-//	ApplicationContext createApplicationContext(ApplicationContext parentContext=null) {
-//		this.integrationContext.createApplicationContext(parentContext);
-//	}
 
 	MessageFlow[] getMessageFlows() {
 		this.integrationContext.messageFlows
@@ -177,6 +150,94 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 	public Object build(InputStream is) {
 		def script = new GroovyClassLoader().parseClass(is).newInstance()
 		this.build(script)
+	}
+
+	public filter(Object[] args){
+		createActionAwareEndpoint(new FilterFactory(), "filter", args)
+	}
+
+	public transformer(Object[] args) {
+		createActionAwareEndpoint(new TransformerFactory(), "transform", args)
+	}
+
+	public serviceActivator(Object[] args) {
+		createActionAwareEndpoint(new ServiceActivatorFactory(), "handle", args)
+	}
+
+	public splitter(Object[] args) {
+		createActionAwareEndpoint(new SplitterFactory(), "split", args)
+	}
+
+	public router(Object[] args) {
+		createActionAwareEndpoint(new RouterCompositionFactory(), "route", args)
+	}
+
+	public aggregator(Object[] args) {
+		createActionAwareEndpoint(new AggregatorFactory(), "aggregate", args)
+	}
+
+	public createActionAwareEndpoint(IntegrationComponentFactory factory, String name, Object[] args){
+		/*
+		 * Find the action closure if any, remove it from the args and use an ActionAwareEndpointFactory to
+		 * build the node correctly
+		 */
+
+		Closure actionClosure
+
+		list = []
+		list.addAll(0,args)
+
+		Map attributes = [:]
+
+		if ( (list.size() > 0) && (list.last() instanceof Map)) {
+			attributes = list.head()
+		}
+	    /*
+	     * Identify any unnamed closures. Should be at most 2. If there are 2, the first one must be the action closure
+	     */
+		def closures = list.findAll {it instanceof Closure}
+		
+		if (closures?.size == 2) {
+			logger.debug(closures)
+			actionClosure = closures[0]
+		}
+
+		/*
+		 * If only one closure, assume it's an action closure unless the 'ref' attribute is set. If the 'ref'
+		 * attribute is set, then it is invalid to also provide an action closure. In this case assume it's the
+		 * builder closure
+		 */
+		else if (closures?.size == 1) {
+			if (!attributes.containsKey('ref')){
+				logger.debug(closures)
+				actionClosure = closures[0]
+			}
+		}
+		/*
+		 * If we have an action closure, remove it from the arg list and register a new
+		 * ActionAwareEndpointFactory instance to set the action after the node is created
+		 */
+		if (actionClosure){
+			assert list.contains(actionClosure)
+		    list = list - actionClosure
+			registerFactory(name,new ActionAwareEndpointFactory(factory,actionClosure.dehydrate()))
+		} else {
+			registerFactory(name,factory)
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("invoking dispathNodeCall for name: $name with args: $list")
+		}
+
+		def node = dispathNodeCall(name,list as Object[])
+	}
+
+	public IntegrationBuilder springXml(Closure closure) {
+		def parent = getCurrent()
+		assert parent && parent instanceof BaseIntegrationComposition, "'springXml' is not valid in this context"
+		parent.add(new XMLBean(builderName:"springXml",beanDefinitions:closure.dehydrate()))
+		closure = null
+		return this
 	}
 
 	private getIntegrationBuilderModuleSupportInstances(String[] modules) {
@@ -190,41 +251,4 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		}
 		instances
 	}
-}
-
-class ClosureEater {
-	def methodMissing(String name, args){}
-}
-
-abstract class IntegrationComponentFactory extends AbstractFactory {
-	protected Log logger = LogFactory.getLog(this.class)
-
-	protected defaultAttributes(name, value, attributes) {
-		assert !(attributes.containsKey('name') && value), "$name cannot accept both a default value and a 'name' attribute"
-
-		attributes = attributes ?: [:]
-		attributes.builderName = name
-
-		if (!attributes.containsKey('name') && value){
-			attributes.name = value
-		}
-
-		attributes
-	}
-
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) throws InstantiationException, IllegalAccessException {
-		if (logger.isDebugEnabled()){
-			logger.debug("newInstance name: $name value:$value attr:$attributes")
-		}
-		
-		attributes = defaultAttributes(name, value, attributes)
-		def instance = doNewInstance(builder, name, value, attributes)
-
-		def validationContext = instance.validateAttributes(attributes)
-		assert !validationContext.hasErrors, validationContext.errorMessage
-
-		instance
-	}
-
-	protected abstract doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
 }

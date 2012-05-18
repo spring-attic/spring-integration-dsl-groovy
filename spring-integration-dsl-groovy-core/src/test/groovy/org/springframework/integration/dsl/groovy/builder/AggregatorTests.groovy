@@ -75,7 +75,7 @@ class AggregatorTests {
 			queueChannel('queueChannel')
 			split()
 			aggregate(
-				  action:{ list-> ['list':list] })
+				  { list-> ['list':list] })
 		 }
  
 		 def ac = builder.integrationContext.createApplicationContext()

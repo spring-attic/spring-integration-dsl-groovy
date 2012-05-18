@@ -17,7 +17,7 @@ package org.springframework.integration.dsl.groovy;
  *
  */
 class SimpleEndpoint extends IntegrationComponent {
-	static mutuallyExclusiveAttributes=[['inputChannel','input-channel'],['ref','action','evaluate']]
+	static mutuallyExclusiveAttributes=[['inputChannel','input-channel']]
 	String inputChannel
 	def poller
 	
@@ -45,7 +45,7 @@ class MessageProducingEndpoint extends SimpleEndpoint {
 }
 
 class ServiceActivator extends MessageProducingEndpoint {
-	static attributesRequiresOneOf = ['ref','action','evaluate']
+	//static attributesRequiresOneOf = ['ref','action','evaluate']
 	Closure action
 	static requiresReply = false
 	protected String defaultNamePrefix(){
@@ -61,7 +61,6 @@ class MessagingBridge extends MessageProducingEndpoint {
 
 
 class Transformer extends MessageProducingEndpoint {
-	static attributesRequiresOneOf = ['ref','action','evaluate']
 	Closure action
 	protected String defaultNamePrefix(){
 		'$xfmr'
@@ -69,7 +68,6 @@ class Transformer extends MessageProducingEndpoint {
 }
 
 class Filter extends MessageProducingEndpoint {
-	static attributesRequiresOneOf = ['ref','action','evaluate']
 	Closure action
 	String discardChannel
 	protected String defaultNamePrefix(){

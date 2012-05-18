@@ -48,7 +48,7 @@ class SplitterTests {
 		def ic = builder.doWithSpringIntegration {
 			queueChannel('queueChannel')
 			flow = messageFlow(outputChannel:'queueChannel') {
-				split(evaluate:{it.split(',')})
+				split {it.split(',')}
 			}
 		}
 

@@ -10,26 +10,23 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.springframework.integration.dsl.groovy.builder
+package org.springframework.integration.dsl.groovy.jms
 
-import static org.junit.Assert.*
-import org.junit.Test
+import org.springframework.integration.dsl.groovy.IntegrationComponent
+
 /**
  * @author David Turanski
  *
  */
-class SimpleTransformerTests {
-	IntegrationBuilder builder = new IntegrationBuilder()
+class JmsListener extends IntegrationComponent {
+	def destinationName
+	def connectionFactory
 	
-	@Test
-	void testTransformer() {
-		def flow = builder.messageFlow {
-			transform('myTransformer',{it.toUpperCase()})
-		}
-			
-		def result = flow.sendAndReceive("hello")	
-		assert result == "HELLO"
+	JmsListener() {
+		super()
 	}
 	
-	
+	protected String defaultNamePrefix(){
+		'$jmsMsgDrvnChAdptr'
+	}
 }

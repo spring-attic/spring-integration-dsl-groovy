@@ -30,9 +30,9 @@ public class ChannelInterceptorTests {
 	    builder.doWithSpringIntegration {
 			interceptor(pattern:'*',preSend:{payload -> println "payload:$payload"; payload*2})
 			flow = messageFlow {
-				transform(evaluate:{it.toUpperCase()})
-				transform(evaluate:{it.toLowerCase()})
-				transform(evaluate:{it.capitalize()})
+				transform {it.toUpperCase()}
+				transform {it.toLowerCase()}
+				transform {it.capitalize()}
 			}
 		}
 		
@@ -49,9 +49,9 @@ public class ChannelInterceptorTests {
 				interceptor(preSend:{payload -> println "payload:$payload"; payload*2})
 			}
 			flow = messageFlow(inputChannel:'inputChannel') {
-				transform(evaluate:{it.toUpperCase()})
-				transform(evaluate:{it.toLowerCase()})
-				transform(evaluate:{it.capitalize()})
+				transform {it.toUpperCase()}
+				transform {it.toLowerCase()}
+				transform {it.capitalize()}
 			}
 		}
 		
@@ -71,7 +71,7 @@ public class ChannelInterceptorTests {
 				wiretap(channel:'logger')
 			}
 			flow = messageFlow(inputChannel:'inputChannel') {
-				transform(evaluate:{it.toUpperCase()})
+				transform {it.toUpperCase()}
 			}
 		}
 		
@@ -86,7 +86,7 @@ public class ChannelInterceptorTests {
 			wiretap(channel:'tapChannel',pattern:'input*')
 			
 			flow = messageFlow(inputChannel:'inputChannel') {
-				transform(evaluate:{it.toUpperCase()})
+				transform {it.toUpperCase()}
 			}
 			
 			queueChannel('tapChannel')

@@ -59,9 +59,9 @@ public class MessageFlowTests {
 	@Test 
 	void testSimpleChain() {
 		def flow = builder.messageFlow(inputChannel:'inputChannel') {
-			filter(evaluate:{it == "World"})
-			transform(evaluate:{"Hello " + it})
-			handle(evaluate:{println "****************** $it ***************" })
+			filter {it == "World"}
+			transform {"Hello " + it}
+			handle {println "****************** $it ***************" }
 		}
 		
 		flow.send("World")
@@ -73,11 +73,11 @@ public class MessageFlowTests {
 	void testMultipleFlows() {
 		builder.setAutoCreateApplicationContext(false)
 		def flow1 = builder.messageFlow('flow1',outputChannel:'outputChannel1') {
-			transform(evaluate:{it.toUpperCase()})
+			transform {it.toUpperCase()}
 		}
 		def flow2 = builder.messageFlow('flow2',inputChannel:'outputChannel1') {
-			filter(evaluate:{it.class == String})
-			transform(evaluate:{it.toLowerCase()})
+			filter {it.class == String}
+			transform {it.toLowerCase()}
 		}
 		
 		assert flow1.sendAndReceive("hello") == "hello"
@@ -94,13 +94,13 @@ public class MessageFlowTests {
 		
 		def ic = builder.doWithSpringIntegration {
 			flow1 = messageFlow(outputChannel:'flow2inputChannel') {
-				transform(evaluate:{it.toUpperCase()})
+				transform {it.toUpperCase()}
 			}
 			flow2 = messageFlow(inputChannel:'flow2inputChannel',outputChannel:'flow2outputChannel') {
-				filter(evaluate:{it.class == String})
-				transform(evaluate:{it.toLowerCase()})
+				filter {it.class == String}
+				transform {it.toLowerCase()}
 			}
-			handle(inputChannel:flow2.outputChannel,evaluate:{println it}) 		
+			handle(inputChannel:flow2.outputChannel,{println it})
 		}	
 		
 		ic.send(flow1.inputChannel,"hello")
@@ -112,8 +112,8 @@ public class MessageFlowTests {
 		def mainflow
 		def ic = builder.doWithSpringIntegration {
 			def subflow = messageFlow('sub'){
-				filter(evaluate:{it.class == String})
-				transform(evaluate:{it.toLowerCase()})
+				filter {it.class == String}
+				transform {it.toLowerCase()}
 			}
 			
 			mainflow = messageFlow('main') {
@@ -132,14 +132,14 @@ public class MessageFlowTests {
 		def mainflow
 		def ic = builder.doWithSpringIntegration {
 			def subflow = messageFlow ('sub'){
-				filter('f',evaluate:{it.class == String})
-				transform('t1', evaluate:{it.toLowerCase()})
+				filter('f', {it.class == String})
+				transform('t1', {it.toLowerCase()})
 			}
 			
 			mainflow = messageFlow ('main'){
-				transform('t2',evaluate:{it.toUpperCase()})
+				transform('t2',{it.toUpperCase()})
 				exec(subflow)
-				transform('t3',evaluate:{"${it.toUpperCase()}${it.toLowerCase()}"})
+				transform('t3',{"${it.toUpperCase()}${it.toLowerCase()}"})
 			}
 		}
 		
@@ -152,14 +152,14 @@ public class MessageFlowTests {
 		def mainflow
 		def ic = builder.doWithSpringIntegration {
 			def subflow = messageFlow ('sub',inputChannel:'sub.in', outputChannel:'sub.out'){
-				filter('f',evaluate:{it.class == String})
-				transform('t1', evaluate:{it.toLowerCase()})
+				filter('f',{it.class == String})
+				transform('t1',{it.toLowerCase()})
 			}
 			
 			mainflow = messageFlow ('main'){
-				transform('t2',evaluate:{it.toUpperCase()})
+				transform('t2',{it.toUpperCase()})
 				exec(subflow)
-				transform('t3',evaluate:{"${it.toUpperCase()}${it.toLowerCase()}"})
+				transform('t3',{"${it.toUpperCase()}${it.toLowerCase()}"})
 			}
 		}
 		
@@ -172,17 +172,17 @@ public class MessageFlowTests {
 		def mainflow
 		def ic = builder.doWithSpringIntegration {
 			def subflow1 = messageFlow {
-				filter(evaluate:{it.class == String})
-				transform(evaluate:{it.toLowerCase()+"one"})
+				filter {it.class == String}
+				transform {it.toLowerCase()+"one"}
 			}
 			
 			def subflow2 = messageFlow {
-				transform(evaluate:{it.toUpperCase()+"two"})
+				transform {it.toUpperCase()+"two"}
 			}
 			
 			mainflow = messageFlow ('main'){
 				exec(subflow1)
-				handle(action:{it})
+				handle {it}
 				exec(subflow2)
 			}
 		}
@@ -194,13 +194,13 @@ public class MessageFlowTests {
 		def mainflow
 		def ic = builder.doWithSpringIntegration {
 			def subflow1 = messageFlow {
-				filter(evaluate:{it.class == String})
-				transform(evaluate:{it.toLowerCase()+"one"})
+				filter {it.class == String}
+				transform {it.toLowerCase()+"one"}
 			}
 			
 			mainflow = messageFlow ('main'){
 				exec(subflow1)
-				handle(action:{it})
+				handle {it}
 			}
 		}
 		
@@ -213,12 +213,12 @@ public class MessageFlowTests {
 		def mainflow
 		def ic = builder.doWithSpringIntegration {
 			def subflow1 = messageFlow {
-				filter(evaluate:{it.class == String})
-				transform(evaluate:{it.toLowerCase()+"one"})
+				filter {it.class == String}
+				transform {it.toLowerCase()+"one"}
 			}
 			
 			def subflow2 = messageFlow {
-				transform(evaluate:{it.toUpperCase()+"two"})
+				transform {it.toUpperCase()+"two"}
 			}
 			
 			mainflow = messageFlow ('main'){ 
@@ -233,11 +233,11 @@ public class MessageFlowTests {
 	@Test 
 	void testNestedFlows() {
 		def flow = builder.messageFlow {
-			handle( action:{payload -> payload.toUpperCase()})
+			handle {payload -> payload.toUpperCase()}
 			messageFlow {
-				transform(evaluate:{it*2})
+				transform {it*2}
 				messageFlow {
-					transform(evaluate:{payload->payload.toLowerCase()})
+					transform {payload->payload.toLowerCase()}
 				}
 			}
 		}
