@@ -13,7 +13,9 @@
 package org.springframework.integration.dsl.groovy.builder
 
 import static org.junit.Assert.*
+
 import org.junit.Test
+import org.springframework.integration.message.GenericMessage
 /**
  * @author David Turanski
  *
@@ -44,17 +46,15 @@ class SplitterTests {
 
 	@Test
 	void testCustomSplitter() {
-		def flow
 		def ic = builder.doWithSpringIntegration {
 			queueChannel('queueChannel')
-			flow = messageFlow(outputChannel:'queueChannel') {
-				split {it.split(',')}
-			}
+			split inputChannel:'splitChannel',{ it.split(',')}, outputChannel:'queueChannel'
 		}
 
 		def ac = ic.createApplicationContext()
 		def queueChannel = ac.getBean('queueChannel')
-		flow.send('hello,world')
+		def inputChannel = ac.getBean('splitChannel')
+		inputChannel.send(new GenericMessage('hello,world'))
 		def result = queueChannel.receive()
 		assert result.payload == 'hello'
 		result = queueChannel.receive()

@@ -15,11 +15,11 @@ doWithSpringIntegration {
   queueChannel('hotDrinks',capacity:10)
   handle(inputChannel:'hotDrinks',ref:'barista',method:'prepareHotDrink',outputChannel:'preparedDrinks')
   
-  aggregate(inputChannel:'preparedDrinks', {drinks-> new Delivery(drinks)},
+  aggregate(inputChannel:'preparedDrinks', {drinks-> new Delivery(drinks.payload)},
       correlationStrategy: {drink->  drink.getOrderNumber()}
       ,outputChannel:'deliveries')
   
-  handle(inputChannel:'deliveries',{println it}}
+  handle(inputChannel:'deliveries',{println it})
   
   poll('poller','default':true,'fixed-delay':1000)
 }

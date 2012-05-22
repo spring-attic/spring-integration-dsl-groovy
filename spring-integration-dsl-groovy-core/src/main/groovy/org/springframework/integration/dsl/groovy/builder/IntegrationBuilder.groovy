@@ -1,11 +1,11 @@
 /*
  * Copyright 2002-2012 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -17,10 +17,6 @@ import org.apache.commons.logging.Log
 import org.springframework.context.ApplicationContext
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
 import org.springframework.integration.dsl.groovy.IntegrationContext
-import org.springframework.integration.dsl.groovy.Filter
-import org.springframework.integration.dsl.groovy.ServiceActivator
-import org.springframework.integration.dsl.groovy.Splitter
-import org.springframework.integration.dsl.groovy.Transformer
 import org.springframework.integration.dsl.groovy.MessageFlow
 import org.springframework.integration.dsl.groovy.XMLBean
 
@@ -31,13 +27,13 @@ import org.springframework.integration.dsl.groovy.XMLBean
  */
 class IntegrationBuilderCategory {
 	/**
-	 * Overrrides the DefaultGroovyMethods.split() with no parameters 
+	 * Overrrides the DefaultGroovyMethods.split() with no parameters
 	 * @param self
 	 * @param closure
 	 * @return the result of builder invoking split
 	 */
 	static Object split(Object self, Closure closure){
-		self.delegate.splitter([closure] as Object[] )
+		self.delegate.splitter([closure]as Object[] )
 	}
 }
 
@@ -99,9 +95,10 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		registerExplicitMethod 'transform', this.&transformer
 		registerExplicitMethod 'handle', this.&serviceActivator
 		registerExplicitMethod 'aggregate', this.&aggregator
+		registerExplicitMethod 'split', this.&splitter
 		registerFactory 'bridge', new BridgeFactory()
 		/*
-		 * Router 
+		 * Router
 		 */
 		registerExplicitMethod 'route', this.&router
 		registerFactory 'when', new RouterConditionFactory()
@@ -109,7 +106,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		registerFactory 'map', new ChannelMapFactory()
 
 		/*
-		 * XML Bean 
+		 * XML Bean
 		 */
 		registerExplicitMethod 'springXml', this.&springXml
 		registerFactory 'namespaces', new XMLNamespaceFactory()
@@ -181,11 +178,11 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		if ( (list.size() > 0) && (list.last() instanceof Map)) {
 			attributes = list.head()
 		}
-	    /*
-	     * Identify any unnamed closures. Should be at most 2. If there are 2, the first one must be the action closure
-	     */
+		/*
+		 * Identify any unnamed closures. Should be at most 2. If there are 2, the first one must be the action closure
+		 */
 		def closures = list.findAll {it instanceof Closure}
-		
+
 		if (closures?.size == 2) {
 			logger.debug(closures)
 			actionClosure = closures[0]
@@ -208,7 +205,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		 */
 		if (actionClosure){
 			assert list.contains(actionClosure)
-		    list = list - actionClosure
+			list = list - actionClosure
 			registerFactory(name,new ActionAwareEndpointFactory(factory,actionClosure.dehydrate()))
 		} else {
 			registerFactory(name,factory)
