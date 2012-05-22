@@ -18,21 +18,18 @@ package org.springframework.integration.samples.cafe;
 
 import java.util.List;
 
-import org.springframework.integration.samples.cafe.Delivery;
-import org.springframework.integration.samples.cafe.Drink;
-
 /**
  * @author Marius Bogoevici
  */
 
 public class Waiter {
 
-    public Delivery prepareDelivery(List<Drink> drinks) {
-        return new Delivery(drinks);
-    }
-    
-    public int correlateByOrderNumber(Drink drink) {
-    	return drink.getOrderNumber();
-    }
-    
+	public Delivery prepareDelivery(List<Drink> drinks) {
+		return new Delivery(drinks);
+	}
+
+	public int correlateByOrderNumber(Drink drink) {
+		return drink.getOrderNumber();
+	}
+
 }

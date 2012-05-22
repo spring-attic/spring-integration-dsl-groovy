@@ -21,7 +21,7 @@ import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder;
 
 /**
  * @author David Turanski
- *
+ * 
  */
 public class Main {
 
@@ -31,9 +31,9 @@ public class Main {
 	public static void main(String[] args) {
 		IntegrationBuilder integrationBuilder = new IntegrationBuilder();
 		try {
-			integrationBuilder.build(new FileInputStream("config/cafe-config.groovy"));	
+			integrationBuilder.build(new FileInputStream("config/cafe-config.groovy"));
 			ApplicationContext applicationContext = integrationBuilder.getApplicationContext();
-			
+
 			Cafe cafe = (Cafe) applicationContext.getBean("cafe");
 			for (int i = 1; i <= 100; i++) {
 				Order order = new Order(i);
@@ -41,7 +41,7 @@ public class Main {
 				order.addItem(DrinkType.MOCHA, 3, true);
 				cafe.placeOrder(order);
 			}
-			((GenericApplicationContext)applicationContext).close();		
+			((GenericApplicationContext) applicationContext).close();
 		}
 		catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

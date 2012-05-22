@@ -25,26 +25,23 @@ public class Delivery {
 
 	private static final String SEPARATOR = "-----------------------";
 
+	private final List<Drink> deliveredDrinks;
 
-    private List<Drink> deliveredDrinks;
-
-	private int orderNumber;
-
+	private final int orderNumber;
 
 	public Delivery(List<Drink> deliveredDrinks) {
-		assert(deliveredDrinks.size() > 0);
-        this.deliveredDrinks = deliveredDrinks;
+		assert (deliveredDrinks.size() > 0);
+		this.deliveredDrinks = deliveredDrinks;
 		this.orderNumber = deliveredDrinks.get(0).getOrderNumber();
-    }
+	}
 
-
-    public int getOrderNumber() {
+	public int getOrderNumber() {
 		return orderNumber;
 	}
 
 	public List<Drink> getDeliveredDrinks() {
-        return deliveredDrinks;
-    }
+		return deliveredDrinks;
+	}
 
 	@Override
 	public String toString() {

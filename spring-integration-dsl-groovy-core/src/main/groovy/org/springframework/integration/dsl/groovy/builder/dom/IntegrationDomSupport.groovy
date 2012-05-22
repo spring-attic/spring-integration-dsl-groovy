@@ -1,11 +1,11 @@
 /*
  * Copyright 2002-2012 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -30,7 +30,7 @@ class IntegrationDomSupport {
 	private XMLNamespaceSupport namespaceSupport = new XMLNamespaceSupport()
 
 	/**
-	 * Translate DSL context to XML	
+	 * Translate DSL context to XML
 	 * @param integrationContext
 	 * @return Spring XML bean definitions
 	 */
@@ -38,7 +38,7 @@ class IntegrationDomSupport {
 	private final domBuilders = [:]
 
 	IntegrationDomSupport() {
-		registerBuilders();
+		registerBuilders()
 	}
 	IntegrationDomSupport(List<AbstractIntegrationBuilderModuleSupport> moduleSupportInstances) {
 		this()
@@ -46,9 +46,9 @@ class IntegrationDomSupport {
 			moduleSupport.registerDomBuilders(this)
 		}
 	}
-	
 
-    private void registerBuilders() {
+
+	private void registerBuilders() {
 		domBuilders["org.springframework.integration.dsl.groovy.AbstractChannel"]=new ChannelDomBuilder(this)
 		domBuilders["org.springframework.integration.dsl.groovy.SimpleEndpoint"]=new SimpleEndpointDomBuilder(this)
 		domBuilders["org.springframework.integration.dsl.groovy.Aggregator"]=new AggregatorDomBuilder(this)
@@ -60,14 +60,14 @@ class IntegrationDomSupport {
 	}
 
 	def domBuilder(Object component) {
-		def builder = null 
+		def builder = null
 		if (component instanceof String) {
 			builder = domBuilders[component]
 		}
 		else if (component instanceof AbstractChannel) {
 			builder = domBuilders[AbstractChannel.class.name]
 		} else if (component instanceof SimpleEndpoint) {
-		    builder =  domBuilders[component.class.name] ?: domBuilders[SimpleEndpoint.class.name]
+			builder =  domBuilders[component.class.name] ?: domBuilders[SimpleEndpoint.class.name]
 		} else {
 			builder = domBuilders[component.class.name]
 		}
@@ -78,8 +78,8 @@ class IntegrationDomSupport {
 
 		resolveXMLBeanNamespaces(integrationContext.components.findAll {it instanceof XMLNamespace} )
 
-		integrationContext.messageFlows?.each {messageFlow -> 
-			domBuilder(messageFlow).resolveMessageFlowChannels(messageFlow) 
+		integrationContext.messageFlows?.each {messageFlow ->
+			domBuilder(messageFlow).resolveMessageFlowChannels(messageFlow)
 		}
 
 		def markupBuilder = new StreamingMarkupBuilder()
@@ -92,7 +92,7 @@ class IntegrationDomSupport {
 						Closure c = component.beanDefinitions
 						c.delegate = builder
 						c.call()
-					} 
+					}
 					else  {
 						domBuilder(component)?.build(builder, integrationContext.applicationContext, component)
 					}

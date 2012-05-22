@@ -12,11 +12,6 @@
  */
 package org.springframework.integration.dsl.groovy.builder
 
-import groovy.util.AbstractFactory
-import groovy.util.FactoryBuilderSupport
-
-import java.util.Map
-
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
@@ -40,7 +35,7 @@ abstract class IntegrationComponentFactory extends AbstractFactory {
 		attributes
 	}
 
-	public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) throws InstantiationException, IllegalAccessException {
+	def newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) throws InstantiationException, IllegalAccessException {
 		if (logger.isDebugEnabled()){
 			logger.debug("newInstance name: $name value:$value attr:$attributes")
 		}

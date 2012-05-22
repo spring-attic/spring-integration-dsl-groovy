@@ -18,6 +18,6 @@ package org.springframework.integration.dsl.groovy
  */
 class ComponentNamer {
 	String defaultName(String prefix){
-		"${prefix}_" +  UUID.randomUUID().toString().substring(0, 8)
+		"${prefix}_" +  UUID.randomUUID().toString()[0..8]
 	}
 }

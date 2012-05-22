@@ -55,4 +55,7 @@ class FlowExecution extends MessageProducingEndpoint {
 		outputChannel = messageFlow.outputChannel
 		name = messageFlow.name
 	}
+	String defaultNamePrefix() {
+		"$mflw"
+	}
 }

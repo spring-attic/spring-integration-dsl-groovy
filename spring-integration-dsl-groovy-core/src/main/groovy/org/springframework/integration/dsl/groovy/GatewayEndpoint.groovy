@@ -16,7 +16,7 @@ package org.springframework.integration.dsl.groovy
  * @author David Turanski
  *
  */
-class GatewayEndpoint extends IntegrationComponent {
+abstract class GatewayEndpoint extends IntegrationComponent {
 	static mutuallyExclusiveAttributes=[['requestChannel','request-channel'],['replyChannel','reply-channel']]
 	String requestChannel
 	String replyChannel
@@ -24,9 +24,8 @@ class GatewayEndpoint extends IntegrationComponent {
 	String name
 	
 	GatewayEndpoint(){
-		name = name = defaultName(defaultNamePrefix())
+		name = defaultName(defaultNamePrefix())
 	}
 	
-	protected String defaultNamePrefix(){
-	}
+	abstract protected String defaultNamePrefix()
 }

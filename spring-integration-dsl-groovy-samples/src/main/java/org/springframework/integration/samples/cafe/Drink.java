@@ -21,30 +21,28 @@ package org.springframework.integration.samples.cafe;
  */
 public class Drink {
 
-    private boolean iced;
+	private final boolean iced;
 
-    private int shots;
+	private final int shots;
 
-    private DrinkType drinkType;
+	private final DrinkType drinkType;
 
-	private int orderNumber;
+	private final int orderNumber;
 
-	
-    public Drink(int orderNumber, DrinkType drinkType, boolean hot, int shots) {
-	    this.orderNumber = orderNumber;
-        this.drinkType = drinkType;
-        this.iced = hot;
-        this.shots = shots;
-    }
-
+	public Drink(int orderNumber, DrinkType drinkType, boolean hot, int shots) {
+		this.orderNumber = orderNumber;
+		this.drinkType = drinkType;
+		this.iced = hot;
+		this.shots = shots;
+	}
 
 	public int getOrderNumber() {
 		return orderNumber;
 	}
 
 	@Override
-    public String toString() {
-        return (iced?"Iced":"Hot")  + " " + drinkType.toString() + ", " + shots + " shots.";
-    }
+	public String toString() {
+		return (iced ? "Iced" : "Hot") + " " + drinkType.toString() + ", " + shots + " shots.";
+	}
 
 }

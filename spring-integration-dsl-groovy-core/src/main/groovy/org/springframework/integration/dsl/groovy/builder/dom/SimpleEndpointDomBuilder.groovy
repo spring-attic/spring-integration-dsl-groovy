@@ -33,7 +33,7 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
 	}
 	
 	@Override
-	public void build(Object builder, ApplicationContext applicationContext, Object endpoint, Closure closure) {
+	void build(Object builder, ApplicationContext applicationContext, Object endpoint, Closure closure) {
 		
 		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(new Channel())
 		def name = endpoint.name
@@ -62,22 +62,22 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
 		}
 		
 		if (endpoint instanceof Transformer) {
-			buildEndpoint(builder,endpoint,attributes,"transformer")
+			buildEndpoint(builder,endpoint,attributes,'transformer')
 		}
 		else if (endpoint instanceof Filter) {
-			buildEndpoint(builder,endpoint,attributes,"filter")
+			buildEndpoint(builder,endpoint,attributes,'filter')
 		}
 		else if (endpoint instanceof ServiceActivator) {
-			buildEndpoint(builder,endpoint,attributes,"service-activator")
+			buildEndpoint(builder,endpoint,attributes,'service-activator')
 		}
 		else if (endpoint instanceof Bridge) {
-			buildEndpoint(builder,endpoint,attributes,"bridge")
+			buildEndpoint(builder,endpoint,attributes, 'bridge')
 		}
 		else if (endpoint instanceof Splitter) {
-			buildEndpoint(builder,endpoint,attributes,"splitter")
+			buildEndpoint(builder,endpoint,attributes,'splitter')
 		}
 		else if (endpoint instanceof RouterComposition) {
-			buildEndpoint(builder,endpoint,attributes,"router",closure)
+			buildEndpoint(builder,endpoint,attributes,'router',closure)
 		}
 	}
 	
@@ -90,7 +90,9 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
 					"$siPrefix:poller"(ref:endpoint.poller)
 				}
 			}
-			if (closure)closure.call()
+			if (closure) {
+				closure.call()
+			}
 		}
 	}
 

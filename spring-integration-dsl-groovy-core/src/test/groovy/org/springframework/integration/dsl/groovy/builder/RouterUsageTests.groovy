@@ -10,13 +10,15 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.springframework.integration.dsl.groovy.builder;
+package org.springframework.integration.dsl.groovy.builder
+
+import static org.junit.Assert.*
 import org.junit.Test
 
 import org.springframework.integration.dsl.groovy.RouterComposition
 import org.springframework.integration.dsl.groovy.RouterCondition
 import org.springframework.integration.dsl.groovy.ServiceActivator
-import static org.junit.Assert.*
+
 
 import org.springframework.integration.support.MessageBuilder
 /**
@@ -24,7 +26,7 @@ import org.springframework.integration.support.MessageBuilder
  *
  */
 
-public class RouterUsageTests {
+class RouterUsageTests {
 	IntegrationBuilder builder = new IntegrationBuilder()
 
 	@Test
@@ -36,8 +38,8 @@ public class RouterUsageTests {
 			handle('lower', {payload -> payload.toLowerCase()})
 		}
 
-		assert integrationContext.sendAndReceive('inputChannel',"Hello") == "HELLO"
-		assert integrationContext.sendAndReceive('inputChannel',"GoodBye") == "goodbye"
+		assert integrationContext.sendAndReceive('inputChannel','Hello') == 'HELLO'
+		assert integrationContext.sendAndReceive('inputChannel','GoodBye') == 'goodbye'
 	}
 
 
@@ -61,7 +63,7 @@ public class RouterUsageTests {
 	void testRouterWhen() {
 		def flow = builder.messageFlow {
 
-			route('myRouter', { it == "Hello" ? 'foo' : 'bar' } )
+			route('myRouter', { it == 'Hello' ? 'foo' : 'bar' } )
 			{
 				when('foo') {
 					handle {payload -> payload.toUpperCase()}
@@ -86,14 +88,14 @@ public class RouterUsageTests {
 		def sa = routerCondition.components[0]
 		assert (sa instanceof ServiceActivator)
 
-		assert flow.sendAndReceive("Hello") == "HELLO"
-		assert flow.sendAndReceive("SOMETHING") == "something"
+		assert flow.sendAndReceive('Hello') == 'HELLO'
+		assert flow.sendAndReceive('SOMETHING') == 'something'
 	}
 
 	@Test
 	void testRouterWithOtherwise() {
 		def flow = builder.messageFlow {
-			route('myRouter', { if (it == "Hello" ) 'foo' } )
+			route('myRouter', { if (it == 'Hello' ) 'foo' } )
 			{
 				when('foo') {
 					handle {payload -> payload.toUpperCase()}
@@ -104,17 +106,14 @@ public class RouterUsageTests {
 				}
 			}
 		}
-		assert flow.sendAndReceive("Hello") == "HELLO"
-		assert flow.sendAndReceive("SOMETHING") == "something"
+		assert flow.sendAndReceive('Hello') == 'HELLO'
+		assert flow.sendAndReceive('SOMETHING') == 'something'
 	}
 
 	@Test
-	/*
-	 *  
-	 */
 	void testMidstreamRouter() {
 		def flow = builder.messageFlow {
-			route('myRouter', { if (it == "Hello" ) 'foo' } )
+			route('myRouter', { if (it == 'Hello' ) 'foo' } )
 			{
 				when('foo') {
 					handle(outputChannel:'foo.out', {payload -> payload.toUpperCase()})
@@ -130,8 +129,8 @@ public class RouterUsageTests {
 			messageFlow(inputChannel:'default.out') { transform {it*2} }
 		}
 
-		assert flow.sendAndReceive("Hello") == "HE"
-		assert flow.sendAndReceive("SOMETHING") == "somethingsomething"
+		assert flow.sendAndReceive('Hello') == 'HE'
+		assert flow.sendAndReceive('SOMETHING') == 'somethingsomething'
 	}
 
 	@Test
@@ -143,7 +142,7 @@ public class RouterUsageTests {
 					when('bar') { handle {} }
 				}
 			}
-			fail("should throw assertion error")
+			fail('should throw assertion error')
 		} catch (AssertionError e) {
 		}
 	}
@@ -167,10 +166,10 @@ public class RouterUsageTests {
 		assert router.channelMap == [bar:'barChannel',baz:'bazChannel']
 
 
-		def message = MessageBuilder.withPayload("Hello").copyHeaders([foo:'bar']).build()
-		assert flow.sendAndReceive(message).payload == "He"
+		def message = MessageBuilder.withPayload('Hello').copyHeaders([foo:'bar']).build()
+		assert flow.sendAndReceive(message).payload == 'He'
 
-		message = MessageBuilder.withPayload("SOMETHING").copyHeaders([foo:'baz']).build()
-		assert flow.sendAndReceive(message).payload == "SOMETHINGSOMETHING"
+		message = MessageBuilder.withPayload('SOMETHING').copyHeaders([foo:'baz']).build()
+		assert flow.sendAndReceive(message).payload == 'SOMETHINGSOMETHING'
 	}
 }

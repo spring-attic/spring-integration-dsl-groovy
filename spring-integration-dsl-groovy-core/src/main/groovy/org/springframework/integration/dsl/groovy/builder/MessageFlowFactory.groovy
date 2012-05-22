@@ -12,10 +12,6 @@
  */
 package org.springframework.integration.dsl.groovy.builder
 
-import groovy.util.AbstractFactory
-import groovy.util.FactoryBuilderSupport
-import org.apache.commons.logging.LogFactory
-import org.apache.commons.logging.Log
 import org.springframework.integration.dsl.groovy.IntegrationContext
 import org.springframework.integration.dsl.groovy.MessageFlow
 /**
@@ -59,7 +55,7 @@ class MessageFlowFactory extends IntegrationComponentFactory {
 					logger.debug("adding message flow ${messageFlow.name} to integration context")
 				}
 			} else {
-				throw new IllegalArgumentException("parent must be of type IntegrationContext or MessageFlow")
+				throw new IllegalArgumentException('parent must be of type IntegrationContext or MessageFlow')
 			}
 			parent.add(messageFlow)
 		}

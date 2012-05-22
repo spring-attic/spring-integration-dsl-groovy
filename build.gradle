@@ -24,7 +24,7 @@ subprojects { subproject ->
    junitVersion = '4.8.2'
    log4jVersion = '1.2.12'
    mockitoVersion = '1.9.0'
-   springIntegrationVersion = '2.1.1.RELEASE'
+   springIntegrationVersion = '2.2.0.M1'
 
    install {
       repositories.mavenInstaller {
@@ -151,8 +151,8 @@ def customizePom(def pom, def gradleProject) {
                 }
             }
             scm {
-                url = 'https://github.com/dturanski/spring-integration-groovy-dsl'
-                connection = 'scm:git:git://github.com/SpringSource/spring-integration-groovy-dsl'
+                url = 'https://github.com/SpringSource/spring-integration-groovy-dsl'
+                connection = 'scm:git:git://github.com/SpringSource/spring-integration-dsl-groovy'
                 developerConnection = 'scm:git:git://github.com/SpringSource/spring-integration-dsl-groovy'
             }
             developers {

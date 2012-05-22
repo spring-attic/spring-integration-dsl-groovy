@@ -42,7 +42,8 @@ abstract class IntegrationComponent   {
 }
 
 /**
- * A class used to support core Spring components commonly used in integration such as task executor and task scheduler, etc
+ * A class used to support core Spring components commonly used in integration
+ * such as task executor and task scheduler, etc
  * @author David Turanski
  *
  */

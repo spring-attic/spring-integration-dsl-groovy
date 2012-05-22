@@ -8,3 +8,4 @@ build
 .gradle
 .externalToolBuilders
 bin
+activemq-data

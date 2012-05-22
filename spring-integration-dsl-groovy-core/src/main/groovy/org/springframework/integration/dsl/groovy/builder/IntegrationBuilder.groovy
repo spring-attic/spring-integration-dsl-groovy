@@ -12,20 +12,10 @@
  */
 package org.springframework.integration.dsl.groovy.builder
 
-import groovy.lang.Closure;
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.Script;
-import groovy.util.AbstractFactory
-import groovy.util.FactoryBuilderSupport
-import java.io.InputStream
-import java.util.Collection;
-import java.util.Map;
-
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
 import org.springframework.context.ApplicationContext
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
-import org.springframework.integration.dsl.groovy.IntegrationConfig
 import org.springframework.integration.dsl.groovy.IntegrationContext
 import org.springframework.integration.dsl.groovy.Filter
 import org.springframework.integration.dsl.groovy.ServiceActivator
@@ -33,7 +23,6 @@ import org.springframework.integration.dsl.groovy.Splitter
 import org.springframework.integration.dsl.groovy.Transformer
 import org.springframework.integration.dsl.groovy.MessageFlow
 import org.springframework.integration.dsl.groovy.XMLBean
-import org.codehaus.groovy.runtime.InvokerHelper
 
 /**
  * Workaround for DefaultGroovyMethods.split()
@@ -47,7 +36,7 @@ class IntegrationBuilderCategory {
 	 * @param closure
 	 * @return the result of builder invoking split
 	 */
-	public static Object split(Object self, Closure closure){
+	static Object split(Object self, Closure closure){
 		self.delegate.splitter([closure] as Object[] )
 	}
 }
@@ -58,7 +47,7 @@ class IntegrationBuilderCategory {
  *
  */
 class IntegrationBuilder extends FactoryBuilderSupport {
-	private static Log logger = LogFactory.getLog(IntegrationBuilder.class)
+	private static final Log logger = LogFactory.getLog(IntegrationBuilder.class)
 	private final IntegrationContext integrationContext
 	private final ApplicationContext parentContext
 	private boolean autoCreateApplicationContext = true
@@ -69,7 +58,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		this.parentContext = parentContext
 	}
 
-	IntegrationBuilder(ArrayList<String> modules, ApplicationContext parentContext = null) {
+	IntegrationBuilder(List<String> modules, ApplicationContext parentContext = null) {
 		this(modules as String[])
 		this.parentContext = parentContext
 	}
@@ -86,54 +75,54 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		}
 	}
 
-	public void setAutoCreateApplicationContext(boolean autoCreateApplicationContext){
+	void setAutoCreateApplicationContext(boolean autoCreateApplicationContext){
 		this.autoCreateApplicationContext = autoCreateApplicationContext
 	}
 
-	public ApplicationContext getApplicationContext() {
+	ApplicationContext getApplicationContext() {
 		this.integrationContext.applicationContext
 	}
 
-	public IntegrationContext getIntegrationContext() {
+	IntegrationContext getIntegrationContext() {
 		this.integrationContext
 	}
 
 	@Override
 	def registerObjectFactories() {
 
-		registerFactory "messageFlow", new MessageFlowFactory()
-		registerFactory "doWithSpringIntegration", new IntegrationContextFactory()
+		registerFactory 'messageFlow', new MessageFlowFactory()
+		registerFactory 'doWithSpringIntegration', new IntegrationContextFactory()
 		/*
 		 * Simple endpoints
 		 */
-		registerExplicitMethod "filter", this.&filter
-		registerExplicitMethod "transform", this.&transformer
-		registerExplicitMethod "handle", this.&serviceActivator
-		registerExplicitMethod "aggregate", this.&aggregator
-		registerFactory "bridge", new BridgeFactory()
+		registerExplicitMethod 'filter', this.&filter
+		registerExplicitMethod 'transform', this.&transformer
+		registerExplicitMethod 'handle', this.&serviceActivator
+		registerExplicitMethod 'aggregate', this.&aggregator
+		registerFactory 'bridge', new BridgeFactory()
 		/*
 		 * Router 
 		 */
-		registerExplicitMethod "route", this.&router
-		registerFactory "when", new RouterConditionFactory()
-		registerFactory "otherwise", new RouterConditionFactory()
-		registerFactory "map", new ChannelMapFactory()
+		registerExplicitMethod 'route', this.&router
+		registerFactory 'when', new RouterConditionFactory()
+		registerFactory 'otherwise', new RouterConditionFactory()
+		registerFactory 'map', new ChannelMapFactory()
 
 		/*
 		 * XML Bean 
 		 */
-		registerExplicitMethod "springXml", this.&springXml
-		registerFactory "namespaces", new XMLNamespaceFactory()
+		registerExplicitMethod 'springXml', this.&springXml
+		registerFactory 'namespaces', new XMLNamespaceFactory()
 
 
-		registerFactory "channel", new ChannelFactory()
-		registerFactory "pubSubChannel", new ChannelFactory()
-		registerFactory "queueChannel", new ChannelFactory()
-		registerFactory "interceptor", new ChannelInterceptorFactory()
-		registerFactory "wiretap", new ChannelInterceptorFactory()
+		registerFactory 'channel', new ChannelFactory()
+		registerFactory 'pubSubChannel', new ChannelFactory()
+		registerFactory 'queueChannel', new ChannelFactory()
+		registerFactory 'interceptor', new ChannelInterceptorFactory()
+		registerFactory 'wiretap', new ChannelInterceptorFactory()
 
-		registerFactory "poll", new PollerFactory()
-		registerFactory "exec", new FlowExecutionFactory()
+		registerFactory 'poll', new PollerFactory()
+		registerFactory 'exec', new FlowExecutionFactory()
 	}
 
 	@Override
@@ -147,36 +136,36 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		this.integrationContext.messageFlows
 	}
 
-	public Object build(InputStream is) {
+	Object build(InputStream is) {
 		def script = new GroovyClassLoader().parseClass(is).newInstance()
 		this.build(script)
 	}
 
-	public filter(Object[] args){
-		createActionAwareEndpoint(new FilterFactory(), "filter", args)
+	def filter(Object[] args){
+		createActionAwareEndpoint(new FilterFactory(), 'filter', args)
 	}
 
-	public transformer(Object[] args) {
-		createActionAwareEndpoint(new TransformerFactory(), "transform", args)
+	def transformer(Object[] args) {
+		createActionAwareEndpoint(new TransformerFactory(), 'transform', args)
 	}
 
-	public serviceActivator(Object[] args) {
-		createActionAwareEndpoint(new ServiceActivatorFactory(), "handle", args)
+	def serviceActivator(Object[] args) {
+		createActionAwareEndpoint(new ServiceActivatorFactory(), 'handle', args)
 	}
 
-	public splitter(Object[] args) {
-		createActionAwareEndpoint(new SplitterFactory(), "split", args)
+	def splitter(Object[] args) {
+		createActionAwareEndpoint(new SplitterFactory(), 'split', args)
 	}
 
-	public router(Object[] args) {
-		createActionAwareEndpoint(new RouterCompositionFactory(), "route", args)
+	def router(Object[] args) {
+		createActionAwareEndpoint(new RouterCompositionFactory(), 'route', args)
 	}
 
-	public aggregator(Object[] args) {
-		createActionAwareEndpoint(new AggregatorFactory(), "aggregate", args)
+	def aggregator(Object[] args) {
+		createActionAwareEndpoint(new AggregatorFactory(), 'aggregate', args)
 	}
 
-	public createActionAwareEndpoint(IntegrationComponentFactory factory, String name, Object[] args){
+	def createActionAwareEndpoint(IntegrationComponentFactory factory, String name, Object[] args){
 		/*
 		 * Find the action closure if any, remove it from the args and use an ActionAwareEndpointFactory to
 		 * build the node correctly
@@ -232,7 +221,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		def node = dispathNodeCall(name,list as Object[])
 	}
 
-	public IntegrationBuilder springXml(Closure closure) {
+	IntegrationBuilder springXml(Closure closure) {
 		def parent = getCurrent()
 		assert parent && parent instanceof BaseIntegrationComposition, "'springXml' is not valid in this context"
 		parent.add(new XMLBean(builderName:"springXml",beanDefinitions:closure.dehydrate()))
@@ -247,7 +236,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 			if (logger.isDebugEnabled()) {
 				logger.debug("checking classpath for $className")
 			}
-			instances << Class.forName(className).newInstance()
+			instances << this.class.classLoader.loadClass(className).newInstance()
 		}
 		instances
 	}

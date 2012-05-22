@@ -1,11 +1,11 @@
 /*
  * Copyright 2002-2012 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -14,16 +14,13 @@ package org.springframework.integration.dsl.groovy.builder.dom
 
 
 import org.springframework.context.ApplicationContext
-import org.springframework.integration.dsl.groovy.Channel
 import org.springframework.integration.dsl.groovy.FlowExecution
 import org.springframework.integration.dsl.groovy.GatewayEndpoint
 import org.springframework.integration.dsl.groovy.MessageFlow
 import org.springframework.integration.dsl.groovy.MessageProducingEndpoint
-import org.springframework.integration.dsl.groovy.RouterComposition
 import org.springframework.integration.dsl.groovy.SimpleEndpoint
 import org.springframework.integration.dsl.groovy.AbstractChannel
-import org.apache.commons.logging.LogFactory
-import org.apache.commons.logging.Log
+
 
 /**
  * @author David Turanski
@@ -32,16 +29,16 @@ import org.apache.commons.logging.Log
 class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 	ChannelDomBuilder channelBuilder
 	SimpleEndpointDomBuilder endpointBuilder
-	
+
 	MessageFlowDomBuilder(IntegrationDomSupport integrationDomSupport) {
 		this.integrationDomSupport = integrationDomSupport
 	}
-	
-   @Override 
-   public void build(builder, ApplicationContext applicationContext, Object messageFlow, Closure closure) {
-	   SimpleEndpointDomBuilder endpointBuilder = integrationDomSupport.domBuilder(SimpleEndpoint.class.name)
-	   ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(AbstractChannel.class.name)
-	   
+
+	@Override
+	void build(Object builder, ApplicationContext applicationContext, Object messageFlow, Closure closure) {
+		SimpleEndpointDomBuilder endpointBuilder = integrationDomSupport.domBuilder(SimpleEndpoint.class.name)
+		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(AbstractChannel.class.name)
+
 		def previousComponent = null
 		if (messageFlow.outputChannel) {
 			channelBuilder.createDirectChannelIfNotDefined(builder, messageFlow.outputChannel)
@@ -66,19 +63,19 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 	def resolveMessageFlowChannels(messageFlow) {
 
 		def first = messageFlow.components.first()
-		
-		if (first.hasProperty('inputChannel')){ 
+
+		if (first.hasProperty('inputChannel')){
 			first.inputChannel = first.inputChannel ?: messageFlow.inputChannel
 		} else if (first.hasProperty('requestChannel')) {
 			first.requestChannel = first.requestChannel ?: messageFlow.inputChannel
 		}
-		
+
 		def last = messageFlow.components.last()
 
 		if (last instanceof MessageProducingEndpoint){
 			last.outputChannel = last.outputChannel ?: messageFlow.outputChannel
 		}
-		
+
 		if (last instanceof GatewayEndpoint){
 			last.replyChannel = last.replyChannel ?: messageFlow.outputChannel
 		}
@@ -113,34 +110,32 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 
 		}
 	}
-	
+
 	private String channelName(from,to){
 		String channelName = getInboundChannelPropertyIfNull(to,"from.${from.name}.to.${to.name}")
 	}
-    
+
 	private getInboundChannelPropertyIfNull(component, value) {
 		def channelName
 		if (component.hasProperty('inputChannel')){
-		   channelName = component.inputChannel? component.inputChannel: value
+			channelName = component.inputChannel? component.inputChannel: value
 		}
 		else
 		if (component.hasProperty('requestChannel')){
-		  channelName = component.requestChannel? component.requestChannel: value
+			channelName = component.requestChannel? component.requestChannel: value
 		}
 		channelName
 	}
-	
+
 	private getOutboundChannelPropertyIfNull(component, value) {
 		def channelName
 		if (component.hasProperty('outputChannel')){
-		   channelName = component.outputChannel? component.outputChannel: value
+			channelName = component.outputChannel? component.outputChannel: value
 		}
 		else
 		if (component.hasProperty('replyChannel')){
-		  channelName = component.replyChannel? component.replyChannel: value
+			channelName = component.replyChannel? component.replyChannel: value
 		}
 		channelName
 	}
- 
-
 }
