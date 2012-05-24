@@ -21,20 +21,34 @@ import org.springframework.integration.dsl.groovy.builder.dom.IntegrationCompone
  * @author David Turanski
  *
  */
-class JmsListenerDomBuilder extends IntegrationComponentDomBuilder {
+class JmsOutboundDomBuilder extends IntegrationComponentDomBuilder {
 
 	@Override
 	public void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes, Closure closure) {
 
 		attributes.'connection-factory' = component.connectionFactory?:'connectionFactory'
 
-		if (component.destinationName){
-			attributes.'request-destination-name' = component.destinationName
-		}
-		if (component.requestChannel){
-			attributes.'request-channel' = component.requestChannel
-		}
+		if (component.oneWay) {
+			if (component.destinationName){
+				attributes.'destination-name' = component.destinationName
+			}
+			if (component.requestChannel){
+				attributes.'channel' = component.requestChannel
+			}
+			builder.'int-jms:outbound-channel-adapter'(attributes)
+		} else {
+			if (component.destinationName){
+				attributes.'request-destination-name' = component.destinationName
+			}
 
-		builder.'int-jms:inbound-gateway'(attributes)
+			if (component.requestChannel){
+				attributes.'request-channel' = component.requestChannel
+			}
+
+			if (component.replyChannel){
+				attributes.'reply-channel' = component.replyChannel
+			}
+			builder.'int-jms:outbound-gateway'(attributes)
+		}
 	}
 }

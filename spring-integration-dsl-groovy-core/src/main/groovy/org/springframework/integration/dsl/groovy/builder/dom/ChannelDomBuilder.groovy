@@ -37,18 +37,19 @@ class ChannelDomBuilder extends IntegrationComponentDomBuilder {
 	 * Builds and registers a channel definition. These can be overridden
 	 */
 	@Override
-	public void build(builder, ApplicationContext applicationContext, Object channel, Closure closure) {
+	public void doBuild(builder, ApplicationContext applicationContext, Object channel, Map attributes, Closure closure) {
 		if (channel instanceof Channel) {
-			builder."$siPrefix:channel"([id:channel.name] << channel.componentProperties) {
+			builder."$siPrefix:channel"(attributes) {
 				addChannelInterceptors(builder, applicationContext, channel, closure)
 			}
 		} else if (channel instanceof PubSubChannel) {
-			builder."$siPrefix:publish-subscribe-channel"([id:channel.name] << channel.componentProperties){
+			builder."$siPrefix:publish-subscribe-channel"(attributes){
 				addChannelInterceptors(builder, applicationContext, channel, closure)
 			}
 		} else if (channel instanceof QueueChannel) {
 			builder."$siPrefix:channel"(id:channel.name) {
-				"$siPrefix:queue"(channel.componentProperties)
+				attributes.remove('id')
+				"$siPrefix:queue"(attributes)
 				addChannelInterceptors(builder, applicationContext, channel, closure)
 			}
 		}
@@ -77,6 +78,9 @@ class ChannelDomBuilder extends IntegrationComponentDomBuilder {
 	 * @return
 	 */
 	def createDirectChannelIfNotDefined (builder, channelName) {
+		if (['nullChannel', 'errorChannel'].contains(channelName) ) {
+			return
+		}
 		if (!declaredChannels.contains(channelName)){
 			builder."$siPrefix:channel"(id:channelName)
 			declaredChannels << channelName

@@ -10,33 +10,23 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.springframework.integration.dsl.groovy.builder
-import static org.junit.Assert.*
-import org.junit.Test
+package org.springframework.integration.dsl.groovy.jms
 
+import org.springframework.integration.dsl.groovy.GatewayEndpoint
 
 /**
  * @author David Turanski
  *
  */
+class JmsOutbound extends GatewayEndpoint {
+	static requiredAttributes = ['destinationName']
+	static requiresReply = false
+	String destinationName
+	String connectionFactory = 'connectionFactory'
+	boolean oneWay
 
-class XMLBeanTests {
-
-	IntegrationBuilder builder = new IntegrationBuilder()
-
-	@Test
-	void testXMLBeans() {
-		builder.doWithSpringIntegration {
-			namespaces('int-http')
-			springXml {
-				'int-http:inbound-channel-adapter'(
-						id:'httpChannelAdapter',
-						channel:'requests',
-						'supported-methods':'PUT, DELETE')
-				'si:channel'(id:'requests')
-			}
-		}
-
-		builder.applicationContext.getBean('requests')
+	@Override
+	protected String defaultNamePrefix() {
+		'$jmsOut'
 	}
 }

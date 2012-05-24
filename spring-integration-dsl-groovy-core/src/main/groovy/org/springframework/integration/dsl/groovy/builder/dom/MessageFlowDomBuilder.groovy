@@ -35,7 +35,7 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 	}
 
 	@Override
-	void build(Object builder, ApplicationContext applicationContext, Object messageFlow, Closure closure) {
+	void doBuild(Object builder, ApplicationContext applicationContext, Object messageFlow, Map attributes, Closure closure) {
 		SimpleEndpointDomBuilder endpointBuilder = integrationDomSupport.domBuilder(SimpleEndpoint.class.name)
 		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(AbstractChannel.class.name)
 
@@ -62,7 +62,8 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 
 	def resolveMessageFlowChannels(messageFlow) {
 
-		def first = messageFlow.components.first()
+		def endpoints = messageFlow.components.findAll{it.hasProperty('inputChannel') || it.hasProperty('requestChannel')}
+		def first = endpoints?.first()
 
 		if (first.hasProperty('inputChannel')){
 			first.inputChannel = first.inputChannel ?: messageFlow.inputChannel
@@ -70,7 +71,7 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 			first.requestChannel = first.requestChannel ?: messageFlow.inputChannel
 		}
 
-		def last = messageFlow.components.last()
+		def last = endpoints?.last()
 
 		if (last instanceof MessageProducingEndpoint){
 			last.outputChannel = last.outputChannel ?: messageFlow.outputChannel
@@ -82,15 +83,17 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 
 		def outputChannel
 
-		messageFlow.components.eachWithIndex {component, i->
+		endpoints.eachWithIndex {component, i->
 
 			if (component instanceof SimpleEndpoint ) {
+				if (component != first && endpoints[i-1] instanceof GatewayEndpoint ) {
+					component.inputChannel = component.inputChannel ?: endpoints[i-1].requestChannel
+				}
 				component.inputChannel = component.inputChannel ?: outputChannel
-
 
 				if (component instanceof MessageProducingEndpoint ) {
 					if (component != last && component.linkToNext) {
-						component.outputChannel = outputChannel = component.outputChannel ?: channelName(component,messageFlow.components[i+1])
+						component.outputChannel = outputChannel = component.outputChannel ?: channelName(component,endpoints[i+1])
 						//If component is Flow execution in the midst of a messageFlow, it requires an outputChannel
 						if (component instanceof FlowExecution ) {
 							def c = component.messageFlow.components.last()
@@ -103,7 +106,7 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 			else if (component instanceof GatewayEndpoint ){
 				component.requestChannel = component.requestChannel ?: outputChannel
 				if (component != last && component.linkToNext) {
-					component.replyChannel = outputChannel = component.replyChannel ?: channelName(component,messageFlow.components[i+1])
+					component.replyChannel = outputChannel = component.replyChannel ?: channelName(component,endpoints[i+1])
 				}
 
 			}

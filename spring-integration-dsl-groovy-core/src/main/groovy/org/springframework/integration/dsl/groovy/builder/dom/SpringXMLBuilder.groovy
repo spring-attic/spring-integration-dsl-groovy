@@ -10,33 +10,24 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.springframework.integration.dsl.groovy.builder
-import static org.junit.Assert.*
-import org.junit.Test
+package org.springframework.integration.dsl.groovy.builder.dom
 
+import groovy.lang.Closure
+
+import java.util.Map
+import org.springframework.context.ApplicationContext
 
 /**
  * @author David Turanski
  *
  */
+class SpringXMLBuilder extends IntegrationComponentDomBuilder {
 
-class XMLBeanTests {
-
-	IntegrationBuilder builder = new IntegrationBuilder()
-
-	@Test
-	void testXMLBeans() {
-		builder.doWithSpringIntegration {
-			namespaces('int-http')
-			springXml {
-				'int-http:inbound-channel-adapter'(
-						id:'httpChannelAdapter',
-						channel:'requests',
-						'supported-methods':'PUT, DELETE')
-				'si:channel'(id:'requests')
-			}
-		}
-
-		builder.applicationContext.getBean('requests')
+	@Override
+	protected void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes,
+	Closure closure) {
+		Closure c = component.beanDefinitions
+		c.delegate = builder
+		c.call()
 	}
 }

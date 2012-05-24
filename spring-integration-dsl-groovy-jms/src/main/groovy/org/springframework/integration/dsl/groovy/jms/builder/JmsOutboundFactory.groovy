@@ -12,27 +12,27 @@
  */
 package org.springframework.integration.dsl.groovy.jms.builder
 
-
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
 import org.springframework.integration.dsl.groovy.builder.IntegrationComponentFactory
-import org.springframework.integration.dsl.groovy.jms.JmsListener
+import org.springframework.integration.dsl.groovy.jms.JmsOutbound
 
 import groovy.util.FactoryBuilderSupport
-import java.util.Map
 
 /**
  * @author David Turanski
  *
  */
-class JmsListenerFactory extends IntegrationComponentFactory {
+class JmsOutboundFactory extends IntegrationComponentFactory {
+	boolean oneWay
+
 	@Override
-	def doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
-		new JmsListener(attributes)
+	Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
+		new JmsOutbound(attributes << [oneWay:oneWay])
 	}
 
 	@Override
-	void setParent(FactoryBuilderSupport builder, Object parent, Object jmsListener) {
-		assert parent instanceof BaseIntegrationComposition, "'${jmsListener.builderName}' cannot be a child of '${parent.builderName}'"
-		parent.add(jmsListener)
+	void setParent(FactoryBuilderSupport builder, Object parent, Object jmsOutbound) {
+		assert parent instanceof BaseIntegrationComposition, "'${jmsOutbound.builderName}' cannot be a child of '${parent.builderName}'"
+		parent.add(jmsOutbound)
 	}
 }

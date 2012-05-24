@@ -31,11 +31,8 @@ class RouterDomBuilder extends IntegrationComponentDomBuilder {
 	}
 
 	@Override
-	void build(builder, ApplicationContext applicationContext, Object routerComposition, Closure closure) {
+	void doBuild(builder, ApplicationContext applicationContext, Object routerComposition, Map attributes, Closure closure) {
 		SimpleEndpointDomBuilder endpointBuilder = integrationDomSupport.domBuilder(SimpleEndpoint.class.name)
-		if (logger.isDebugEnabled()){
-			logger.debug("Building router composition")
-		}
 
 		def otherwise = routerComposition.components.find{it instanceof OtherwiseCondition}
 		if (otherwise){

@@ -79,9 +79,9 @@ class IntegrationContext extends BaseIntegrationComposition {
 				applicationContext.parentContext = parentContext
 			}
 
-			def integrationMarkupSupport = new IntegrationDomSupport(this.moduleSupportInstances)
+			def integrationDomSupport = new IntegrationDomSupport(this.moduleSupportInstances)
 
-			def xml = integrationMarkupSupport.translateToXML(this)
+			def xml = integrationDomSupport.translateToXML(this)
 
 			applicationContext.load(new ByteArrayResource(xml.getBytes() ))
 			applicationContext.refresh()

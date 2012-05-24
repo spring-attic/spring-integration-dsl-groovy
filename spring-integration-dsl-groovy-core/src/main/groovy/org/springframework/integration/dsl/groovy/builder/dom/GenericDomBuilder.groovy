@@ -30,7 +30,7 @@ class GenericDomBuilder extends IntegrationComponentDomBuilder {
 	}
 
 	@Override
-	public void build(Object builder, ApplicationContext applicationContext, Object component, Closure closure) {
+	public void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes, Closure closure) {
 		if (component.name) {
 			component.componentProperties << [id:component.name]
 		}

@@ -6,23 +6,24 @@
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * Unless required by aplicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 package org.springframework.integration.dsl.groovy.jms
 
-import org.springframework.integration.dsl.groovy.IntegrationComponent
+import org.springframework.integration.dsl.groovy.GatewayEndpoint
 
 /**
  * @author David Turanski
  *
  */
-class JmsListener extends IntegrationComponent {
-	def destinationName
-	def connectionFactory
+class JmsListener extends GatewayEndpoint {
+	static requiredAttributes = ['destinationName']
+	String destinationName
+	String connectionFactory = 'connectionFactory'
 
 	protected String defaultNamePrefix(){
-		'$jmsMsgDrvnChAdptr'
+		'$jmsIn'
 	}
 }

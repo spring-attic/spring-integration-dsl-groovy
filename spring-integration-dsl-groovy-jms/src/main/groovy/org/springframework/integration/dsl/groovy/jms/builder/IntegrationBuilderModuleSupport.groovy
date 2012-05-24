@@ -15,6 +15,7 @@ import org.springframework.integration.dsl.groovy.builder.AbstractIntegrationBui
 import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationDomSupport
 import org.springframework.integration.dsl.groovy.jms.builder.dom.JmsListenerDomBuilder
+import org.springframework.integration.dsl.groovy.jms.builder.dom.JmsOutboundDomBuilder
 
 /**
  * @author David Turanski
@@ -25,6 +26,8 @@ class IntegrationBuilderModuleSupport extends AbstractIntegrationBuilderModuleSu
 	@Override
 	void registerBuilderFactories(IntegrationBuilder builder) {
 		builder.registerFactory 'jmsListen', new JmsListenerFactory()
+		builder.registerFactory 'jmsSend', new JmsOutboundFactory(oneWay:true)
+		builder.registerFactory 'jmsSendAndReceive', new JmsOutboundFactory()
 	}
 
 	@Override
@@ -32,5 +35,7 @@ class IntegrationBuilderModuleSupport extends AbstractIntegrationBuilderModuleSu
 		integrationDomSupport.namespaceSupport.addIntegrationNamespace('int-jms')
 		integrationDomSupport.domBuilders['org.springframework.integration.dsl.groovy.jms.JmsListener'] \
 			= new JmsListenerDomBuilder(integrationDomSupport:integrationDomSupport)
+		integrationDomSupport.domBuilders['org.springframework.integration.dsl.groovy.jms.JmsOutbound'] \
+			= new JmsOutboundDomBuilder(integrationDomSupport:integrationDomSupport)
 	}
 }

@@ -13,13 +13,12 @@
 package org.springframework.integration.dsl.groovy.builder.dom
 
 import groovy.xml.StreamingMarkupBuilder
-import groovy.xml.XmlUtil
 
-import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
-
+import org.apache.commons.logging.LogFactory
 import org.springframework.integration.dsl.groovy.*
 import org.springframework.integration.dsl.groovy.builder.AbstractIntegrationBuilderModuleSupport
+import groovy.xml.XmlUtil
 
 /**
  * @author David Turanski
@@ -57,6 +56,7 @@ class IntegrationDomSupport {
 		domBuilders["org.springframework.integration.dsl.groovy.Poller"]=new GenericDomBuilder(this,'poller')
 		domBuilders["org.springframework.integration.dsl.groovy.ChannelInterceptor"]=new ChannelInterceptorDomBuilder(this)
 		domBuilders["org.springframework.integration.dsl.groovy.Wiretap"]=new GenericDomBuilder(this,'wire-tap')
+		domBuilders["org.springframework.integration.dsl.groovy.XMLBean"]=new SpringXMLBuilder()
 	}
 
 	def domBuilder(Object component) {
@@ -88,14 +88,7 @@ class IntegrationDomSupport {
 			println namespaceSupport.namespaceDeclarations
 			beans(namespaceSupport.schemaLocationDeclaration() ) {
 				integrationContext.components.each {component ->
-					if (component instanceof XMLBean){
-						Closure c = component.beanDefinitions
-						c.delegate = builder
-						c.call()
-					}
-					else  {
-						domBuilder(component)?.build(builder, integrationContext.applicationContext, component)
-					}
+					domBuilder(component)?.build(builder, integrationContext.applicationContext, component)
 				}
 			}
 		}

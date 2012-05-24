@@ -14,11 +14,11 @@ package org.springframework.integration.dsl.groovy.http.builder.dom
 
 import org.springframework.beans.factory.config.BeanDefinitionHolder
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
-import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils
+import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.context.ApplicationContext
-import org.springframework.integration.dsl.groovy.builder.dom.IntegrationComponentDomBuilder
 import org.springframework.integration.dsl.groovy.ClosureInvokingMessageProcessor
+import org.springframework.integration.dsl.groovy.builder.dom.IntegrationComponentDomBuilder
 
 /**
  * @author David Turanski
@@ -27,36 +27,37 @@ import org.springframework.integration.dsl.groovy.ClosureInvokingMessageProcesso
 class HttpOutboundDomBuilder extends IntegrationComponentDomBuilder {
 
 	@Override
-	void build(Object builder, ApplicationContext applicationContext, Object component, Closure closure) {
+	void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes, Closure closure) {
 
 		def httpMethod = 'GET'
 		if (component.builderName == 'httpPut') {
 			httpMethod = 'PUT'
 		}
 
-		if (component.requestChannel && !component.componentProperties.containsKey('request-channel')){
-			component.'request-channel' = component.requestChannel
+		if (component.requestChannel && !attributes.containsKey('request-channel')){
+			attributes.'request-channel' = component.requestChannel
 		}
 
-		if (component.replyChannel && !component.componentProperties.containsKey('reply-channel')){
-			component.'reply-channel' = component.replyChannel
+		if (component.replyChannel && !attributes.containsKey('reply-channel')){
+			attributes.'reply-channel' = component.replyChannel
 		}
 
 		component.'http-method' = httpMethod
 
 		if (component.responseType) {
-			component.'expected-response-type' =component.responseType.name
+			attributes.'expected-response-type' =component.responseType.name
 		}
 
 		Closure urlExpression
 
+		attributes.url = component.url
 		if (component.url instanceof Closure) {
 			urlExpression = component.url
-			component.url = '{url}'
+			attributes.url = '{url}'
 		}
 
 
-		builder.'int-http:outbound-gateway'(component.componentProperties) {
+		builder.'int-http:outbound-gateway'(attributes) {
 			if (urlExpression){
 				def beanName = "${component.name}_closureInvokingHandler"
 				BeanDefinitionBuilder  handlerBuilder =

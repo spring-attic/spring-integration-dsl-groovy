@@ -34,7 +34,7 @@ class ChannelInterceptorDomBuilder extends IntegrationComponentDomBuilder {
 	 * Builds and registers a channel interceptor
 	 */
 	@Override
-	public void build(builder, ApplicationContext applicationContext, Object channelInterceptor, Closure closure) {
+	public void doBuild(builder, ApplicationContext applicationContext, Object channelInterceptor, Map attributes, Closure closure) {
 
 		def beanName = "${channelInterceptor.name}_closureInvokingChannelInterceptor"
 
@@ -46,7 +46,8 @@ class ChannelInterceptorDomBuilder extends IntegrationComponentDomBuilder {
 
 		channelInterceptor.ref=beanName
 		if (channelInterceptor.global){
-			builder."$siPrefix:channel-interceptor"(channelInterceptor.componentProperties)
+			attributes.remove('id')
+			builder."$siPrefix:channel-interceptor"(attributes)
 		} else {
 			builder.ref(bean:beanName)
 		}
