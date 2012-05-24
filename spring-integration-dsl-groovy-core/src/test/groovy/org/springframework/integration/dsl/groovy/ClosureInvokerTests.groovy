@@ -13,10 +13,13 @@ package org.springframework.integration.dsl.groovy
  */
 import static org.junit.Assert.*
 
+
 import org.junit.Test
-import org.springframework.integration.Message
 import org.springframework.integration.support.MessageBuilder
 import org.springframework.integration.message.GenericMessage
+import org.springframework.integration.Message
+
+import java.lang.reflect.*
 
 /**
  * @author David Turanski
@@ -48,7 +51,7 @@ class ClosureInvokerTests {
 		assertEquals('foobar',messageClosureInvoker.processMessage(message))
 	}
 
-	//These also invoked from a Java Test
+	//These may also be invoked from a Java Test
 
 	static ClosureInvokingMessageProcessor getSimpleMessageInvoker() {
 		new ClosureInvokingMessageProcessor({Message m-> m.payload})

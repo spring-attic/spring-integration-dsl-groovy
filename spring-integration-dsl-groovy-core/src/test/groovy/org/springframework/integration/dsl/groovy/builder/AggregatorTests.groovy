@@ -33,14 +33,15 @@ class AggregatorTests {
 
 
 		def result = flow.sendAndReceive([1, 2])
-		assert result == [1, 2]}
+		assert result == [1, 2]
+	}
 
 	@Test
 	void testCustomReleaseStrategy() {
 		def flow = builder.messageFlow {
 
 			split()
-			aggregate(releaseStrategy:{List<Integer> list-> (list.inject(0){sum,item-> sum + item.payload} >= 6) })
+			aggregate(releaseStrategy:{list-> (list.inject(0){sum,item-> sum + item} >= 6) })
 		}
 
 
@@ -73,7 +74,7 @@ class AggregatorTests {
 		def flow = builder.messageFlow(outputChannel:'queueChannel') {
 			queueChannel('queueChannel')
 			split()
-			aggregate( { list-> ['list':list] })
+			aggregate {List list-> ['list':list] }
 		}
 
 		def ac = builder.integrationContext.createApplicationContext()

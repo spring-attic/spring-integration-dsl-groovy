@@ -15,7 +15,7 @@ doWithSpringIntegration {
   queueChannel('hotDrinks',capacity:10)
   handle(inputChannel:'hotDrinks',ref:'barista',method:'prepareHotDrink',outputChannel:'preparedDrinks')
   
-  aggregate(inputChannel:'preparedDrinks', {drinks-> new Delivery(drinks.payload)},
+  aggregate(inputChannel:'preparedDrinks', {drinks-> new Delivery(drinks)},
       correlationStrategy: {drink->  drink.getOrderNumber()}
       ,outputChannel:'deliveries')
   
