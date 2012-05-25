@@ -21,5 +21,5 @@ doWithSpringIntegration {
   
   handle(inputChannel:'deliveries',{println it})
   
-  poll('poller','default':true,'fixed-delay':1000)
+  poll('poller','default':true,fixedDelay:1000)
 }

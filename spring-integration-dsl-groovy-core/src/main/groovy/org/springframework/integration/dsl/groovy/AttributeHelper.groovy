@@ -13,11 +13,12 @@
 package org.springframework.integration.dsl.groovy
 
 /**
- *
+ *Mixin for IntegrationComponent
+ * @see IntegrationComponent
  * @author David Turanski
  *
  */
-class AttributeValidator {
+class AttributeHelper {
 	/**
 	 * Validates component attributes and generates a descriptive error message
 	 * @param attributes
@@ -91,5 +92,27 @@ class AttributeValidator {
 			}
 		}
 		errorMsg
+	}
+
+	String propertyNameToAttributeName(String property) {
+		assert property =~ /^[a-z]+(\-[a-z]+)*([A-Z]+[a-z]*)*$/, "property $property is not well-formed"
+		if (property =~ /^[a-z]+(\-[a-z]+)*$/) {
+			return property
+		}
+		def attribute=''
+		def uc
+		property.each { c ->
+			if (c =~ /[a-z]/) {
+				uc = null
+				attribute += c
+			} else {
+				if (!uc) {
+					attribute += '-'
+				}
+				uc = c
+				attribute += c.toLowerCase()
+			}
+		}
+		attribute
 	}
 }

@@ -1,11 +1,11 @@
 /*
  * Copyright 2002-2012 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -18,24 +18,26 @@ import org.apache.commons.logging.LogFactory
  * @author David Turanski
  *
  */
-@Mixin(AttributeValidator)
+@Mixin(AttributeHelper)
 @Mixin(ComponentNamer)
 abstract class IntegrationComponent   {
 	protected logger = LogFactory.getLog(this.class)
 	protected String name
 	protected componentProperties = [:]
 	protected String builderName
-	
+
 	def component
-	
+
+	//getter
 	def propertyMissing(name) {
-		componentProperties[name]
+		componentProperties[propertyNameToAttributeName(name)]
 	}
-	
-	def propertyMissing(String name, Object val) {	
-		componentProperties[name]=val
-	}	
-	
+
+	//setter
+	def propertyMissing(String name, Object val) {
+		componentProperties[propertyNameToAttributeName(name)]=val
+	}
+
 	IntegrationComponent() {
 		component = this
 	}
@@ -54,23 +56,23 @@ class CoreSpringComponent extends IntegrationComponent {
 class BaseIntegrationComposition extends IntegrationComponent {
 	protected BaseIntegrationComposition parentComposition;
 	protected components = [];
-	
+
 	def add(child){
-		 components << child
-		 if (child instanceof BaseIntegrationComposition) {
-			 child.parentComposition = this
-		 }
+		components << child
+		if (child instanceof BaseIntegrationComposition) {
+			child.parentComposition = this
+		}
 	}
-	
+
 	String toString(){
-		 "{${this.class} components $components}" 
+		"{${this.class} components $components}"
 	}
 }
 
 
 abstract class RouterCondition extends BaseIntegrationComposition {
 	def channel
-	def value	
+	def value
 }
 
 class WhenCondition extends RouterCondition {
@@ -84,20 +86,20 @@ class OtherwiseCondition extends RouterCondition {
 }
 
 class RouterComposition extends BaseIntegrationComposition {
-   String inputChannel
-   String name
-   def channelMap
-   Closure action
-   
-   RouterComposition() {
-	   name = defaultName("$rtr")
-   }
-   
-   void setEvaluate(closure) {
-	   action = closure
-   }
-   
-   def getEvaluate() {
-	   action
-   }
+	String inputChannel
+	String name
+	def channelMap
+	Closure action
+
+	RouterComposition() {
+		name = defaultName("$rtr")
+	}
+
+	void setEvaluate(closure) {
+		action = closure
+	}
+
+	def getEvaluate() {
+		action
+	}
 }

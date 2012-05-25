@@ -105,14 +105,6 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
 			attributes.'output-channel' = endpoint.outputChannel
 		}
 
-		if (endpoint.hasProperty('ref')) {
-			attributes.ref = endpoint.ref
-		}
-
-		if (endpoint.hasProperty('method')) {
-			attributes.method = endpoint.method
-		}
-
 		attributes
 	}
 

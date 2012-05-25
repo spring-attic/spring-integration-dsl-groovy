@@ -41,7 +41,7 @@ class JmsUsageTests {
 				}
 			}
 
-			jmsListen destinationName:'myRequest','auto-startup':false
+			jmsListen destinationName:'myRequest',autoStartup:false
 			transform {it.toUpperCase()}
 
 		}

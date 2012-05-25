@@ -11,7 +11,9 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.springframework.integration.dsl.groovy
+import static org.junit.Assert.*
 import org.junit.Test
+
 /**
  * @author David Turanski
  *
@@ -59,6 +61,36 @@ class IntegrationComponentTests {
 
 		validationContext = test.validateAttributes([:])
 		assert validationContext.errorMessage == "'test2' must include at least one of [bar, baz, bag]"
+	}
+
+	@Test
+	void testPropertyToAttributeWithInvalidProperty() {
+		def attributeHelper = new AttributeHelper()
+		def shouldBeInvalid = {property->
+			try {
+				attributeHelper.propertyNameToAttributeName(property)
+				fail("should throw exception on property $property")
+			} catch (AssertionError e) {
+				if (e.message.startsWith('should throw exception')){
+					throw e
+				}
+			}
+		}
+
+		shouldBeInvalid('FooBar')
+		shouldBeInvalid ('foo1Bar')
+		shouldBeInvalid ('foo-bar-')
+	}
+
+	@Test
+	void testPropertyToAttribute() {
+		String property
+		def attributeHelper = new AttributeHelper()
+		assert 'foo-bar' == attributeHelper.propertyNameToAttributeName('fooBar')
+		assert 'foo-bar-car' == attributeHelper.propertyNameToAttributeName('foo-bar-car')
+		assert 'foo-car' == attributeHelper.propertyNameToAttributeName('foo-car')
+		assert 'foo-bar-car' == attributeHelper.propertyNameToAttributeName('fooBarCar')
+		assert 'foo-bbbar-car' == attributeHelper.propertyNameToAttributeName('fooBBBarCar')
 	}
 }
 

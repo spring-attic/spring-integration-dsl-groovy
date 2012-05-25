@@ -85,7 +85,6 @@ class IntegrationDomSupport {
 		def markupBuilder = new StreamingMarkupBuilder()
 		def writer = markupBuilder.bind { builder ->
 			namespaces <<  namespaceSupport.namespaceDeclarations
-			println namespaceSupport.namespaceDeclarations
 			beans(namespaceSupport.schemaLocationDeclaration() ) {
 				integrationContext.components.each {component ->
 					domBuilder(component)?.build(builder, integrationContext.applicationContext, component)
