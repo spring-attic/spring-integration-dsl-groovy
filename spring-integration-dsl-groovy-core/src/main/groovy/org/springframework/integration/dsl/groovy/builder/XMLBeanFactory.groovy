@@ -24,13 +24,13 @@ import org.springframework.integration.dsl.groovy.XMLBean
  */
 class XMLBeanFactory extends IntegrationComponentFactory {
 
-	Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
+	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
 		new XMLBean(builderName:name)
 	}
 
 	@Override
 	boolean isLeaf() {
-		false
+		true
 	}
 
 	@Override

@@ -21,7 +21,7 @@ import org.springframework.integration.dsl.groovy.SimpleEndpoint
  */
 class PollerFactory extends IntegrationComponentFactory {
 	@Override
-	Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
+	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
 		new Poller(attributes)
 	}
 

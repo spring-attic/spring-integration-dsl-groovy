@@ -87,6 +87,9 @@ class IntegrationDomSupport {
 			namespaces <<  namespaceSupport.namespaceDeclarations
 			beans(namespaceSupport.schemaLocationDeclaration() ) {
 				integrationContext.components.each {component ->
+					if (logger.isDebugEnabled()) {
+						logger.debug("building ${component}")
+					}
 					domBuilder(component)?.build(builder, integrationContext.applicationContext, component)
 				}
 			}

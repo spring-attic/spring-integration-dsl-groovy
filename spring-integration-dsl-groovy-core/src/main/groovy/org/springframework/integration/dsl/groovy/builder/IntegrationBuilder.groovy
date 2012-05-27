@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
 import org.springframework.integration.dsl.groovy.IntegrationContext
 import org.springframework.integration.dsl.groovy.MessageFlow
+import org.springframework.integration.dsl.groovy.SpringModuleContext
 import org.springframework.integration.dsl.groovy.XMLBean
 
 /**
@@ -218,12 +219,12 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		def node = dispathNodeCall(name,list as Object[])
 	}
 
-	IntegrationBuilder springXml(Closure closure) {
+	def springXml(Closure closure) {
 		def parent = getCurrent()
 		assert parent && parent instanceof BaseIntegrationComposition, "'springXml' is not valid in this context"
 		parent.add(new XMLBean(builderName:"springXml",beanDefinitions:closure.dehydrate()))
 		closure = null
-		return this
+		this
 	}
 
 	private getIntegrationBuilderModuleSupportInstances(String[] modules) {

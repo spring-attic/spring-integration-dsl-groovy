@@ -24,7 +24,7 @@ import org.springframework.integration.dsl.groovy.WhenCondition
  */
 class RouterCompositionFactory extends IntegrationComponentFactory {
 
-	Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
+	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
 		new RouterComposition(attributes)
 	}
 

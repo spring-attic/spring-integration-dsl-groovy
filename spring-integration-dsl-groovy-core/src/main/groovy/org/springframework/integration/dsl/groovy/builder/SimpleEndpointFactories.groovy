@@ -22,7 +22,7 @@ import org.springframework.integration.dsl.groovy.*
 abstract class EndpointFactory extends IntegrationComponentFactory {
 
 	@Override
-	Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
+	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
 		endpointInstance(attributes)
 	}
 

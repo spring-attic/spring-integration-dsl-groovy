@@ -1,5 +1,6 @@
 rootProject.name = 'spring-integration-dsl-groovy'
 include 'spring-integration-dsl-groovy-core'
+include 'spring-integration-dsl-groovy-amqp'
 include 'spring-integration-dsl-groovy-http'
 include 'spring-integration-dsl-groovy-jms'
 include 'spring-integration-dsl-groovy-samples'

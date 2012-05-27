@@ -10,27 +10,16 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.springframework.integration.dsl.groovy.builder
-
-import java.util.Map
-import groovy.util.FactoryBuilderSupport
-
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
+package org.springframework.integration.dsl.groovy.amqp
+import org.springframework.integration.dsl.groovy.SpringModuleContext
 
 /**
  * @author David Turanski
  *
  */
-class IntegrationContextFactory extends IntegrationComponentFactory { 
-	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
-		return builder.integrationContext;
-	}
-	
+public class RabbitContext extends SpringModuleContext {
+
 	@Override
-	void onNodeCompleted( FactoryBuilderSupport builder, Object parent, Object integrationContext ) {
-		if (builder.autoCreateApplicationContext) {
-			integrationContext.createApplicationContext(builder.parentContext)
-		}
-	}
-}
+	protected String getNamespacePrefix() {
+		'rabbit'
+	}}

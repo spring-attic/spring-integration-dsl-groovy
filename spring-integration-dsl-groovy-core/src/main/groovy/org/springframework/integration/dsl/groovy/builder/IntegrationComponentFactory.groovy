@@ -14,6 +14,8 @@ package org.springframework.integration.dsl.groovy.builder
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 import java.util.Map
 import groovy.util.FactoryBuilderSupport
 
@@ -26,6 +28,7 @@ abstract class IntegrationComponentFactory extends AbstractFactory {
 
 	protected defaultAttributes(name, value, attributes) {
 		assert !(attributes.containsKey('name') && value), "$name cannot accept both a default value and a 'name' attribute"
+		assert !(attributes.containsKey('id') && value), "$name cannot accept both a default value and a 'id' attribute"
 
 		attributes = attributes ?: [:]
 		attributes.builderName = name
@@ -44,13 +47,13 @@ abstract class IntegrationComponentFactory extends AbstractFactory {
 
 		attributes = defaultAttributes(name, value, attributes)
 		def instance = doNewInstance(builder, name, value, attributes)
-
-		def validationContext = instance.validateAttributes(attributes)
-		assert !validationContext.hasErrors, validationContext.errorMessage
-
+		if (instance.respondsTo('validateAttributes')) {
+			def validationContext = instance.validateAttributes(attributes)
+			assert !validationContext.hasErrors, validationContext.errorMessage
+		}
 		instance
 	}
 
-	protected abstract doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
+	protected abstract Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
 }
 

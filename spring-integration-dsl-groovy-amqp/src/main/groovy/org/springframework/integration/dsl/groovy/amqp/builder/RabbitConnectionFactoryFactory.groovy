@@ -10,28 +10,24 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.springframework.integration.dsl.groovy.builder
-
+package org.springframework.integration.dsl.groovy.amqp.builder
 import groovy.util.FactoryBuilderSupport
-
 import java.util.Map
-import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
-import org.springframework.integration.dsl.groovy.XMLNamespace
+import org.springframework.integration.dsl.groovy.amqp.RabbitContext
+import org.springframework.integration.dsl.groovy.builder.SpringXmlComponentFactory
 
 /**
  * @author David Turanski
  *
  */
-class XMLNamespaceFactory extends IntegrationComponentFactory {
+class RabbitConnectionFactoryFactory extends SpringXmlComponentFactory {
 
-	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
-		assert value, "A value is required for '$name'. It contains a comma delimited list of namespace prefixes"
-		new XMLNamespace(name:value)
-	}
-
+	/* (non-Javadoc)
+	 * @see org.springframework.integration.dsl.groovy.builder.IntegrationComponentFactory#doNewInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
+	 */
 	@Override
-	void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
-		assert parent instanceof BaseIntegrationComposition
-		parent.add(child)
+	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
+		def id =  attributes.name ?:'connectionFactory'
+		builder.springXml{"rabbit:connection-factory"(id:id)}
 	}
 }

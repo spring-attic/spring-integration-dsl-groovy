@@ -75,6 +75,14 @@ project('spring-integration-dsl-groovy-jms') {
   }
 }
 
+project('spring-integration-dsl-groovy-amqp') {
+  description = 'Spring Integration Groovy DSL AMQP'
+  dependencies {
+    compile project(":spring-integration-dsl-groovy-core")
+    compile "org.springframework.integration:spring-integration-amqp:$springIntegrationVersion"
+  }
+}
+
 project('spring-integration-dsl-groovy-http') {
   description = 'Spring Integration Groovy DSL Http'
   dependencies {

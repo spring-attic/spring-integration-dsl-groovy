@@ -49,7 +49,7 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
 
 		attributes = buildAttributes(attributes, endpoint)
 		if (endpoint.hasProperty('action') && endpoint.action) {
-			assert !(attributes.containsKey('ref')), 'endoint cannot provide a bean reference and a closure'
+			assert !(attributes.containsKey('ref')), 'endpoint cannot provide a bean reference and a closure'
 			attributes.method='processMessage'
 			def beanName = "${name}_closureInvokingHandler"
 			attributes.ref = beanName

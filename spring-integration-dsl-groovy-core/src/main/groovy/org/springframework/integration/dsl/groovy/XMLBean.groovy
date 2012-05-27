@@ -18,4 +18,5 @@ package org.springframework.integration.dsl.groovy
  */
 class XMLBean extends IntegrationComponent {
 	Closure beanDefinitions
+	String builderName='springXml'
 }

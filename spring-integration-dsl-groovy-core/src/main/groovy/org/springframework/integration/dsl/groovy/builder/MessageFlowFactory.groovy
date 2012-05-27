@@ -20,7 +20,7 @@ import org.springframework.integration.dsl.groovy.MessageFlow
  */
 class MessageFlowFactory extends IntegrationComponentFactory {
 
-	public Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
+	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes){
 		def messageFlow = new MessageFlow(attributes)
 		if (!messageFlow.inputChannel) {
 			messageFlow.inputChannel = "${messageFlow.name}.inputChannel"
