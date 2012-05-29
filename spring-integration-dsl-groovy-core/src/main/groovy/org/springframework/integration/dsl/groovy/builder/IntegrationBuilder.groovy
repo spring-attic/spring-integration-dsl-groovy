@@ -92,12 +92,13 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		/*
 		 * Simple endpoints
 		 */
+		registerFactory 'bridge', new BridgeFactory()
 		registerExplicitMethod 'filter', this.&filter
 		registerExplicitMethod 'transform', this.&transformer
 		registerExplicitMethod 'handle', this.&serviceActivator
 		registerExplicitMethod 'aggregate', this.&aggregator
 		registerExplicitMethod 'split', this.&splitter
-		registerFactory 'bridge', new BridgeFactory()
+
 		/*
 		 * Router
 		 */
@@ -221,7 +222,8 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 
 	def springXml(Closure closure) {
 		def parent = getCurrent()
-		assert parent && parent instanceof BaseIntegrationComposition, "'springXml' is not valid in this context"
+		parent = parent?:this.integrationContext
+		assert parent instanceof BaseIntegrationComposition, "'springXml' is not valid in this context"
 		parent.add(new XMLBean(builderName:"springXml",beanDefinitions:closure.dehydrate()))
 		closure = null
 		this

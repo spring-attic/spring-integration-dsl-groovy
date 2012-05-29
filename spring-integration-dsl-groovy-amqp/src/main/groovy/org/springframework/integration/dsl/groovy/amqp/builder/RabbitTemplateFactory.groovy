@@ -20,7 +20,7 @@ import org.springframework.integration.dsl.groovy.builder.SpringXmlComponentFact
  * @author David Turanski
  *
  */
-class RabbitExchangeFactory extends SpringXmlComponentFactory {
+class RabbitTemplateFactory extends SpringXmlComponentFactory {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.integration.dsl.groovy.builder.IntegrationComponentFactory#doNewInstance(groovy.util.FactoryBuilderSupport, java.lang.Object, java.lang.Object, java.util.Map)
@@ -28,21 +28,10 @@ class RabbitExchangeFactory extends SpringXmlComponentFactory {
 	@Override
 	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
 		String elementName = elementName('rabbit',name)
+		attributes['connection-factory'] = attributes['connection-factory']?:'connectionFactory'
+		attributes['id'] = attributes['id']?:attributes.remove('name')
+		attributes['id'] = attributes['id']?:'amqpTemplate'
 		
-		def bindings
-		if (attributes.containsKey('bindings')){
-			bindings = attributes.remove('bindings')
-		}
-		builder.springXml{"$elementName"(attributes) {
-				if (bindings){
-					'rabbit:bindings' {
-					// Expecting a list of Maps
-						bindings.each {Map binding ->
-							'rabbit:binding'(binding)
-						}
-					}
-				}
-			}
-		}
+		builder.springXml{"$elementName"(attributes)}
 	}
 }

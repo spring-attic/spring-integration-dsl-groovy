@@ -29,10 +29,4 @@ class JmsOutboundFactory extends IntegrationComponentFactory {
 	Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
 		new JmsOutbound(attributes << [oneWay:oneWay])
 	}
-
-	@Override
-	void setParent(FactoryBuilderSupport builder, Object parent, Object jmsOutbound) {
-		assert parent instanceof BaseIntegrationComposition, "'${jmsOutbound.builderName}' cannot be a child of '${parent.builderName}'"
-		parent.add(jmsOutbound)
-	}
 }

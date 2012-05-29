@@ -20,33 +20,60 @@ import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder
  */
 class AmqpUsageTests {
 	def builder = new IntegrationBuilder('amqp')
-	
+
 	@Test
 	void testConnectionFactory() {
 		builder.doWithSpringIntegration {
-				rabbitConnectionFactory()
+			rabbitConnectionFactory()
 		}
 		
 		builder.applicationContext.getBean('connectionFactory')
 	}
-	
+
 	@Test
 	void testDirectExchange() {
 		builder.doWithSpringIntegration {
-			rabbitQueue('q1')
-			rabbitQueue('q2')
-			rabbitQueue('q3')
-			rabbitDirectExchange('myExchange',bindings:[[key:'t1',queue:'q1'],[key:'t2',queue:'q2'],[queue:'q3']])
+			doWithRabbit {
+				queue 'q1'
+				queue 'q2'
+				queue 'q3'
+				directExchange 'myExchange', bindings:[[key:'t1',queue:'q1'],[key:'t2',queue:'q2'],[queue:'q3']]
+			}
 		}
-		
+
 		builder.applicationContext.getBean('myExchange')
 	}
-	
+
 	@Test
 	void testAdmin() {
 		builder.doWithSpringIntegration {
-			rabbitConnectionFactory('myConnectionFactory')
-			rabbitAdmin(connectionFactory:'myConnectionFactory')
+			doWithRabbit {
+				connectionFactory 'myConnectionFactory'
+				admin connectionFactory:'myConnectionFactory'
+			}
+		}
+	}
+
+	@Test
+	void testDoWithRabbit() {
+		builder.doWithSpringIntegration {
+			builder.doWithRabbit {
+				connectionFactory 'myConnectionFactory'
+			}
+			rabbitAdmin connectionFactory:'myConnectionFactory'
+		}
+	}
+
+	@Test
+	void testOutboundGateway() {
+		builder.doWithSpringIntegration {
+			doWithRabbit {
+				connectionFactory()
+				template 'myRabbitTemplate'
+			}
+			messageFlow {
+				amqpSend amqpTemplate:'myRabbitTemplate'
+			}
 		}
 	}
 }

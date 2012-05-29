@@ -36,19 +36,19 @@ class JmsUsageTests {
 	public void testJmsListener() {
 		def flow = builder.messageFlow {
 			springXml {
-				bean(id:'connectionFactory','class':'org.apache.activemq.ActiveMQConnectionFactory'){
+				bean(id:'myConnectionFactory','class':'org.apache.activemq.ActiveMQConnectionFactory'){
 					property(name:'brokerURL',value:'vm://localhost?broker.persistent=false&broker.useJmx=false')
 				}
 			}
 
-			jmsListen destinationName:'myRequest',autoStartup:false
+			jmsListen destinationName:'myRequest',autoStartup:false,connectionFactory:'myConnectionFactory'
 			transform {it.toUpperCase()}
 
 		}
 
 		def replyQ = new org.apache.activemq.command.ActiveMQQueue('myReply')
 		def requestQ = new org.apache.activemq.command.ActiveMQQueue('myRequest')
-		def connectionFactory = builder.applicationContext.getBean('connectionFactory')
+		def connectionFactory = builder.applicationContext.getBean('myConnectionFactory')
 
 		def jmsTemplate = new JmsTemplate(connectionFactory)
 

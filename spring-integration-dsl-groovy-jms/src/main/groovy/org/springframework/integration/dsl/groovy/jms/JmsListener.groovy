@@ -21,7 +21,6 @@ import org.springframework.integration.dsl.groovy.GatewayEndpoint
 class JmsListener extends GatewayEndpoint {
 	static requiredAttributes = ['destinationName']
 	String destinationName
-	String connectionFactory = 'connectionFactory'
 
 	protected String defaultNamePrefix(){
 		'$jmsIn'

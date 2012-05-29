@@ -27,7 +27,7 @@ class RabbitQueueFactory extends SpringXmlComponentFactory {
 	 */
 	@Override
 	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
-		String elementName = propertyNameToAttributeName(name).replace('rabbit-','rabbit:')
+		String elementName = elementName('rabbit',name)
 		builder.springXml{"$elementName"(attributes)}
 	}
 }

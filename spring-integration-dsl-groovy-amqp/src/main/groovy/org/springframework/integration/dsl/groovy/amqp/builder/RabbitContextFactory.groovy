@@ -11,21 +11,30 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.springframework.integration.dsl.groovy.amqp.builder
+import groovy.lang.Closure
 import groovy.util.FactoryBuilderSupport
 import java.util.Map
-import org.springframework.integration.dsl.groovy.amqp.RabbitContext
+import org.springframework.integration.dsl.groovy.SpringModuleContext
 import org.springframework.integration.dsl.groovy.builder.IntegrationComponentFactory
-import org.springframework.integration.dsl.groovy.builder.IntegrationContextFactory
-import org.springframework.integration.dsl.groovy.builder.SpringXmlComponentFactory
 
 /**
  * @author David Turanski
  *
  */
-class RabbitContextFactory extends IntegrationContextFactory {
+class RabbitContextFactory extends IntegrationComponentFactory {
 
 	@Override
 	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
-		new RabbitContext()
+		return new SpringModuleContext()
+	}
+
+	public boolean isHandlesNodeChildren() {
+		return true;
+	}
+
+	public boolean onNodeChildren( FactoryBuilderSupport builder, Object node, Closure childContent) {
+		println("nodeChildren of $node")
+		builder.withBuilder(new RabbitBuilder(builder), childContent)
+		return false
 	}
 }

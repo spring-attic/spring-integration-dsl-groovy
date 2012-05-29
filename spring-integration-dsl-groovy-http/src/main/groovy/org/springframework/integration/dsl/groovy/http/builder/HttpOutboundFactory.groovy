@@ -25,10 +25,4 @@ class HttpOutboundFactory extends IntegrationComponentFactory {
 	public doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
 		new HttpOutbound(attributes)
 	}
-
-	@Override
-	void setParent(FactoryBuilderSupport builder, Object parent, Object httpOutbound) {
-		assert parent instanceof BaseIntegrationComposition, "'${httpOutbound.builderName}' cannot be a child of '${parent.builderName}'"
-		parent.add(httpOutbound)
-	}
 }

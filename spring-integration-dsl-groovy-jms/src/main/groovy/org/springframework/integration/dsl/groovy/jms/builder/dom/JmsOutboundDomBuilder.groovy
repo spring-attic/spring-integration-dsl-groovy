@@ -26,7 +26,7 @@ class JmsOutboundDomBuilder extends IntegrationComponentDomBuilder {
 	@Override
 	public void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes, Closure closure) {
 
-		attributes.'connection-factory' = component.connectionFactory?:'connectionFactory'
+		attributes.'connection-factory' = attributes.'connection-factory'?:'connectionFactory'
 
 		if (component.oneWay) {
 			if (component.destinationName){

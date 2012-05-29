@@ -15,8 +15,9 @@ package org.springframework.integration.dsl.groovy.builder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
-import org.springframework.integration.dsl.groovy.IntegrationComponent
 import java.util.Map
+
+import groovy.lang.Closure;
 import groovy.util.FactoryBuilderSupport
 
 /**
@@ -54,6 +55,11 @@ abstract class IntegrationComponentFactory extends AbstractFactory {
 		instance
 	}
 
+	@Override
+	void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
+		assert parent instanceof BaseIntegrationComposition, "'${parent.builderName}' cannot be a child of '${child.builderName}'"
+		parent.add child
+	}
+
 	protected abstract Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes)
 }
-

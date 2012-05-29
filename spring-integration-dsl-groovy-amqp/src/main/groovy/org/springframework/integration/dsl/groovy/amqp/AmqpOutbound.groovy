@@ -11,15 +11,23 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.springframework.integration.dsl.groovy.amqp
-import org.springframework.integration.dsl.groovy.SpringModuleContext
+
+import org.springframework.integration.dsl.groovy.GatewayEndpoint
 
 /**
  * @author David Turanski
  *
  */
-public class RabbitContext extends SpringModuleContext {
+class AmqpOutbound extends GatewayEndpoint {
+	static requiresReply = false
+	boolean oneWay
 
+	/* (non-Javadoc)
+	 * @see org.springframework.integration.dsl.groovy.GatewayEndpoint#defaultNamePrefix()
+	 */
 	@Override
-	protected String getNamespacePrefix() {
-		'rabbit'
-	}}
+	protected String defaultNamePrefix() {
+		'$amqpOut'
+	}
+
+}

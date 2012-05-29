@@ -17,6 +17,9 @@ package org.springframework.integration.dsl.groovy
  *
  *	A marker for Spring module containers
  */
-abstract class SpringModuleContext extends BaseIntegrationComposition {
-	protected abstract String getNamespacePrefix()
+class SpringModuleContext extends BaseIntegrationComposition {
+	def add(child){
+		assert this.parentComposition, "Spring module $builderName cannot be root element"
+		parentComposition.add(child)
+	}
 }

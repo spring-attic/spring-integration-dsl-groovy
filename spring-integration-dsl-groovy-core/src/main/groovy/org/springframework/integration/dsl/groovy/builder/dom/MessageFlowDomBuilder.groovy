@@ -58,6 +58,7 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 
 			previousComponent = component
 		}
+		channelBuilder.createDirectChannelIfNotDefined(builder, messageFlow.inputChannel)
 	}
 
 	def resolveMessageFlowChannels(messageFlow) {

@@ -81,6 +81,9 @@ class ChannelDomBuilder extends IntegrationComponentDomBuilder {
 		if (['nullChannel', 'errorChannel'].contains(channelName) ) {
 			return
 		}
+		if (!channelName) {
+			return
+		}
 		if (!declaredChannels.contains(channelName)){
 			builder."$siPrefix:channel"(id:channelName)
 			declaredChannels << channelName

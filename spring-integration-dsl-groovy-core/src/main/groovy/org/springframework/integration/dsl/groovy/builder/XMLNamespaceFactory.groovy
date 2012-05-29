@@ -28,10 +28,4 @@ class XMLNamespaceFactory extends IntegrationComponentFactory {
 		assert value, "A value is required for '$name'. It contains a comma delimited list of namespace prefixes"
 		new XMLNamespace(name:value)
 	}
-
-	@Override
-	void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
-		assert parent instanceof BaseIntegrationComposition
-		parent.add(child)
-	}
 }

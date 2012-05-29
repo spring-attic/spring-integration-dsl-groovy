@@ -35,7 +35,6 @@ class MessageFlowFactory extends IntegrationComponentFactory {
 
 	@Override
 	void onNodeCompleted( FactoryBuilderSupport builder, Object parent, Object messageFlow ) {
-
 		if (!parent){
 			if (logger.isDebugEnabled()) {
 				logger.debug("adding root message flow ${messageFlow.name} to integration context")
@@ -44,20 +43,6 @@ class MessageFlowFactory extends IntegrationComponentFactory {
 			if (builder.autoCreateApplicationContext) {
 				builder.integrationContext.createApplicationContext(builder.parentContext)
 			}
-		} else {
-
-			if (parent instanceof MessageFlow){
-				if (logger.isDebugEnabled()) {
-					logger.debug("creating nested message flow ${messageFlow.name} parent: ${parent.name}")
-				}
-			} else if (parent instanceof IntegrationContext) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("adding message flow ${messageFlow.name} to integration context")
-				}
-			} else {
-				throw new IllegalArgumentException('parent must be of type IntegrationContext or MessageFlow')
-			}
-			parent.add(messageFlow)
 		}
 	}
 }

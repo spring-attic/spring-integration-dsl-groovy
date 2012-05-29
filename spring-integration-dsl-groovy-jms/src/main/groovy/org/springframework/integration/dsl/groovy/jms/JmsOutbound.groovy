@@ -22,7 +22,6 @@ class JmsOutbound extends GatewayEndpoint {
 	static requiredAttributes = ['destinationName']
 	static requiresReply = false
 	String destinationName
-	String connectionFactory = 'connectionFactory'
 	boolean oneWay
 
 	@Override

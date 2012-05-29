@@ -32,10 +32,4 @@ class XMLBeanFactory extends IntegrationComponentFactory {
 	boolean isLeaf() {
 		true
 	}
-
-	@Override
-	void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
-		assert parent instanceof BaseIntegrationComposition
-		parent.add(child)
-	}
 }

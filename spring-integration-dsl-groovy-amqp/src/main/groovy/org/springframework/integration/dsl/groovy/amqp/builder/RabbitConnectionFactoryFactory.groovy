@@ -13,7 +13,6 @@
 package org.springframework.integration.dsl.groovy.amqp.builder
 import groovy.util.FactoryBuilderSupport
 import java.util.Map
-import org.springframework.integration.dsl.groovy.amqp.RabbitContext
 import org.springframework.integration.dsl.groovy.builder.SpringXmlComponentFactory
 
 /**
