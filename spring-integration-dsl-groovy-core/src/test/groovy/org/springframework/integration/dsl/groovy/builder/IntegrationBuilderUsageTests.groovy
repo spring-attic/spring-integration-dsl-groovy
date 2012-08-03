@@ -13,6 +13,7 @@
 package org.springframework.integration.dsl.groovy.builder
 
 import static org.junit.Assert.*
+
 import org.junit.Test
 
 /**

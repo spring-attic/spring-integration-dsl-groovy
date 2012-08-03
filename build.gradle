@@ -1,18 +1,19 @@
-description = 'Spring Integration Groovy DSL'
+
 
 apply plugin: 'base'
 
-allprojects {
-  group = 'org.springframework.integration'
+version = "$projectVersion"
+description = 'Spring Integration Groovy DSL'
 
+allprojects {
+  group = 'org.springframework.integration' 
   repositories {
-    mavenCentral()
-    maven { url 'https://repo.springsource.org/libs-staging-local'}
-    maven { url 'http://repo.springsource.org/libs-milestone' }
-    maven { url 'https://repo.springsource.org/libs-snapshot'}
-    maven { url 'https://repo.springsource.org/libs-release'}
-  }
+         maven { url 'http://repo.springsource.org/libs-milestone' }
+         maven { url 'https://repo.springsource.org/libs-snapshot'}
+         maven { url 'https://repo.springsource.org/libs-release'}
+     }
 }
+
 
 subprojects { subproject ->
    apply plugin: 'groovy'
@@ -21,10 +22,10 @@ subprojects { subproject ->
    sourceCompatibility=1.5
    targetCompatibility=1.5 
    
-   junitVersion = '4.8.2'
-   log4jVersion = '1.2.12'
-   mockitoVersion = '1.9.0'
-   springIntegrationVersion = '2.2.0.M1'
+   project.ext.junitVersion = '4.8.2'
+   project.ext.log4jVersion = '1.2.12'
+   project.ext.mockitoVersion = '1.9.0'
+   project.ext.springIntegrationVersion = '2.1.3.RELEASE'
 
    install {
       repositories.mavenInstaller {
@@ -43,7 +44,7 @@ subprojects { subproject ->
   // dependencies that are common across all java projects
    dependencies {
 
-    groovy 'org.codehaus.groovy:groovy-all:1.8.6'
+    groovy 'org.codehaus.groovy:groovy-all:1.8.7'
 
     testCompile "junit:junit-dep:$junitVersion"
     testCompile "log4j:log4j:$log4jVersion"
@@ -107,7 +108,7 @@ project('spring-integration-dsl-groovy-samples') {
 task wrapper(type: Wrapper) {
     description = 'Generates gradlew[.bat] scripts'
     gradleVersion = '1.0-milestone-8'
-    distributionUrl = 'http://repo.gradle.org/gradle/distributions-snapshots/gradle-1.0-milestone-8-20120112000036+0100-bin.zip'
+    distributionUrl = 'http://services.gradle.org/distributions/gradle-1.1-bin.zip'
     jarFile = '.wrapper/gradle-wrapper.jar'
 }
 

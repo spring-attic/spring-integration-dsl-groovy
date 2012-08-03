@@ -7,11 +7,11 @@ package org.springframework.integration.dsl.groovy
 
 import java.lang.reflect.ParameterizedType
 
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import org.springframework.integration.Message
 import org.springframework.integration.MessageChannel
 import org.springframework.integration.support.MessageBuilder
-import org.apache.commons.logging.LogFactory
-import org.apache.commons.logging.Log
 
 /**
  *
@@ -63,7 +63,7 @@ class ClosureInvokingMessageProcessor  {
  *
  */
 class MultiMessageParameterTransformer {
-	private final closureExpectsMessages
+	private final boolean closureExpectsMessages
 	private final boolean closureParameterIsArray
 
 	MultiMessageParameterTransformer(Closure closure) {
@@ -79,8 +79,10 @@ class MultiMessageParameterTransformer {
 		}
 	}
 
-	def mapClosureArg(List<Message> list){
-		def transformedArg = closureExpectsMessages? list: list*.payload
+	def mapClosureArg(List list){
+		boolean listContainsMessages = list?.get(0) instanceof Message
+
+		def transformedArg = closureExpectsMessages  ? list: listContainsMessages  ? list*.payload : list
 		if (closureParameterIsArray) {
 			transformedArg = closureExpectsMessages? transformedArg as Message[] : transformedArg as Object[]
 		}
