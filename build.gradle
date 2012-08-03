@@ -145,6 +145,7 @@ def customizePom(def pom, def gradleProject) {
 
         // add all items necessary for maven central publication
         generatedPom.project {
+            version="$projectVersion"
             name = gradleProject.description
             description = gradleProject.description
             url = 'https://github.com/SpringSource/spring-integration-dsl-groovy'
