@@ -2,7 +2,6 @@
 
 apply plugin: 'base'
 
-version = "$projectVersion"
 description = 'Spring Integration Groovy DSL'
 
 allprojects {
@@ -107,7 +106,7 @@ project('spring-integration-dsl-groovy-samples') {
 
 task wrapper(type: Wrapper) {
     description = 'Generates gradlew[.bat] scripts'
-    gradleVersion = '1.0-milestone-8'
+    gradleVersion = '1.1'
     distributionUrl = 'http://services.gradle.org/distributions/gradle-1.1-bin.zip'
     jarFile = '.wrapper/gradle-wrapper.jar'
 }
@@ -145,7 +144,6 @@ def customizePom(def pom, def gradleProject) {
 
         // add all items necessary for maven central publication
         generatedPom.project {
-            version="$projectVersion"
             name = gradleProject.description
             description = gradleProject.description
             url = 'https://github.com/SpringSource/spring-integration-dsl-groovy'
