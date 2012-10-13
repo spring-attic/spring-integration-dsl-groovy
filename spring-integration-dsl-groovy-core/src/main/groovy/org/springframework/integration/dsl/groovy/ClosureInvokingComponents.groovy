@@ -1,10 +1,6 @@
 package org.springframework.integration.dsl.groovy
 
-
-
-
-
-
+import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 
 import org.apache.commons.logging.Log
@@ -70,17 +66,24 @@ class MultiMessageParameterTransformer {
 		def method = closure.class.methods.find { it.name == 'call' }
 		if (method.genericParameterTypes) {
 			def ptype =  method.genericParameterTypes[0]
-			if (ptype instanceof ParameterizedType) {
-				closureExpectsMessages = Message.isAssignableFrom(ptype.actualTypeArguments[0])
+ 			if (ptype instanceof ParameterizedType) {
+ 				closureExpectsMessages = Message.isAssignableFrom(ptype.actualTypeArguments[0])
+			} else if (ptype instanceof GenericArrayType){
+				closureParameterIsArray = ptype instanceof Object[]
+				closureExpectsMessages = false
+				
 			} else {
-				closureParameterIsArray = ptype.isArray()
-				closureExpectsMessages =  closureParameterIsArray && Message == ptype.componentType
+			    closureParameterIsArray = ptype.isArray()
+				closureExpectsMessages =  Message == ptype.componentType
 			}
 		}
 	}
+	
 
 	def mapClosureArg(List list){
 		boolean listContainsMessages = list?.get(0) instanceof Message
+		
+		println("listContainsMessages $listContainsMessages closureExpectsMessages: $closureExpectsMessages closureParameterIsArray:$closureParameterIsArray")
 
 		def transformedArg = closureExpectsMessages  ? list: listContainsMessages  ? list*.payload : list
 		if (closureParameterIsArray) {

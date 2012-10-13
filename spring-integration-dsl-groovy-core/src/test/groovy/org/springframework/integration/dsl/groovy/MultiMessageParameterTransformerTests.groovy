@@ -57,8 +57,11 @@ class MultiMessageParameterTransformerTests {
 		def closure = {Message[] messages ->
 			(1..messages.length).each { i-> assert messages[i-1].payload as int == i}
 		}
+		
+		 
 		multiMessageParameterTransformer = new MultiMessageParameterTransformer(closure)
 		def arg = multiMessageParameterTransformer.mapClosureArg(messageList)
+		assert arg instanceof Message[]
 		assert arg == messageList as Message[]
 		closure.call(arg)
 	}
