@@ -163,6 +163,7 @@ This can be acomplished by simply returning a list of channel names from the clo
 ## Channel Maps
 
 This example shows the use of the map() method to create a channel map for a router. The messages headers are passed to the closure and the value of the 'foo' header is the key to the channel map.
+       
         messageFlow {
 		  route('myRouter',{ Map headers -> headers.foo }) {
 			map(bar:'barChannel',baz:'bazChannel')
