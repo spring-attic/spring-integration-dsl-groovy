@@ -61,8 +61,8 @@ Multiple Message Flows:
         transform {it.toUpperCase()}
       }
       def flow2 = builder.messageFlow('flow2',inputChannel:'outputChannel1') {
-	filter {it.class == String}
-	transform {it.toLowerCase()}
+	    filter {it.class == String}
+	    transform {it.toLowerCase()}
       }
 		
       assert flow1.sendAndReceive("hello") == "hello"
@@ -80,15 +80,15 @@ to flow2 via its outputChannel. Note that the name of the flow1 input channel is
 It is possible to build multiple MessageFlows. In Groovy, builder.messageFlow() may be invoked multiple times. Java access requires a single root 'doWithSpringIntegration', also useful in Groovy code 
 
       doWithSpringIntegration {
-	 messageFlow(outputChannel:'outputChannel1') {
-		transform {it.toUpperCase()}
-	 }
+	    messageFlow(outputChannel:'outputChannel1') {
+		   transform {it.toUpperCase()}
+	    }
 		
-	 def flow2 = messageFlow(inputChannel:'outputChannel1') {
+	     def flow2 = messageFlow(inputChannel:'outputChannel1') {
 	        transform {it.toLowerCase()}
-	 }
+	     }
  		
-	 handle(inputChannel:flow2.outputChannel,{println it})
+	     handle(inputChannel:flow2.outputChannel,{println it})
        }
 
 doWithSpringIntegration returns an IntegrationContext which can be used to access MessageFlows (they are returned as a List). IntegrationContext also provides 
@@ -112,35 +112,36 @@ The following example illustrates the use of the exec() method to execute a flow
         
         doWithSpringIntegration {
 	        def subflow = messageFlow('sub'){
-		     filter {it.class == String}
-		    transform {it.toLowerCase()}
-		}
+		       filter {it.class == String}
+		       transform {it.toLowerCase()}
+		    }
 			
-		mainflow = messageFlow('main') {
-		    exec(subflow)
+		    mainflow = messageFlow('main') {
+		       exec(subflow)
+		    }
 		}
 
 MessageFlows may also be nested:
         
-        messageFlow {
-	        handle( action:{payload -> payload.toUpperCase()})
+    messageFlow {
+	    handle( action:{payload -> payload.toUpperCase()})
 		messageFlow {
 		    transform {it*2}
 		    messageFlow {
-			transform {payload->payload.toLowerCase()}
-	       }
-            }
-	}
+			   transform {payload->payload.toLowerCase()}
+	        }
+        }
+	 }
 
 # Routers
 
 A simple example of routing:
 
         doWithSpringIntegration {
-	    //Must return String, String[] etc...
-	    route('myRouter', { it == "Hello" ? 'upper.inputChannel' : 'lower.inputChannel' } )
-	    handle('upper', {payload -> payload.toUpperCase()})
-	    handle('lower', {payload -> payload.toLowerCase()})
+	       //Must return String, String[] etc...
+	       route('myRouter', { it == "Hello" ? 'upper.inputChannel' : 'lower.inputChannel' } )
+	       handle('upper', {payload -> payload.toUpperCase()})
+	       handle('lower', {payload -> payload.toLowerCase()})
         }
 
 The above example uses named Service Activators and the channel naming convention to route to the appropriate channel. Note that closures obviate the need for Header Value Router, Payload Type Router, Exception Type Router and Recipient Type Router. These may all be accomplished with the same construct. 
@@ -150,7 +151,7 @@ The above example uses named Service Activators and the channel naming conventio
 This can be acomplished by simply returning a list of channel names from the closure
 
 	 def count = 0
-         def integrationContext = builder.doWithSpringIntegration {
+     def integrationContext = builder.doWithSpringIntegration {
 		route('myRouter', { ['upper.inputChannel' , 'lower.inputChannel'] } )
 		handle('upper', {count ++; null})
 		handle('lower', {count ++; null})
@@ -163,19 +164,19 @@ This can be acomplished by simply returning a list of channel names from the clo
 
 This example shows the use of the map() method to create a channel map for a router. The messages headers are passed to the closure and the value of the 'foo' header is the key to the channel map.
         messageFlow {
-		route('myRouter',{ Map headers -> headers.foo }) {
+		  route('myRouter',{ Map headers -> headers.foo }) {
 			map(bar:'barChannel',baz:'bazChannel')
-		}
-		transform(inputChannel:'barChannel', {it[0..1]},linkToNext:false)
+		  }
+		  transform(inputChannel:'barChannel', {it[0..1]},linkToNext:false)
 		 
-		transform(inputChannel:'bazChannel',{it*2})
-	}
+		  transform(inputChannel:'bazChannel',{it*2})
+	    }
 
         def message = MessageBuilder.withPayload("Hello").copyHeaders([foo:'bar']).build()	 
-	assert flow.sendAndReceive(message).payload == "He"
+	    assert flow.sendAndReceive(message).payload == "He"
 		
-	message = MessageBuilder.withPayload("SOMETHING").copyHeaders([foo:'baz']).build()
-	assert flow.sendAndReceive(message).payload == "SOMETHINGSOMETHING"
+	    message = MessageBuilder.withPayload("SOMETHING").copyHeaders([foo:'baz']).build()
+	    assert flow.sendAndReceive(message).payload == "SOMETHINGSOMETHING"
 
 Note also the 'linkToNext' attribute can be used to prevent chaining the two transformers within a MessageFlow. Alternatives include creating the transformers external to the MessageFlow or nest each in its own MessageFlow
 
@@ -183,30 +184,30 @@ Note also the 'linkToNext' attribute can be used to prevent chaining the two tra
 
 Here's some examples illustrating nested MessageFlows conditionally executed: 
 
-        route { it == "Hello" ? 'foo' : 'bar' }
-	{
-		when('foo') {
+       route { it == "Hello" ? 'foo' : 'bar' }
+	   {
+		  when('foo') {
 			handle {payload -> payload.toUpperCase()}
-		}
+		  }
 
-		when('bar') {
-			handle {payload -> payload.toLowerCase()}
-		}
-	}
+		  when('bar') {
+			  handle {payload -> payload.toLowerCase()}
+		  }
+	   }
 
 otherwise() creates a default output channel on the router
         messageFlow {
 	        route('myRouter', { if (it == "Hello" ) 'foo' } )
-		{
-			when('foo') {
-				handle {payload -> payload.toUpperCase()}
-			}
+		    {
+			   when('foo') {
+				  handle {payload -> payload.toUpperCase()}
+			   }
 
-			otherwise {
-				handle {payload -> payload.toLowerCase()}
-			}
-		}
-	}
+			   otherwise {
+				  handle {payload -> payload.toLowerCase()}
+			   }
+		    }
+	     }
 
 # Aggregator
 The aggregator supports releaseStrategy and correlationStrategy as named closures. Additionally, the aggregation logic may be provided by a closure:
@@ -236,15 +237,15 @@ Note it is also possible to invoke createApplicationContext(ApplicationContext p
 Since the IntegrationBuilder builds an XMLApplicationContext, it is necessary to provide XML namespace declarations. The builder uses convention over configuration to make this easy.
 
         doWithSpringIntegration {
-		namespaces('int-http')
-		springXml {
+		  namespaces('int-http')
+		  springXml {
 			'int-http:inbound-channel-adapter'(
-			 id:'httpChannelAdapter', 
-			channel:'requests',
-			  'supported-methods':'PUT, DELETE')
-			'si:channel'(id:'requests')
+			     id:'httpChannelAdapter', 
+			     channel:'requests',
+			     'supported-methods':'PUT, DELETE')
+			     'si:channel'(id:'requests')
 		  }
-	}
+	    }
 		
 
 The namespaces() method takes a comma delimited list of standard Spring namespace prefixes. If a prefix starts with 'int-' it will generate the required XML namespace declarations required for any of the referenced components. Otherwise, it will be interpreted as a Core Spring namespace, e.g., 'jms','jmx','aop'. The standard namespace for the core Spring Integration components is 'si' and is automatically included. 
