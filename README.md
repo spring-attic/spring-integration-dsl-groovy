@@ -196,16 +196,16 @@ Here's some examples illustrating nested MessageFlows conditionally executed:
 		  }
 	   }
 
-otherwise() creates a default output channel on the router
-        messageFlow {
-	        route('myRouter', { if (it == "Hello" ) 'foo' } )
-		    {
-			   when('foo') {
-				  handle {payload -> payload.toUpperCase()}
-			   }
+		otherwise() creates a default output channel on the router
+        	messageFlow {
+	        	route('myRouter', { if (it == "Hello" ) 'foo' } )
+		    	{
+			   		when('foo') {
+				  		handle {payload -> payload.toUpperCase()}
+			   	}
 
-			   otherwise {
-				  handle {payload -> payload.toLowerCase()}
+			   	otherwise {
+					  handle {payload -> payload.toLowerCase()}
 			   }
 		    }
 	     }
