@@ -202,12 +202,12 @@ Here's some examples illustrating nested MessageFlows conditionally executed:
 		    	{
 			   		when('foo') {
 				  		handle {payload -> payload.toUpperCase()}
-			   	}
+			   		}
 
-			   	otherwise {
+			   		otherwise {
 					  handle {payload -> payload.toLowerCase()}
-			   }
-		    }
+			   		}
+		    	}
 	     }
 
 # Aggregator
