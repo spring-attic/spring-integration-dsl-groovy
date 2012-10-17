@@ -196,7 +196,7 @@ Here's some examples illustrating nested MessageFlows conditionally executed:
 		  }
 	   }
 
-		otherwise() creates a default output channel on the router
+		otherwise()  //creates a default output channel on the router
         	messageFlow {
 	        	route('myRouter', { if (it == "Hello" ) 'foo' } )
 		    	{
