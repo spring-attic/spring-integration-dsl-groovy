@@ -41,9 +41,10 @@ class IntegrationBuilderUsageTests {
 
 	@Test
 	void test1() {
-		new File("src/test/resources/messageflow1.groovy").withInputStream {input->
-			script = new GroovyClassLoader().parseClass(input).newInstance()
-		}
+		
+		def codeSource = new GroovyCodeSource(new File("src/test/resources/messageflow1.groovy"));
+		script = new GroovyClassLoader().parseClass(codeSource).newInstance()
+		
 		def eip = builder.build(script)
 	}
 

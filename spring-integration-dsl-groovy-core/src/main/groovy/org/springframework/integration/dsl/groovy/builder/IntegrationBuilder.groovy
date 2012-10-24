@@ -136,7 +136,18 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 	}
 
 	Object build(InputStream is) {
-		def script = new GroovyClassLoader().parseClass(is).newInstance()
+		def grs  = new GroovyCodeSource(new InputStreamReader(is),this.getClass().getName(),GroovyShell.DEFAULT_CODE_BASE)
+		def script = new GroovyClassLoader().parseClass(grs).newInstance()
+		this.build(script)
+	}
+	
+	Object build(File file) {
+		def script = new GroovyClassLoader().parseClass(file).newInstance()
+		this.build(script)
+	}
+	
+	Object build(GroovyCodeSource codeSource) {
+		def script = new GroovyClassLoader().parseClass(codeSource).newInstance()
 		this.build(script)
 	}
 

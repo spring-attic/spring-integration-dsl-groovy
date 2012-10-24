@@ -7,5 +7,6 @@ build
 .idea
 .gradle
 .externalToolBuilders
+.DS_Store
 bin
 activemq-data

@@ -3,7 +3,7 @@ Groovy DSL For Spring Integration
 
 #Overview
 
-This project implements a Groovy DSL for Spring Integration. Coming on the heels of the [Scala DSL for Spring Integration] (https://github.com/SpringSource/spring-integration-scala), I have incorporated some of the same basic ideas and vocabulary however this is intended for Groovy developers and Java developers looking for a simple and powerful alternative to XML configuration. 
+This project implements a Groovy DSL for Spring Integration. Coming on the heels of the [Scala DSL for Spring Integration] (https://github.com/SpringSource/spring-integration-scala), I have incorporated some of the same basic ideas and vocabulary however this is intended for Groovy developers and Java developers looking for a simple and powerful alternative to XML configuration. This page provides a simple overview to get you started using the DSL. Please refer to the project (Wiki)[https://github.com/SpringSource/spring-integration-dsl-groovy/wiki] pages for more details.
 
 ## Features
 * Simple configuration using the Groovy builder pattern with the ability to implement endpoint logic in closures
@@ -51,6 +51,7 @@ This flow can also be executed from a Java class. The easiest way is to create a
      }
 
 The Equivalant Java code is:
+
     IntegrationBuilder builder = new IntegrationBuilder();
     MessageFlow flow = (MessageFlow)builder.build(new FileInputStream("messageFlow1.groovy");
     flow.sendAndReceive("hello");
@@ -71,8 +72,8 @@ Multiple Message Flows:
       assert response == "hello", response
 
 
-The above example illustrates two message flows explicitly connected through a named channel 'outputChannel1'. A message sent to flow1's input channel is routed 
-to flow2 via its outputChannel. Note that the name of the flow1 input channel is automatically created by appending '.inputChannel' to it's name. This is true of all endpoints.
+The above example illustrates two message flows explicitly connected through a named channel *'outputChannel1'*. A message sent to *flow1*'s input channel is routed 
+to *flow2* via its outputChannel. Note that the name of the flow1 input channel is automatically created by appending *'.inputChannel'* to it's name. This is true of all endpoints.
 
 # Building an IntegrationContext with 'doWithSpringIntegration'
 
@@ -91,7 +92,7 @@ It is possible to build multiple MessageFlows. In Groovy, builder.messageFlow() 
 	     handle(inputChannel:flow2.outputChannel,{println it})
        }
 
-doWithSpringIntegration returns an IntegrationContext which can be used to access MessageFlows (they are returned as a List). IntegrationContext also provides 
+_doWithSpringIntegration_ returns an IntegrationContext which can be used to access MessageFlows (they are returned as a List). IntegrationContext also provides 
 send() and sendAndReceive() which require an inputChannel as well as a Message or payload
 
     def integrationContext = doWithSpringIntegration {builder->
@@ -179,7 +180,7 @@ This example shows the use of the map() method to create a channel map for a rou
 	    message = MessageBuilder.withPayload("SOMETHING").copyHeaders([foo:'baz']).build()
 	    assert flow.sendAndReceive(message).payload == "SOMETHINGSOMETHING"
 
-Note also the 'linkToNext' attribute can be used to prevent chaining the two transformers within a MessageFlow. Alternatives include creating the transformers external to the MessageFlow or nest each in its own MessageFlow
+Note also the _'linkToNext'_ attribute can be used to prevent chaining the two transformers within a MessageFlow. Alternatives include creating the transformers external to the MessageFlow or nest each in its own MessageFlow
 
 ## Nested Router Conditions
 

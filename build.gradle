@@ -20,12 +20,6 @@ subprojects { subproject ->
    apply plugin: 'eclipse'
    sourceCompatibility=1.6
    targetCompatibility=1.6
-   
-   project.ext.junitVersion = '4.8.2'
-   project.ext.log4jVersion = '1.2.14'
-   project.ext.mockitoVersion = '1.9.0'
-   project.ext.springIntegrationVersion = '2.2.0.RC1'
-   project.ext.groovyVersion = '1.8.7'
 
    install {
       repositories.mavenInstaller {
@@ -47,7 +41,7 @@ subprojects { subproject ->
     groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
 
     testCompile "junit:junit-dep:$junitVersion"
-    testCompile "log4j:log4j:$log4jVersion"
+    testRuntime "log4j:log4j:$log4jVersion"
     testCompile "org.mockito:mockito-all:$mockitoVersion"
   }
 }
