@@ -22,7 +22,7 @@ import org.junit.Ignore
  *
  */
 class HttpOutboundTests {
-	IntegrationBuilder builder = new IntegrationBuilder(['http'])
+	IntegrationBuilder builder = new IntegrationBuilder('http')
 	
 	@Test
 	void testSimpleHttpOutboundGateway() {
@@ -39,8 +39,8 @@ class HttpOutboundTests {
 		def flow = builder.messageFlow {
 			httpGet(url:'http://www.google.com/finance/info?q=VMW',responseType:String)
 		}		
-		def result = flow.sendAndReceive(new GenericMessage(''))
-		println result.payload	 
+		def result = flow.sendAndReceive('')
+		println result 
 	}
 	
 	@Test

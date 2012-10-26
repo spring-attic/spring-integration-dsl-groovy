@@ -33,7 +33,6 @@ class RabbitContextFactory extends IntegrationComponentFactory {
 	}
 
 	public boolean onNodeChildren( FactoryBuilderSupport builder, Object node, Closure childContent) {
-		println("nodeChildren of $node")
 		builder.withBuilder(new RabbitBuilder(builder), childContent)
 		return false
 	}

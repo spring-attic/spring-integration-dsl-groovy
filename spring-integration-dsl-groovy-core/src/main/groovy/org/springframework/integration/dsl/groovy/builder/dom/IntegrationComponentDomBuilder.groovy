@@ -44,5 +44,12 @@ abstract class IntegrationComponentDomBuilder {
 		integrationDomSupport.namespaceSupport.integrationNamespacePrefix
 	}
 
+	/** 
+	 * @param builder StreamingMarkupBuilder
+	 * @param applicationContext the Spring ApplicationContext
+	 * @param component the IntegrationComponent
+	 * @param attributes a Map of undeclared component properties passed as named parameters
+	 * @param an optional closure containing additional XML markup used to generate child elements if necessary
+	 */
 	protected abstract void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes, Closure closure);
 }

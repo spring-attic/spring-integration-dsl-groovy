@@ -42,8 +42,12 @@ class MessageFlow extends BaseIntegrationComposition {
 		integrationContext.send(inputChannel,msgOrPayload)
 	}
 
-	def sendAndReceive(msgOrPayload,timeout=1000) {
+	def sendAndReceive(msgOrPayload,long timeout=1000) {
 		integrationContext.sendAndReceive(inputChannel,msgOrPayload,timeout)
+	}
+	
+	def receive(long timeout=0) {
+		integrationContext.receive(outputChannel,timeout)
 	}
 
 	def start() {

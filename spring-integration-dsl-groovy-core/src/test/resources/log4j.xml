@@ -13,11 +13,11 @@
 	<!-- Loggers -->
 
 	<logger name="org.springframework.integration.dsl.groovy">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 	
 	<logger name="org.springframework.integration">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 
 	<!-- Root Logger -->

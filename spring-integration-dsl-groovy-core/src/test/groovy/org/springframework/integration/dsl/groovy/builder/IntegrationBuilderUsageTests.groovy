@@ -20,20 +20,6 @@ import org.junit.Test
  * @author David Turanski
  *
  */
-/*
- * class MyBinding extends Binding {
- def builder
- Object getVariable(String name) {
- return { Object... args ->  builder.invokeMethod(name,args) }
- }
- }
- // parse the script and run it against the builder
- new File("foo.groovy").withInputStream { input ->
- Script s = new GroovyClassLoader().parseClass(input).newInstance()
- s.binding = new MyBinding(builder:builder)
- s.run()
- }
- */
 class IntegrationBuilderUsageTests {
 	IntegrationBuilder builder = new IntegrationBuilder()
 

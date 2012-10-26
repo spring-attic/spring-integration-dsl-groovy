@@ -23,7 +23,6 @@ import org.springframework.integration.message.GenericMessage
 
 class SplitterTests {
 
-
 	IntegrationBuilder builder = new IntegrationBuilder()
 
 	@Test

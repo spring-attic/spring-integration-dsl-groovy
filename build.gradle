@@ -97,6 +97,8 @@ project('spring-integration-dsl-groovy-samples') {
     compile project(":spring-integration-dsl-groovy-core")
     compile "log4j:log4j:$log4jVersion"
   }
+  sourceSets.main.groovy.srcDirs = ["src/main/java", "src/main/groovy"]
+  compileJava.enabled = false
 }
 
 task 'run-cafe'(type:JavaExec) {

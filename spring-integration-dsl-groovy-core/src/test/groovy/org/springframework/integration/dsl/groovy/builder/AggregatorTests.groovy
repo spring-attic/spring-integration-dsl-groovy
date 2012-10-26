@@ -31,7 +31,6 @@ class AggregatorTests {
 			aggregate()
 		}
 
-
 		def result = flow.sendAndReceive([1, 2])
 		assert result == [1, 2]
 	}
@@ -39,11 +38,9 @@ class AggregatorTests {
 	@Test
 	void testCustomReleaseStrategy() {
 		def flow = builder.messageFlow {
-
 			split()
-			aggregate(releaseStrategy:{list-> (list.inject(0){sum,item-> sum + item} >= 6) })
+			aggregate(releaseStrategy:{list-> (list.sum() >= 6) })
 		}
-
 
 		def result = flow.sendAndReceive([1, 2, 3, 4])
 		assert result == [1, 2, 3]
@@ -51,22 +48,23 @@ class AggregatorTests {
 
 	@Test
 	void testCustomCorrelationStrategy() {
+		
+		def list = (1..8)
 		def flow = builder.messageFlow(outputChannel:'queueChannel') {
 			queueChannel('queueChannel')
 			split()
 			aggregate(
-					releaseStrategy:{ list-> (list.size() == 2 ) },
-					correlationStrategy:{it % 2 ? 'even' : 'odd' })
+					releaseStrategy:{ agg-> agg.size() == list.size()/2 },
+					correlationStrategy: {it %2 ? 'odd': 'even' }
+					)
 		}
 
-		def ac = builder.integrationContext.createApplicationContext()
-		def queueChannel = ac.getBean('queueChannel')
-		flow.send([1, 2, 3, 4])
+		flow.send(list)
 
-		def result = queueChannel.receive()
-		assert result.payload == [1, 3]
-		result = queueChannel.receive()
-		assert result.payload == [2, 4]
+		def result = flow.receive()
+		assert result.payload == [1, 3, 5, 7]
+		result = flow.receive()
+		assert result.payload == [2, 4, 6, 8]
 	}
 
 	@Test

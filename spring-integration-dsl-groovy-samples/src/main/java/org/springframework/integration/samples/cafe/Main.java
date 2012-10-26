@@ -12,9 +12,6 @@
  */
 package org.springframework.integration.samples.cafe;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder;
@@ -26,28 +23,40 @@ import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder;
 public class Main {
 
 	/**
+	 * Main class for the Cafe Demo using the Groovy DSL from Java
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
 		IntegrationBuilder integrationBuilder = new IntegrationBuilder();
-		try {
-			integrationBuilder.build(new FileInputStream("config/cafe-config.groovy"));
-			ApplicationContext applicationContext = integrationBuilder.getApplicationContext();
 
-			Cafe cafe = (Cafe) applicationContext.getBean("cafe");
-			for (int i = 1; i <= 100; i++) {
-				Order order = new Order(i);
-				order.addItem(DrinkType.LATTE, 2, false);
-				order.addItem(DrinkType.MOCHA, 3, true);
-				cafe.placeOrder(order);
-			}
-			((GenericApplicationContext) applicationContext).close();
-		}
-		catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		/*
+		 * Build the SI Application from Groovy DSL
+		 *
+		 * In this case the script is a compiled groovy.lang.Script. 
+		 * 
+		 * It is also possible to load a .groovy file as a File, Spring Resource,
+		 * GroovyCodeSource, or InputStream
+		 */
+		
+		integrationBuilder.build(new CafeConfig());
+		
+		
+		/*
+		 * Get a reference to the Cafe gateway and place some orders
+		 */
+		ApplicationContext applicationContext = integrationBuilder
+				.getApplicationContext();
 
+		Cafe cafe = applicationContext.getBean("cafe",Cafe.class);
+		for (int i = 1; i <= 100; i++) {
+			Order order = new Order(i);
+			order.addItem(DrinkType.LATTE, 2, false);
+			order.addItem(DrinkType.MOCHA, 3, true);
+			cafe.placeOrder(order);
+		}
+		
+		((GenericApplicationContext) applicationContext).close();
 	}
 
 }

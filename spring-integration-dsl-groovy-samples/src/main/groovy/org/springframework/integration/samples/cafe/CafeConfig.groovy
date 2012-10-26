@@ -1,4 +1,5 @@
-import org.springframework.integration.samples.cafe.*
+package org.springframework.integration.samples.cafe
+
 doWithSpringIntegration {
   springXml {
 	  bean(id:'barista','class':'org.springframework.integration.samples.cafe.Barista')

@@ -15,6 +15,7 @@ package org.springframework.integration.dsl.groovy.builder
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
 import org.springframework.context.ApplicationContext
+import org.springframework.core.io.Resource
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
 import org.springframework.integration.dsl.groovy.IntegrationContext
 import org.springframework.integration.dsl.groovy.MessageFlow
@@ -138,6 +139,15 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 	Object build(InputStream is) {
 		def grs  = new GroovyCodeSource(new InputStreamReader(is),this.getClass().getName(),GroovyShell.DEFAULT_CODE_BASE)
 		def script = new GroovyClassLoader().parseClass(grs).newInstance()
+		this.build(script)
+	}
+	
+	Object build(Resource resource) {
+		return build(resource.getInputStream())
+	}
+	
+	Object build (String className) {
+		Class script = new GroovyClassLoader().loadClass(className)
 		this.build(script)
 	}
 	

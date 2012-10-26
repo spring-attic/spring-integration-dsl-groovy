@@ -31,6 +31,13 @@ class IntegrationContext extends BaseIntegrationComposition {
 	private applicationContext
 	private List<AbstractIntegrationBuilderModuleSupport> moduleSupportInstances
 
+	/**
+	 * Send a message without expecting a reply
+	 * 
+	 * @param inputChannelName
+	 * @param msgOrPayload either a Message or an Object used as a Message payload
+	 * @return true if the send succeeded
+	 */
 	def send(String inputChannelName, Object msgOrPayload) {
 		def ac = createApplicationContext()
 		def inputChannel = ac.getBean(inputChannelName)
@@ -38,7 +45,15 @@ class IntegrationContext extends BaseIntegrationComposition {
 				new GenericMessage(msgOrPayload)
 		inputChannel.send(messageToSend)
 	}
-	//TODO: Add errorFlow
+	
+	/**
+	 * Send a message and receive a reply
+	 * @param inputChannelName
+	 * @param msgOrPayload either a Message or an Object used as a Message payload
+	 * @return the result. If the input object is a Message, also returns a Message 
+	 * otherwise the payload is returned
+	 */
+	//TODO: Add error routing
 	def sendAndReceive(String inputChannelName, Object msgOrPayload, long timeout = 0) {
 		def result
 		def ac = createApplicationContext()
@@ -58,20 +73,54 @@ class IntegrationContext extends BaseIntegrationComposition {
 
 		(msgOrPayload instanceof Message) ? result : result?.payload
 	}
+	
+	Message<?> receive(String channelName, long timeout = 0) {
+		
+		def ac = createApplicationContext()
+		def channel = ac.getBean(channelName)
+		
+		Message<?> msg
+		if (timeout){
+			msg = channel.receive(timeout)
+		} else {
+			msg = channel.receive()
+		}
+		
+		msg
+	}
+	
 
+	/**
+	 * 
+	 * @return all defined MessageFlows
+	 */
 	List<MessageFlow> getMessageFlows() {
 		components.findAll{it instanceof MessageFlow}
 	}
 
+	/**
+	 * Find a messageFlow by its name
+	 * @param name the messageFlow name
+	 * @return the MessageFlow
+	 */
 	MessageFlow getMessageFlowByName(String name){
 		messageFlows.find {it.name = name}
 	}
 
+	/**
+	 * Get the application context
+	 * @return
+	 */
 	ApplicationContext getApplicationContext() {
 		this.applicationContext
 	}
 
 
+	/**
+	 * Create an application context
+	 * @param parentContext optional parent application context
+	 * @return the application context
+	 */
 	ApplicationContext createApplicationContext(ApplicationContext parentContext = null) {
 		if (!applicationContext){
 			applicationContext = new  GenericXmlApplicationContext()
