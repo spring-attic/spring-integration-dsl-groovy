@@ -18,6 +18,7 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.context.ApplicationContext
 import org.springframework.integration.dsl.groovy.ClosureInvokingMessageProcessor
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationComponentDomBuilder
 
 /**
@@ -27,8 +28,10 @@ import org.springframework.integration.dsl.groovy.builder.dom.IntegrationCompone
 class HttpOutboundDomBuilder extends IntegrationComponentDomBuilder {
 
 	@Override
-	void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes, Closure closure) {
+	void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent component, Closure closure) {
 
+		def attributes = component.attributes
+		
 		def httpMethod = 'GET'
 		if (component.builderName == 'httpPut') {
 			httpMethod = 'PUT'

@@ -16,6 +16,7 @@ package org.springframework.integration.dsl.groovy.builder.dom
 import org.springframework.context.ApplicationContext
 import org.springframework.integration.dsl.groovy.FlowExecution
 import org.springframework.integration.dsl.groovy.GatewayEndpoint
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 import org.springframework.integration.dsl.groovy.MessageFlow
 import org.springframework.integration.dsl.groovy.MessageProducingEndpoint
 import org.springframework.integration.dsl.groovy.SimpleEndpoint
@@ -35,9 +36,10 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 	}
 
 	@Override
-	void doBuild(Object builder, ApplicationContext applicationContext, Object messageFlow, Map attributes, Closure closure) {
-		SimpleEndpointDomBuilder endpointBuilder = integrationDomSupport.domBuilder(SimpleEndpoint.class.name)
-		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(AbstractChannel.class.name)
+	void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent messageFlow, Closure closure) {
+		
+		SimpleEndpointDomBuilder endpointBuilder = integrationDomSupport.domBuilder(SimpleEndpoint.class)
+		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(AbstractChannel.class)
 
 		def previousComponent = null
 		if (messageFlow.outputChannel) {

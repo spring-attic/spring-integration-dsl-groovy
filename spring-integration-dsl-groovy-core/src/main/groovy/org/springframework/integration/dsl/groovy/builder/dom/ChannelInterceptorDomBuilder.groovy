@@ -18,6 +18,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils
 import org.springframework.context.ApplicationContext
 import org.springframework.integration.dsl.groovy.ClosureInvokingChannelInterceptor
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 
 
 /**
@@ -34,8 +35,8 @@ class ChannelInterceptorDomBuilder extends IntegrationComponentDomBuilder {
 	 * Builds and registers a channel interceptor
 	 */
 	@Override
-	public void doBuild(builder, ApplicationContext applicationContext, Object channelInterceptor, Map attributes, Closure closure) {
-
+	public void doBuild(builder, ApplicationContext applicationContext, IntegrationComponent channelInterceptor, Closure closure) {
+ 
 		def beanName = "${channelInterceptor.name}_closureInvokingChannelInterceptor"
 
 		BeanDefinitionBuilder  handlerBuilder =
@@ -44,7 +45,10 @@ class ChannelInterceptorDomBuilder extends IntegrationComponentDomBuilder {
 		def bdh = new BeanDefinitionHolder(handlerBuilder.getBeanDefinition(),beanName)
 		BeanDefinitionReaderUtils.registerBeanDefinition(bdh, (BeanDefinitionRegistry) applicationContext)
 
+		
 		channelInterceptor.ref=beanName
+		def attributes = channelInterceptor.attributes
+		
 		if (channelInterceptor.global){
 			attributes.remove('id')
 			builder."$siPrefix:channel-interceptor"(attributes)

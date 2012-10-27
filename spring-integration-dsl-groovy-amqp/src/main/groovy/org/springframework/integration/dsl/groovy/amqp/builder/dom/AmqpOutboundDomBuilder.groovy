@@ -20,6 +20,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.context.ApplicationContext
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationComponentDomBuilder
 import org.springframework.integration.dsl.groovy.ClosureInvokingMessageProcessor
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 
 /**
  * @author David Turanski
@@ -31,10 +32,10 @@ class AmqpOutboundDomBuilder extends IntegrationComponentDomBuilder {
 	 * @see org.springframework.integration.dsl.groovy.builder.dom.IntegrationComponentDomBuilder#doBuild(java.lang.Object, org.springframework.context.ApplicationContext, java.lang.Object, java.util.Map, groovy.lang.Closure)
 	 */
 	@Override
-	protected void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes,
-	Closure closure) {
+	protected void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent component, Closure closure) {
 		def routingKey
 		def beanName = "${component.name}_closureInvokingHandler"
+		def attributes = component.attributes
 		
 		if (attributes.containsKey('routing-key')){
 			routingKey = attributes['routing-key']

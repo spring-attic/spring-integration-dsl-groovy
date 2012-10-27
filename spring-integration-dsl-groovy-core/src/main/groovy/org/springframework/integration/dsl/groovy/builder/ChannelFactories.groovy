@@ -68,7 +68,7 @@ class ChannelInterceptorFactory extends IntegrationComponentFactory {
 			parent.add(channelInterceptor)
 		}  else if (parent instanceof AbstractChannel) {
 			channelInterceptor.global = false
-			assert !channelInterceptor.componentProperties.containsKey('pattern'), "'pattern is only valid for global channel interceptors"
+			assert !channelInterceptor.attributes.containsKey('pattern'), "'pattern is only valid for global channel interceptors"
 			parent.addChannelInterceptor(channelInterceptor)
 		} else {
 			throw new IllegalStateException("${channelInterceptor.builderName} cannot be a child of ${parent.builderName}")

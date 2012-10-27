@@ -32,9 +32,9 @@ class AggregatorDomBuilder extends IntegrationComponentDomBuilder {
 	}
 
 	@Override
-	public void doBuild(Object builder, ApplicationContext applicationContext, Object endpoint, Map attributes, Closure closure) {
+	public void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent endpoint, Closure closure) {
 
-		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(new Channel())
+		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(Channel.class)
 		def name = endpoint.name
 		assert endpoint.name, "name cannot be null for object $endpoint"
 
@@ -42,7 +42,8 @@ class AggregatorDomBuilder extends IntegrationComponentDomBuilder {
 			channelBuilder.createDirectChannelIfNotDefined(builder,endpoint.outputChannel)
 		}
 
-		attributes = buildAttributes(attributes, endpoint)
+		def attributes = buildAttributes(endpoint.attributes, endpoint)
+		
 		if (endpoint.hasProperty('action') && endpoint.action) {
 			assert !(attributes.containsKey('ref')), 'endoint cannot provide a bean reference and a closure'
 			attributes.method='processList'
@@ -90,7 +91,7 @@ class AggregatorDomBuilder extends IntegrationComponentDomBuilder {
 		builder."$siPrefix:$methodName"(attributes) {
 			if (endpoint.poller) {
 				if (endpoint.poller instanceof Poller) {
-					"$siPrefix:poller"(endpoint.poller.componentProperties)
+					"$siPrefix:poller"(endpoint.poller.attributes)
 				} else if (endpoint.poller instanceof String) {
 					"$siPrefix:poller"(ref:endpoint.poller)
 				}

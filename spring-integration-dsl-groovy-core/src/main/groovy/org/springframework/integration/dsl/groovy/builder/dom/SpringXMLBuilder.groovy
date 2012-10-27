@@ -16,19 +16,21 @@ import groovy.lang.Closure
 
 import java.util.Map
 import org.springframework.context.ApplicationContext
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 
 /**
+ * Merge raw XML markup into the output stream
+ * 
  * @author David Turanski
  *
  */
 class SpringXMLBuilder extends IntegrationComponentDomBuilder {
 
 	@Override
-	protected void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes,
+	protected void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent component,
 	Closure closure) {
 		Closure c = component.beanDefinitions
 		c.delegate = builder
 		c.call()
-		println "closure called on $builder"
 	}
 }

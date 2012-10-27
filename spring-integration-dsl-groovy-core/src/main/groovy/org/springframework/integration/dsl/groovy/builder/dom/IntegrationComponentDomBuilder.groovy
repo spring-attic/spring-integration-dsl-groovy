@@ -16,10 +16,13 @@ package org.springframework.integration.dsl.groovy.builder.dom
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
 import org.springframework.context.ApplicationContext
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 import groovy.lang.Closure
 import java.util.Map
 
 /**
+ * The base class for all DOM Builders
+ * 
  * @author David Turanski
  *
  */
@@ -27,13 +30,19 @@ abstract class IntegrationComponentDomBuilder {
 	protected Log logger = LogFactory.getLog(this.class)
 	protected IntegrationDomSupport integrationDomSupport
 
-	void build(builder, ApplicationContext applicationContext, component, Closure closure){
-		def attributes = component.componentProperties
+	/** 
+	 * @param builder StreamingMarkupBuilder
+	 * @param applicationContext the Spring ApplicationContext
+	 * @param component the IntegrationComponent
+	 * @param an optional closure containing additional XML markup used to generate child elements if necessary
+	 */
+	final void build(builder, ApplicationContext applicationContext, IntegrationComponent component, Closure closure){
+ 		
 		if (!component.id){
 			component.id = component.name
 		}
 
-		doBuild(builder,applicationContext,component,attributes,closure)
+		doBuild(builder,applicationContext,component,closure)
 	}
 
 	void build(builder, ApplicationContext applicationContext, component) {
@@ -48,8 +57,7 @@ abstract class IntegrationComponentDomBuilder {
 	 * @param builder StreamingMarkupBuilder
 	 * @param applicationContext the Spring ApplicationContext
 	 * @param component the IntegrationComponent
-	 * @param attributes a Map of undeclared component properties passed as named parameters
 	 * @param an optional closure containing additional XML markup used to generate child elements if necessary
 	 */
-	protected abstract void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes, Closure closure);
+	protected abstract void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent component, Closure closure);
 }

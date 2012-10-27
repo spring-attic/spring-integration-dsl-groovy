@@ -17,6 +17,7 @@ import groovy.lang.Closure;
 import java.util.Map;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationComponentDomBuilder
 
 /**
@@ -29,8 +30,11 @@ class AmqpInboundDomBuilder extends IntegrationComponentDomBuilder {
 	 * @see org.springframework.integration.dsl.groovy.builder.dom.IntegrationComponentDomBuilder#doBuild(java.lang.Object, org.springframework.context.ApplicationContext, java.lang.Object, java.util.Map, groovy.lang.Closure)
 	 */
 	@Override
-	protected void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes,
+	protected void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent component,
 			Closure closure) {
+			
+		def attributes = component.attributes
+			
 		attributes.'connection-factory' = attributes.'connection-factory'?:'connectionFactory'
 		
 		if (component.requestChannel){

@@ -18,6 +18,7 @@ import org.springframework.integration.dsl.groovy.*
 
 
 /**
+ * Builds a SI XML element with configured name and the component attributes provided
  * @author David Turanski
  *
  */
@@ -30,10 +31,7 @@ class GenericDomBuilder extends IntegrationComponentDomBuilder {
 	}
 
 	@Override
-	public void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes, Closure closure) {
-		if (component.name) {
-			component.componentProperties << [id:component.name]
-		}
-		builder."$siPrefix:$name"(component.componentProperties)
+	public void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent component, Closure closure) {
+		builder."$siPrefix:$name"(component.attributes)
 	}
 }

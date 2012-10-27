@@ -13,6 +13,7 @@
 package org.springframework.integration.dsl.groovy.builder.dom
 
 import org.springframework.context.ApplicationContext
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 import org.springframework.integration.dsl.groovy.MessageFlow
 import org.springframework.integration.dsl.groovy.OtherwiseCondition
 import org.springframework.integration.dsl.groovy.RouterCondition
@@ -31,8 +32,9 @@ class RouterDomBuilder extends IntegrationComponentDomBuilder {
 	}
 
 	@Override
-	void doBuild(builder, ApplicationContext applicationContext, Object routerComposition, Map attributes, Closure closure) {
-		SimpleEndpointDomBuilder endpointBuilder = integrationDomSupport.domBuilder(SimpleEndpoint.class.name)
+	void doBuild(builder, ApplicationContext applicationContext, IntegrationComponent routerComposition, Closure closure) {
+		
+		SimpleEndpointDomBuilder endpointBuilder = integrationDomSupport.domBuilder(SimpleEndpoint.class)
 
 		def otherwise = routerComposition.components.find{it instanceof OtherwiseCondition}
 		if (otherwise){
@@ -56,7 +58,7 @@ class RouterDomBuilder extends IntegrationComponentDomBuilder {
 		}
 
 		routerComposition.components.findAll{it instanceof RouterCondition}.each {component ->
-			integrationDomSupport.domBuilder(MessageFlow.class.name).build(builder,applicationContext,component)
+			integrationDomSupport.domBuilder(MessageFlow.class).build(builder,applicationContext,component)
 		}
 	}
 }

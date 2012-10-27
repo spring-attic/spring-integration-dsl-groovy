@@ -12,46 +12,10 @@
  */
 package org.springframework.integration.dsl.groovy
 
-import org.apache.commons.logging.LogFactory
-
 /**
  * @author David Turanski
  *
  */
-@Mixin(AttributeHelper)
-@Mixin(ComponentNamer)
-abstract class IntegrationComponent   {
-	protected logger = LogFactory.getLog(this.class)
-	protected String name
-	protected componentProperties = [:]
-	protected String builderName
-
-	def component
-
-	//getter
-	def propertyMissing(name) {
-		componentProperties[propertyNameToAttributeName(name)]
-	}
-
-	//setter
-	def propertyMissing(String name, Object val) {
-		componentProperties[propertyNameToAttributeName(name)]=val
-	}
-
-	IntegrationComponent() {
-		component = this
-	}
-}
-
-/**
- * A class used to support core Spring components commonly used in integration
- * such as task executor and task scheduler, etc
- * @author David Turanski
- *
- */
-class CoreSpringComponent extends IntegrationComponent {
-	protected String namespacePrefix
-}
 
 class BaseIntegrationComposition extends IntegrationComponent {
 	protected BaseIntegrationComposition parentComposition;

@@ -14,6 +14,7 @@ package org.springframework.integration.dsl.groovy.builder.dom
 
 import org.springframework.context.ApplicationContext
 import org.springframework.integration.dsl.groovy.Channel
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 import org.springframework.integration.dsl.groovy.PubSubChannel
 import org.springframework.integration.dsl.groovy.QueueChannel
 import org.springframework.integration.dsl.groovy.ChannelInterceptor
@@ -37,7 +38,10 @@ class ChannelDomBuilder extends IntegrationComponentDomBuilder {
 	 * Builds and registers a channel definition. These can be overridden
 	 */
 	@Override
-	public void doBuild(builder, ApplicationContext applicationContext, Object channel, Map attributes, Closure closure) {
+	public void doBuild(builder, ApplicationContext applicationContext, IntegrationComponent channel, Closure closure) {
+		
+		def attributes = channel.attributes
+		
 		if (channel instanceof Channel) {
 			builder."$siPrefix:channel"(attributes) {
 				addChannelInterceptors(builder, applicationContext, channel, closure)

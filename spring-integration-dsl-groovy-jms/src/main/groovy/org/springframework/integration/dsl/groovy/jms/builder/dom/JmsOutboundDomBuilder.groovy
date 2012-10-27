@@ -15,6 +15,7 @@ package org.springframework.integration.dsl.groovy.jms.builder.dom
 import groovy.lang.Closure;
 
 import org.springframework.context.ApplicationContext
+import org.springframework.integration.dsl.groovy.IntegrationComponent
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationComponentDomBuilder
 
 /**
@@ -24,8 +25,10 @@ import org.springframework.integration.dsl.groovy.builder.dom.IntegrationCompone
 class JmsOutboundDomBuilder extends IntegrationComponentDomBuilder {
 
 	@Override
-	public void doBuild(Object builder, ApplicationContext applicationContext, Object component, Map attributes, Closure closure) {
+	public void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent component, Closure closure) {
 
+		def attributes = component.attributes
+		
 		attributes.'connection-factory' = attributes.'connection-factory'?:'connectionFactory'
 
 		if (component.oneWay) {

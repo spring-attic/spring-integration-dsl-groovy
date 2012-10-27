@@ -59,20 +59,32 @@ class IntegrationDomSupport {
 		domBuilders["org.springframework.integration.dsl.groovy.XMLBean"]=new SpringXMLBuilder()
 	}
 
-	def domBuilder(Object component) {
+	IntegrationComponentDomBuilder domBuilder(Class clazz) {
+		
 		def builder = null
-		if (component instanceof String) {
-			builder = domBuilders[component]
-		}
-		else if (component instanceof AbstractChannel) {
-			builder = domBuilders[AbstractChannel.class.name]
-		} else if (component instanceof SimpleEndpoint) {
-			builder =  domBuilders[component.class.name] ?: domBuilders[SimpleEndpoint.class.name]
+		if (AbstractChannel.isAssignableFrom(clazz)) {
+			builder = domBuilders[AbstractChannel.class.name]			
+		} else if (SimpleEndpoint.isAssignableFrom(clazz)) {
+			builder =  domBuilders[clazz.name] ?: domBuilders[SimpleEndpoint.class.name]
 		} else {
-			builder = domBuilders[component.class.name]
-		}
+			builder = domBuilders[clazz.name]
+		}		
+		if (logger.isDebugEnabled()) {
+			logger.debug("returning DOMBuilder ${builder?.class?.name} for ${clazz.name}")
+		  }
+		  
 		builder
 	}
+	
+	IntegrationComponentDomBuilder domBuilder(String className) {
+			domBuilders[className]
+	}
+	
+	IntegrationComponentDomBuilder domBuilder(Object component) {
+		domBuilder(component.class)
+	}
+	
+	 
 
 	def translateToXML(integrationContext) {
 

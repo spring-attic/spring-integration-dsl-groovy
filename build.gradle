@@ -95,6 +95,7 @@ project('spring-integration-dsl-groovy-samples') {
   description = 'Spring Integration Groovy DSL Samples'
   dependencies {
     compile project(":spring-integration-dsl-groovy-core")
+     compile project(":spring-integration-dsl-groovy-http")
     compile "log4j:log4j:$log4jVersion"
   }
   sourceSets.main.groovy.srcDirs = ["src/main/java", "src/main/groovy"]

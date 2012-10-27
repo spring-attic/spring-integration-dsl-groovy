@@ -33,16 +33,14 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
 	}
 
 	@Override
-	void doBuild(Object builder, ApplicationContext applicationContext, Object endpoint, Map attributes, Closure closure) {
+	void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent endpoint, Closure closure) {
 
 		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(new Channel())
 		def name = endpoint.name
 		assert endpoint.name, "name cannot be null for object $endpoint"
 
-		if (closure) {
-			closure.delegate = builder
-		}
-
+		def attributes = endpoint.attributes
+		
 		if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel ) {
 			channelBuilder.createDirectChannelIfNotDefined(builder,endpoint.outputChannel)
 		}
@@ -77,6 +75,9 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
 			buildEndpoint(builder,endpoint,attributes,'splitter')
 		}
 		else if (endpoint instanceof RouterComposition) {
+			if (closure) {
+				closure.delegate = builder
+			}
 			buildEndpoint(builder,endpoint,attributes,'router',closure)
 		}
 	}
@@ -85,7 +86,7 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
 		builder."$siPrefix:$methodName"(attributes) {
 			if (endpoint.poller) {
 				if (endpoint.poller instanceof Poller) {
-					"$siPrefix:poller"(endpoint.poller.componentProperties)
+					"$siPrefix:poller"(endpoint.poller.attributes)
 				} else if (endpoint.poller instanceof String) {
 					"$siPrefix:poller"(ref:endpoint.poller)
 				}

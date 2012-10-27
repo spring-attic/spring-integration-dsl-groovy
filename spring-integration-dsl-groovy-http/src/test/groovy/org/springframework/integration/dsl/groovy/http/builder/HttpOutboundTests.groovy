@@ -32,24 +32,4 @@ class HttpOutboundTests {
 			httpGet(requestChannel:'httpRequestChannel',replyChannel:'httpReplyChannel',url:'http://www.foo.com')
 		}
 	}
-	
-	@Test
-	@Ignore
-	void testHttpOutboundInMessageFlow() {
-		def flow = builder.messageFlow {
-			httpGet(url:'http://www.google.com/finance/info?q=VMW',responseType:String)
-		}		
-		def result = flow.sendAndReceive('')
-		println result 
-	}
-	
-	@Test
-	@Ignore
-	void testHttpOutboundWithClosure() {
-		def flow = builder.messageFlow {
-			httpGet(url:{"http://www.google.com/finance/info?q=$it"},responseType:String)
-		}
-		def result = flow.sendAndReceive('vmw')
-		println result
-	}
 }
