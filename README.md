@@ -2,7 +2,7 @@ Groovy DSL For Spring Integration
 =================================
 
 ## Overview
-This project implements a Groovy DSL for Spring Integration. Coming on the heels of the [Scala DSL for Spring Integration](https://github.com/SpringSource/spring-integration-scala), I have incorporated some of the same basic ideas and vocabulary however this has been developed independently with a primary focus on providing Groovy and Java developers a simple, flexible, and powerful alternative to XML configuration for Spring Integration applications. Please refer to the [DSL User's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-Users-Guide) and other pages on the project [wiki](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki) for more details.
+This project implements a Groovy DSL for Spring Integration. Coming on the heels of the [Scala DSL for Spring Integration](https://github.com/SpringSource/spring-integration-scala), I have incorporated some of the same basic ideas and vocabulary however this has been developed independently with a primary focus on providing Groovy and Java developers a simple, flexible, and powerful alternative to XML configuration for Spring Integration applications. Please refer to the [DSL User's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-User's-Guide) and other pages on the project [wiki](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki) for more details.
 
 ## Features
 * Simplified Spring Integration configuration and execution based on the familiar Groovy Builder pattern
@@ -53,18 +53,18 @@ If we save this to a file named 'messageFlow1.groovy', it may be accessed from a
     
 In addition to *InputStream* the API accepts other sources such as a compiled *groovy.lang.Script* and *groovy.lang.GroovyCodeSource*
 
- The [DSL Developer's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-Developers-Guide) contains a lot more examples. Also we recommend looking at the [spring-integration-dsl-groovy-samples](https://github.com/SpringSource/spring-integration-dsl-groovy/tree/master/spring-integration-dsl-groovy-samples) subproject and the unit tests included in the various sub projects. 
+ The [DSL Developer's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-Developer's-Guide) contains a lot more examples. Also we recommend looking at the [spring-integration-dsl-groovy-samples](https://github.com/SpringSource/spring-integration-dsl-groovy/tree/master/spring-integration-dsl-groovy-samples) subproject and the unit tests included in the various sub projects. 
 
 
 ## Project Structure
 
 The DSL structure mirrors Spring Integration itself. The core module provides the core components and language framework. Protocol adapters, e.g., http, jms, are maintained as separate subprojects. In addition there is a samples module to help get you started. Each adapter module plugs in to the DSL framework to provide extensions needed to support the associated adapters. At this time, there are only a few adapters implemented for the DSL, but this is expected to grow according to demand, community contributions, etc.  
 
-Even if an adapter is not implemented directly in the DSL, you can use Groovy markup to drop in native Spring XML. Please refer to the [DSL User's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-Users-Guide) for more information.
+Even if an adapter is not implemented directly in the DSL, you can use Groovy markup to drop in native Spring XML. Please refer to the [DSL User's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-User's-Guide) for more information.
 
 ## Contributing 
 
-With the inital core DSL features in place, there remains much to be done to support the constantly growing collection of protocol adapters covered by Spring Integration. Community contributions are certainly welcome! If this interests you, please refer to the [DSL Developer's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-Developers-Guide) for more information.
+With the inital core DSL features in place, there remains much to be done to support the constantly growing collection of protocol adapters covered by Spring Integration. Community contributions are certainly welcome! If this interests you, please refer to the [DSL Developer's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-Developer's-Guide) for more information.
 
 Here are some ways for you to get involved in the community:
 
