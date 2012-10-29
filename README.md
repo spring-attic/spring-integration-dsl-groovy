@@ -2,7 +2,7 @@ Groovy DSL For Spring Integration
 =================================
 
 ## Overview
-This project implements a Groovy DSL for Spring Integration. Coming on the heels of the [Scala DSL for Spring Integration](https://github.com/SpringSource/spring-integration-scala), I have incorporated some of the same basic ideas and vocabulary however this has been developed independently with a primary focus on providing Groovy and Java developers a simple, flexible, and powerful alternative to XML configuration for Spring Integration applications. Please refer to the [DSL User's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-User's-Guide) and other pages on the project [wiki](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki) for more details.
+This project implements a Groovy DSL for Spring Integration. Coming on the heels of the [Scala DSL for Spring Integration](https://github.com/SpringSource/spring-integration-dsl-scala), I have incorporated some of the same basic ideas and vocabulary however this has been developed independently with a primary focus on providing Groovy and Java developers a simple, flexible, and powerful alternative to XML configuration for Spring Integration applications. Please refer to the [DSL User's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-User's-Guide) and other pages on the project [wiki](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki) for more details.
 
 ## Features
 * Simplified Spring Integration configuration and execution based on the familiar Groovy Builder pattern
