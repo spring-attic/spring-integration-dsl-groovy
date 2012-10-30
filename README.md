@@ -53,7 +53,7 @@ If we save this to a file named 'messageFlow1.groovy', it may be accessed from a
     
 In addition to *InputStream* the API accepts other sources such as a compiled *groovy.lang.Script* and *groovy.lang.GroovyCodeSource*
 
- The [DSL Developer's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-Developer's-Guide) contains a lot more examples. Also we recommend looking at the [spring-integration-dsl-groovy-samples](https://github.com/SpringSource/spring-integration-dsl-groovy/tree/master/spring-integration-dsl-groovy-samples) subproject and the unit tests included in the various sub projects. 
+ The [DSL User's Guide](https://github.com/SpringSource/spring-integration-dsl-groovy/wiki/DSL-User's-Guide) contains a lot more examples to get you started. Also take a look at the [spring-integration-dsl-groovy-samples](https://github.com/SpringSource/spring-integration-dsl-groovy/tree/master/spring-integration-dsl-groovy-samples) subproject as well as the unit tests included in the various sub projects. 
 
 
 ## Project Structure
