@@ -13,6 +13,7 @@
 package org.springframework.integration.dsl.groovy.builder
 
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationDomSupport
+import org.springframework.integration.dsl.groovy.builder.dom.XMLNamespaceSupport
 
 /**
  * @author David Turanski
@@ -21,4 +22,5 @@ import org.springframework.integration.dsl.groovy.builder.dom.IntegrationDomSupp
 abstract class AbstractIntegrationBuilderModuleSupport {
 	abstract void registerBuilderFactories(IntegrationBuilder builder)
 	abstract void registerDomBuilders(IntegrationDomSupport integrationDomSupport)
+	abstract void registerNamespaces(XMLNamespaceSupport namespaceSupport)
 }

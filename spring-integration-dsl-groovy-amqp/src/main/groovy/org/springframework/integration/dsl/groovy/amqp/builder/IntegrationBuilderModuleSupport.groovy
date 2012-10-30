@@ -12,11 +12,14 @@
  */
 package org.springframework.integration.dsl.groovy.amqp.builder
 
+import org.springframework.integration.dsl.groovy.amqp.AmqpOutbound
+import org.springframework.integration.dsl.groovy.amqp.AmqpInbound
 import org.springframework.integration.dsl.groovy.amqp.builder.dom.AmqpInboundDomBuilder
 import org.springframework.integration.dsl.groovy.amqp.builder.dom.AmqpOutboundDomBuilder
 import org.springframework.integration.dsl.groovy.builder.AbstractIntegrationBuilderModuleSupport
 import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationDomSupport
+import org.springframework.integration.dsl.groovy.builder.dom.XMLNamespaceSupport;
 
 /**
  * @author David Turanski
@@ -45,13 +48,18 @@ class IntegrationBuilderModuleSupport extends AbstractIntegrationBuilderModuleSu
 
 	@Override
 	void registerDomBuilders(IntegrationDomSupport integrationDomSupport) {
-		integrationDomSupport.namespaceSupport.addIntegrationNamespace('int-amqp')
-		integrationDomSupport.namespaceSupport.addSpringNamespace('rabbit')
 
-		integrationDomSupport.domBuilders['org.springframework.integration.dsl.groovy.amqp.AmqpOutbound'] \
-		= new AmqpOutboundDomBuilder(integrationDomSupport:integrationDomSupport)
-		integrationDomSupport.domBuilders['org.springframework.integration.dsl.groovy.amqp.AmqpInbound'] \
-		= new AmqpInboundDomBuilder(integrationDomSupport:integrationDomSupport)
+		integrationDomSupport.registerDomBuilder (AmqpOutbound.class,
+			new AmqpOutboundDomBuilder())
+		integrationDomSupport.registerDomBuilder(AmqpInbound.class,
+		    new AmqpInboundDomBuilder())
 
+	}
+
+	@Override
+	public void registerNamespaces(XMLNamespaceSupport namespaceSupport) {
+		namespaceSupport.addIntegrationNamespace('int-amqp')
+		namespaceSupport.addSpringNamespace('rabbit')
+		
 	}
 }

@@ -45,10 +45,20 @@ abstract class IntegrationComponentDomBuilder {
 		doBuild(builder,applicationContext,component,closure)
 	}
 
-	void build(builder, ApplicationContext applicationContext, component) {
+	/**
+	 * 
+	 * @param builder StreamingMarkupBuilder
+	 * @param applicationContext the Spring ApplicationContext
+	 * @param component the IntegrationComponent
+	 */
+	final void build(builder, ApplicationContext applicationContext, component) {
 		build(builder, applicationContext, component, null)
 	}
-
+	
+    /**
+     * Convenience method to get the assigned SI core namespace prefix
+     * @return
+     */
 	protected String getSiPrefix() {
 		integrationDomSupport.namespaceSupport.integrationNamespacePrefix
 	}

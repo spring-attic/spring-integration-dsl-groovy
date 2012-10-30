@@ -11,9 +11,12 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.springframework.integration.dsl.groovy.jms.builder
+import org.springframework.integration.dsl.groovy.jms.JmsListener
+import org.springframework.integration.dsl.groovy.jms.JmsOutbound
 import org.springframework.integration.dsl.groovy.builder.AbstractIntegrationBuilderModuleSupport
 import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationDomSupport
+import org.springframework.integration.dsl.groovy.builder.dom.XMLNamespaceSupport;
 import org.springframework.integration.dsl.groovy.jms.builder.dom.JmsListenerDomBuilder
 import org.springframework.integration.dsl.groovy.jms.builder.dom.JmsOutboundDomBuilder
 
@@ -32,10 +35,14 @@ class IntegrationBuilderModuleSupport extends AbstractIntegrationBuilderModuleSu
 
 	@Override
 	void registerDomBuilders(IntegrationDomSupport integrationDomSupport) {
-		integrationDomSupport.namespaceSupport.addIntegrationNamespace('int-jms')
-		integrationDomSupport.domBuilders['org.springframework.integration.dsl.groovy.jms.JmsListener'] \
-			= new JmsListenerDomBuilder(integrationDomSupport:integrationDomSupport)
-		integrationDomSupport.domBuilders['org.springframework.integration.dsl.groovy.jms.JmsOutbound'] \
-			= new JmsOutboundDomBuilder(integrationDomSupport:integrationDomSupport)
+	  integrationDomSupport.registerDomBuilder(JmsListener.class,
+			new JmsListenerDomBuilder())
+	   integrationDomSupport.registerDomBuilder(JmsOutbound.class,
+		new JmsOutboundDomBuilder())
+	}
+
+	@Override
+	public void registerNamespaces(XMLNamespaceSupport namespaceSupport) {
+		namespaceSupport.addIntegrationNamespace('int-jms')
 	}
 }

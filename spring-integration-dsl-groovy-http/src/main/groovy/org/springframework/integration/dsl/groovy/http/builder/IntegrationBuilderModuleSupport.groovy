@@ -14,13 +14,15 @@ package org.springframework.integration.dsl.groovy.http.builder
 import org.springframework.integration.dsl.groovy.builder.AbstractIntegrationBuilderModuleSupport
 import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationDomSupport
+import org.springframework.integration.dsl.groovy.builder.dom.XMLNamespaceSupport
 import org.springframework.integration.dsl.groovy.http.builder.dom.HttpOutboundDomBuilder
-
+import org.springframework.integration.dsl.groovy.http.HttpOutbound
 /**
  * @author David Turanski
  *
  */
 class IntegrationBuilderModuleSupport extends AbstractIntegrationBuilderModuleSupport {
+	
 	@Override
 	void registerBuilderFactories(IntegrationBuilder builder) {
 		builder.registerFactory 'httpGet', new HttpOutboundFactory()
@@ -28,8 +30,12 @@ class IntegrationBuilderModuleSupport extends AbstractIntegrationBuilderModuleSu
 
 	@Override
 	void registerDomBuilders(IntegrationDomSupport integrationDomSupport) {
-		integrationDomSupport.namespaceSupport.addIntegrationNamespace('int-http')
-		integrationDomSupport.domBuilders['org.springframework.integration.dsl.groovy.http.HttpOutbound'] \
-			= new HttpOutboundDomBuilder(integrationDomSupport:integrationDomSupport)
+		integrationDomSupport.registerDomBuilder(HttpOutbound.class,
+			new HttpOutboundDomBuilder())
+	}
+
+	@Override
+	public void registerNamespaces(XMLNamespaceSupport namespaceSupport) {
+		namespaceSupport.addIntegrationNamespace('int-http')
 	}
 }

@@ -27,26 +27,32 @@ import groovy.xml.XmlUtil
 class IntegrationDomSupport {
 	private Log logger = LogFactory.getLog(IntegrationDomSupport)
 	private XMLNamespaceSupport namespaceSupport = new XMLNamespaceSupport()
-
-	/**
-	 * Translate DSL context to XML
-	 * @param integrationContext
-	 * @return Spring XML bean definitions
-	 */
-
+	
 	private final domBuilders = [:]
 
+	/**
+	 * Default constructor
+	 */
 	IntegrationDomSupport() {
 		registerBuilders()
 	}
+	
+	/**
+	 * Constructor to register additional DOM builders for external modules
+	 *  
+	 * @param moduleSupportInstances
+	 */
 	IntegrationDomSupport(List<AbstractIntegrationBuilderModuleSupport> moduleSupportInstances) {
 		this()
 		moduleSupportInstances?.each {AbstractIntegrationBuilderModuleSupport moduleSupport ->
 			moduleSupport.registerDomBuilders(this)
+			moduleSupport.registerNamespaces(this.namespaceSupport)
 		}
 	}
 
-
+    /*
+     * Register core DSL DOM Builders
+     */
 	private void registerBuilders() {
 		domBuilders["org.springframework.integration.dsl.groovy.AbstractChannel"]=new ChannelDomBuilder(this)
 		domBuilders["org.springframework.integration.dsl.groovy.SimpleEndpoint"]=new SimpleEndpointDomBuilder(this)
@@ -59,8 +65,12 @@ class IntegrationDomSupport {
 		domBuilders["org.springframework.integration.dsl.groovy.XMLBean"]=new SpringXMLBuilder()
 	}
 
-	IntegrationComponentDomBuilder domBuilder(Class clazz) {
-		
+	/**
+	 * Get the DOM Builder registered for an IntegrationComponent by its class
+	 * @param clazz
+	 * @return the builder or null if one does not exist
+	 */
+	IntegrationComponentDomBuilder domBuilder(Class clazz) {		
 		def builder = null
 		if (AbstractChannel.isAssignableFrom(clazz)) {
 			builder = domBuilders[AbstractChannel.class.name]			
@@ -76,16 +86,35 @@ class IntegrationDomSupport {
 		builder
 	}
 	
+	/**
+	 * Get the DOM Builder assigned to an Integration Component by 
+	 * its class name
+	 * @param className
+	 * @return the builder or null if one does not exist
+	 */
 	IntegrationComponentDomBuilder domBuilder(String className) {
 			domBuilders[className]
 	}
 	
+	/**
+	 * Return the DOM builder for an IntegrationComponent instance
+	 * @param component the instance
+	 * @return the builder or null if one does not exist
+	 */
 	IntegrationComponentDomBuilder domBuilder(Object component) {
 		domBuilder(component.class)
 	}
 	
-	 
-
+	protected void registerDomBuilder(Class clazz, IntegrationComponentDomBuilder domBuilder) {
+		domBuilder.integrationDomSupport = this;
+		domBuilders[clazz.name] = domBuilder
+	}
+	
+	/**
+	 * Translate DSL context to XML
+	 * @param integrationContext the DSL IntegrationContext
+	 * @return Spring XML bean definitions
+	 */
 	def translateToXML(integrationContext) {
 
 		resolveXMLBeanNamespaces(integrationContext.components.findAll {it instanceof XMLNamespace} )
