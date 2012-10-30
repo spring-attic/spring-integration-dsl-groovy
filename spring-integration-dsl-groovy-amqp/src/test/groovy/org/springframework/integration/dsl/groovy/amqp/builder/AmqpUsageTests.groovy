@@ -19,7 +19,7 @@ import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder
  *
  */
 class AmqpUsageTests {
-	def builder = new IntegrationBuilder('amqp')
+	IntegrationBuilder builder = new IntegrationBuilder('amqp')
 
 	@Test
 	void testConnectionFactory() {

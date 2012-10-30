@@ -1,0 +1,67 @@
+ 
+ 
+	contribute(currentType("org.springframework.integration.dsl.groovy.builder.IntegrationBuilder")) 
+	{ provider = "Spring Integration DSL for AMQP"  
+		
+		method name: 'directExchange',
+		type: 'org.springframework.amqp.core.DirectExchange',
+		useNamedArgs: true,
+		doc: """Creates an AMQP DirectExchange."""
+		
+		method name: 'topicExchange',
+		type: 'org.springframework.amqp.core.TopicExchange',
+		useNamedArgs: true,
+		doc: """Creates an AMQP TopicExchange."""
+		
+		method name: 'fanoutExchange',
+		type: 'org.springframework.amqp.core.FanoutExchange',
+		useNamedArgs: true,
+		doc: """Creates an AMQP FanoutExchange."""
+		
+		method name: 'headersExchange',
+		type: 'org.springframework.amqp.core.HeadersExchange',
+		useNamedArgs: true,
+		doc: """Creates an AMQP HeadersExchange."""
+		
+		method name: 'federatedExchange',
+		type: 'org.springframework.amqp.core.HeadersExchange',
+		useNamedArgs: true,
+		doc: """Creates an AMQP FederatedExchange."""
+		
+		method name: 'rabbitConnectionFactory',
+		type: 'org.springframework.amqp.rabbit.connection.CachingConnectionFactory',
+		useNamedArgs: true,
+		doc: """Creates a Rabbit ConnectionFactory."""
+		
+		method name: 'rabbitQueue',
+		type: 'org.springframework.amqp.core.Queue',
+		useNamedArgs: true,
+		doc: """Creates an AMQP Queue."""
+		
+		method name: 'rabbitAdmin',
+		type: 'org.springframework.amqp.rabbit.core.RabbitAdmin',
+		useNamedArgs: true,
+		doc: """Creates a RabbitAdmin."""
+	
+		method name: 'rabbitTemplate',
+		type: 'org.springframework.amqp.rabbit.core.RabbitTemplate',
+		useNamedArgs: true,
+		doc: """Creates a RabbitTemplate."""
+	 
+		//Amqp adapters
+		
+		method name: 'amqplisten',
+		type: 'org.springframework.integration.dsl.groovy.amqp.AmqpInbound',
+		useNamedArgs: true,
+		doc: """Creates an AMQP Inbound adapter."""
+		
+		method name: 'amqpSend',
+		type: 'org.springframework.integration.dsl.groovy.amqp.AmqpOutbound',
+		useNamedArgs: true,
+		doc: """Creates a one-way (request only) AMQP Outbound adapter."""
+		
+		method name: 'amqpSendAndReceive',
+		type: 'org.springframework.integration.dsl.groovy.amqp.AmqpOutbound',
+		useNamedArgs: true,
+		doc: """Creates a request-reply AMQP Outbound adapter."""
+}

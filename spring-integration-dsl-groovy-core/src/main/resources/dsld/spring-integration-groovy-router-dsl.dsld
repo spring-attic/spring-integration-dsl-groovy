@@ -1,0 +1,27 @@
+contribute(currentType("org.springframework.integration.dsl.groovy.builder.IntegrationBuilder")) {
+	provider = "Spring Integration DSL"
+	
+	method name: "map", 
+	type: "java.util.Map", 
+	doc: """
+	Required parent node: route
+    Creates a Channel map with keys set to the result of the router action and values set to the associated channel name.
+	"""
+	method name: "when", 
+	type: "org.springframework.integration.dsl.groovy.RouterCondition", 
+	useNamedArgs: false, 
+	params: [value: Object, action: Closure],
+ 	doc: """
+Required parent node: route
+Execute an inline message flow if the router result matches the value.
+    """
+	 
+	method name: "otherwise",
+	type: "org.springframework.integration.dsl.groovy.RouterCondition",
+	useNamedArgs: false,
+	params: [ action: Closure],
+	 doc: """
+Required parent node: route
+Execute an inline message flow if the router result does not match any 'when' conditions.
+    """
+}

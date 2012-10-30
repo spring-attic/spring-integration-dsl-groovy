@@ -1,0 +1,27 @@
+
+
+
+contribute(currentType("org.springframework.integration.dsl.groovy.builder.IntegrationBuilder")) {
+	provider = "Spring Integration DSL for Http"
+
+	//HTTP adapters
+
+	method  name: 'httpGet',
+			type: 'org.springframework.integration.dsl.groovy.http.HttpOutbound',
+			useNamedArgs: true,
+			namedParameters:[inputChannel:String, outputChannel:String, url:Object],	
+			doc: """Creates an HTTP Outbound adapter for the given url with method=GET."""
+}
+
+contribute(currentType("org.springframework.integration.dsl.groovy.MessageFlow")) {
+	provider = "Spring Integration DSL"
+
+	//HTTP adapters
+
+	method  name: 'httpGet',
+			type: 'org.springframework.integration.dsl.groovy.http.HttpOutbound',
+			useNamedArgs: true,
+			namedParameters:[url:Object],
+			optionalParameters:[inputChannel:String, outputChannel:String, linkToNext:boolean],
+			doc: """Creates an HTTP Outbound adapter for the given url with method=GET."""
+}

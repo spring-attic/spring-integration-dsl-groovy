@@ -1,36 +1,179 @@
- 
+
+def standardXMLAttributes = "All native Spring Integration XML attributes for this component are supported (camelCase names are automatically converted to equivalent hyphenated attribute names)."
+def standardSimpleEndpoint = "Channel names are optional if declared within a MessageFlow. 'linkToNext' is only valid within a MessageFlow. $standardXMLAttributes" 
 contribute(currentType("org.springframework.integration.dsl.groovy.builder.IntegrationBuilder")) {
 	provider = "Spring Integration DSL"
 	
-	method name: "doWithSpringIntegration", type: "org.springframework.integration.dsl.groovy.IntegrationContext", useNamedArgs: false,
-	doc: """
-	Creates a new Spring Integration Context
+	method name: "doWithSpringIntegration", 
+	parameters: [closure: Closure],
+	type: "org.springframework.integration.dsl.groovy.IntegrationContext", 
+	useNamedArgs: false,
+	doc: """ This defines a top level closure returning an IntegrationContext instance. 
+The closure may contain nested MessageFlows, SimpleEndpoints, Channels, and other DSL Components.
 	"""
+	method name: "messageFlow", 
+	type: "org.springframework.integration.dsl.groovy.MessageFlow", 
+	useNamedArgs: true, 
+	parameters: [closure: Closure],
+	optionalParams: [name:String, inputChannel: String, outputChannel: String], 
+	doc: """Defines a closure to create a message flow. Message flows may be nested"""
 	
-	
-	method name: "messageFlow", type: "org.springframework.integration.dsl.groovy.MessageFlow", useNamedArgs: true, params: [inputChannel: String, outputChannel: String], 
+	method name: "exec",
+	type: "org.springframework.integration.dsl.groovy.MessageFlow",
+	useNamedArgs: false,
+	parameters: [messageFlow: Object],
 	doc: """
-	Creates a new Spring Integration Message Flow 
+Required parent node: doWithSpringIntegration or messageFlow.
+Executes the referenced message flow."""
+ 
+
+	method name: "filter", type: "org.springframework.integration.dsl.groovy.Filter", 
+	useNamedArgs: true, 
+	params: [action: Closure],
+	namedParams:[inputChannel:String, outputChannel:String],
+	optionalParams:[name:String, discardChannel: String],
+	doc: """
+Required parent node: doWithSpringIntegration or messageFlow.
+Creates a Filter executing the action Closure. The action must return a boolean.
+${standardSimpleEndpoint}
 	"""
-	method name: "filter", type: "org.springframework.integration.dsl.groovy.Filter", useNamedArgs: true, params: [name:String,evaluate: Closure],
+	method name: "route", 
+	type: "org.springframework.integration.dsl.groovy.RouterComposition", 
+	useNamedArgs: true, 
+	params: [action: Closure],
+	namedParams:[inputChannel:String, outputChannel:String],
+	optionalParams:[name:String, linkToNext:boolean]
 	doc: """
-	Creates a Filter
-	"""
-	method name: "route", type: "org.springframework.integration.dsl.groovy.RouterComposition", useNamedArgs: true, params: [name:String,evaluate: Closure],
-	doc: """
-	Creates a Router
+Required parent node: doWithSpringIntegration or messageFlow.
+Creates a Router. If the action returns a string, it is interpreted as a channel name or a key to a channel map. 
+If the action returns a list, it is interpreted as a recipient list.
+${standardSimpleEndpoint}
     """
 	
-	method name: "bridge", type: "org.springframework.integration.dsl.groovy.Bridge", useNamedArgs: true, params: [inputChannel:String,outputChannel:String],
+	method name: "bridge", 
+	type: "org.springframework.integration.dsl.groovy.Bridge", 
+	useNamedArgs: true, 
+	namedParams:[inputChannel:String, outputChannel:String],
+	optionalParams: [name:String, linkToNext:boolean],
 	doc: """
-	Creates a Bridge
+Required parent node: doWithSpringIntegration or messageFlow.
+Creates a Bridge.
+Channel names are optional if declared within a MessageFlow.
+${standardSimpleEndpoint}
 	"""
-	method name: "handle", type: "org.springframework.integration.dsl.groovy.ServiceActivator", useNamedArgs: true, params: [name:String,evaluate: Closure],
+	method name: "handle", 
+	type: "org.springframework.integration.dsl.groovy.ServiceActivator", 
+	useNamedArgs: true,
+	params:[action:Closure] ,
+	namedParams:[inputChannel:String, outputChannel:String],
+	optionalParams: [name:String, linkToNext:boolean],
 	doc: """
-	Creates a ServiceActivator
+Required parent node: doWithSpringIntegration or messageFlow.
+Creates a ServiceActivator executing the given action.
+${standardSimpleEndpoint}
 	"""
-	method name: "transform", type: "org.springframework.integration.dsl.groovy.Transformer", useNamedArgs: true, params: [name:String,evaluate: Closure],
+	method name: "transform", 
+	type: "org.springframework.integration.dsl.groovy.Transformer", 
+	useNamedArgs: true,
+	params:[action:Closure] ,
+	namedParams:[inputChannel:String, outputChannel:String],
+	optionalParams: [name:String, linkToNext:boolean],
 	doc: """
-	Creates a Transformer
+Required parent node: doWithSpringIntegration or messageFlow.
+Creates a Transformer executing the given action.
+${standardSimpleEndpoint}
 	"""
+	method name: "poll",
+	type: "org.springframework.integration.dsl.groovy.Poller",
+	useNamedArgs: true,
+	namedParams:[inputChannel:String, outputChannel:String],
+	optionalParams: [name:String, linkToNext:boolean],
+	doc: """
+Required parent node: doWithSpringIntegration or messageFlow.
+Creates a Poller.
+${standardSimpleEndpoint}
+	"""
+	
+	method name: "aggregate",
+	type: "org.springframework.integration.dsl.groovy.Aggregator",
+	useNamedArgs: true,
+	namedParams:[inputChannel:String, outputChannel:String],
+	optionalParams: [name:String, releaseStrategy:Closure, correlationStrategy:Closure, linkToNext:boolean],
+	doc: """
+Required parent node: doWithSpringIntegration or messageFlow
+Creates an Aggregator using the given releaseStrategy (optional) and correlationStrategy (optional).
+${standardSimpleEndpoint}
+	"""
+	
+	method name: "split",
+	type: "org.springframework.integration.dsl.groovy.Splitter",
+	useNamedArgs: true,
+	namedParams:[inputChannel:String, outputChannel:String],
+	optionalParams: [action:Closure, name:String , linkToNext: boolean],
+	doc: """
+Required parent node: doWithSpringIntegration or messageFlow
+Creates a Spliter using the given action (optional). action may be an unnamed parameter.
+${standardSimpleEndpoint}
+	"""
+	
+	method name: "springXml", 
+	useNamedArgs: false,
+	type: "org.springframework.integration.dsl.groovy.XMLBean",
+	params: [springXml:Closure],
+	doc: """
+Required parent node: doWithSpringIntegration or messageFlow
+Used to pass native Spring XML as Groovy markup."""
+	
+	method name: "namespaces",
+	type: "org.springframework.integration.dsl.groovy.XMLNamespace",
+	useNamedArgs: false,
+	params: [namespaces:String],
+	doc: """Used to declare Spring XML nameespaces. A comma delimited list of standard Spring namespace prefixes, e.g., 'int-http'"""
+
+	method name: "channel",
+	type: "org.springframework.integration.dsl.groovy.Channel",
+	useNamedArgs: false,
+	params: [name:String],
+	doc: """
+Required parent node: doWithSpringIntegration or messageFlow
+Used to declare a direct channel with the given name.
+${standardXMLAttributes}	"""
+	method name: "pubSubChannel",
+	type: "org.springframework.integration.dsl.groovy.PubSubChannel",
+	useNamedArgs: false,
+	params: [name:String],
+	doc: """
+Required parent node: doWithSpringIntegration or messageFlow
+Used to declare a publish subscribe channel with the given name.
+${standardXMLAttributes}"""
+	
+	method name: "queueChannel",
+	type: "org.springframework.integration.dsl.groovy.QueueChannel",
+	useNamedArgs: false,
+	params: [name:String],
+	doc: """
+Required parent node: doWithSpringIntegration or messageFlow
+Used to declare a queue channel with the given name.
+${standardXMLAttributes}"""
+	
+	method name: "interceptor",
+	type: "org.springframework.integration.dsl.groovy.ChannelInterceptor",
+	useNamedArgs: true,
+	optionalParams: [pattern: String, name:String, preSend:Closure, postSend:Closure, preReceive:Closure,postReceive:Closure],
+	doc: """
+Required parent node: doWithSpringIntegration ,messageFlow, or channel type
+Used to declare a global channel interceptor to intercept channels whose name matches the pattern(all channels if omitted).
+'pattern' is invalid if this is a child of a channel.
+${standardXMLAttributes}"""
+
+	method name: "wiretap",
+	type: "org.springframework.integration.dsl.groovy.Wiretap",
+	useNamedArgs: true,
+	namedParams: [channel:String],
+	optionalParams: [pattern: String, name:String],
+	doc: """
+Required parent node: doWithSpringIntegration ,messageFlow, or channel type
+Used to declare a global wiretap to send messages to the target channel on channels whose name matches the pattern(all channels if omitted).
+'pattern' is invalid if this is a child of a channel.
+${standardXMLAttributes}"""
 }
