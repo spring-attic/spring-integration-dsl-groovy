@@ -119,9 +119,11 @@ class IntegrationContext extends BaseIntegrationComposition {
 	/**
 	 * Create an application context
 	 * @param parentContext optional parent application context
+	 * @param integrationContextsToMerge a list of {@link IntegrationContext} from other builder instances to merge.
 	 * @return the application context
 	 */
-	ApplicationContext createApplicationContext(ApplicationContext parentContext = null) {
+	ApplicationContext createApplicationContext(ApplicationContext parentContext = null, 
+		List<IntegrationContext> integrationContextsToMerge = null) {
 		if (!applicationContext){
 			applicationContext = new  GenericXmlApplicationContext()
 			if (parentContext){
@@ -129,12 +131,32 @@ class IntegrationContext extends BaseIntegrationComposition {
 			}
 
 			def integrationDomSupport = new IntegrationDomSupport(this.moduleSupportInstances)
+			
+			List<IntegrationContext> integrationContexts = [this];
+			if (integrationContextsToMerge) {
+				integrationContexts.addAll(integrationContextsToMerge)
+			}
+			
+			ByteArrayResource[] resources = new ByteArrayResource[integrationContexts.size()]
 
-			def xml = integrationDomSupport.translateToXML(this)
+			integrationContexts.eachWithIndex {ic, i ->
+			  ic.applicationContext = applicationContext	
+			  def xml = integrationDomSupport.translateToXML(ic)
+			  resources[i] = new ByteArrayResource(xml.getBytes())
+			}
 
-			applicationContext.load(new ByteArrayResource(xml.getBytes() ))
+			applicationContext.load(resources)
 			applicationContext.refresh()
 		}
 		applicationContext
+	}
+		
+	/**
+	 * Create an application context
+	 * @param integrationContextsToMerge a list of {@link IntegrationContext} from other builder instances to merge.
+	 * @return the application context
+	 */
+	ApplicationContext createApplicationContext(List<IntegrationContext> integrationContextsToMerge) {
+		this.createApplicationContext(null, integrationContextsToMerge)	
 	}
 }

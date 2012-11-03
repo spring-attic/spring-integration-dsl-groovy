@@ -44,4 +44,28 @@ class IntegrationBuilderUsageTests {
 
 		assert ic.sendAndReceive('t1.inputChannel','Hello') == "HELLOHELLO"
 	}
+	
+	@Test 
+	void testMergedApplicationContext() {
+		IntegrationBuilder builder1 = new IntegrationBuilder()
+		builder1.setAutoCreateApplicationContext(false)
+		
+		IntegrationBuilder builder2 = new IntegrationBuilder()
+		builder2.setAutoCreateApplicationContext(false)
+		
+		def ic1 = builder1.doWithSpringIntegration {
+			transform('t1',outputChannel:'t1.out',{it.toUpperCase()})
+		}
+		
+		def ic2 = builder2.doWithSpringIntegration {
+			transform('t2',outputChannel:'t2.out',{it.toUpperCase()})
+		}
+		
+		def ac = ic2.createApplicationContext([ic1])
+		
+		ac.getBean('t1')
+		ac.getBean('t2')
+        ac.getBean('t1.out')
+	    ac.getBean('t2.out')
+	}
 }
