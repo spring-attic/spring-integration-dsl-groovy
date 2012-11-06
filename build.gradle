@@ -29,10 +29,18 @@ subprojects { subproject ->
 
   task sourcesJar(type: Jar) {
     classifier = 'sources'
+    from sourceSets.main.allSource
   }
+
+  task groovydocJar(type:Jar) {
+    classifier = 'groovydoc'
+    from groovydoc
+  }
+
 
    artifacts {
     archives sourcesJar
+    archives groovydocJar
    }
 
   // dependencies that are common across all java projects
