@@ -53,24 +53,22 @@ class HttpOutboundDomBuilder extends IntegrationComponentDomBuilder {
 
 		Closure urlExpression
 
-		attributes.url = component.url
+		
 		if (component.url instanceof Closure) {
 			urlExpression = component.url
-			attributes.url = '{url}'
+			def beanName = "${component.name}_closureInvokingHandler"
+			BeanDefinitionBuilder  handlerBuilder =
+					BeanDefinitionBuilder.genericBeanDefinition(ClosureInvokingMessageProcessor)
+			handlerBuilder.addConstructorArgValue(urlExpression)
+			def bdh = new BeanDefinitionHolder(handlerBuilder.getBeanDefinition(),beanName)
+			BeanDefinitionReaderUtils.registerBeanDefinition(bdh, (BeanDefinitionRegistry) applicationContext)
+			
+			attributes.'url-expression' = "@${beanName}.processMessage(#this)"
+		} else {
+		    attributes.url = component.url
 		}
 
 
-		builder.'int-http:outbound-gateway'(attributes) {
-			if (urlExpression){
-				def beanName = "${component.name}_closureInvokingHandler"
-				BeanDefinitionBuilder  handlerBuilder =
-						BeanDefinitionBuilder.genericBeanDefinition(ClosureInvokingMessageProcessor)
-				handlerBuilder.addConstructorArgValue(urlExpression)
-				def bdh = new BeanDefinitionHolder(handlerBuilder.getBeanDefinition(),beanName)
-				BeanDefinitionReaderUtils.registerBeanDefinition(bdh, (BeanDefinitionRegistry) applicationContext)
-
-				'int-http:uri-variable'(name:'url', expression:"@${beanName}.processMessage(#this)")
-			}
-		}
+		builder.'int-http:outbound-gateway'(attributes) 
 	}
 }
