@@ -26,7 +26,6 @@ import org.springframework.integration.dsl.groovy.*
  *
  */
 class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
-	ChannelDomBuilder channelBuilder
 
 	SimpleEndpointDomBuilder(IntegrationDomSupport integrationDomSupport){
 		this.integrationDomSupport = integrationDomSupport
@@ -34,16 +33,16 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
 
 	@Override
 	void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent endpoint, Closure closure) {
+        def name = endpoint.name
+        assert endpoint.name, "name cannot be null for object $endpoint"
 
-		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(new Channel())
-		def name = endpoint.name
-		assert endpoint.name, "name cannot be null for object $endpoint"
+        def attributes = endpoint.attributes
 
-		def attributes = endpoint.attributes
-		
-		if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel ) {
-			channelBuilder.createDirectChannelIfNotDefined(builder,endpoint.outputChannel)
-		}
+        //Fix for https://jira.springsource.org/browse/INTDSLGROOVY-11
+        //ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(new Channel())
+        /*if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel ) {
+            channelBuilder.createDirectChannelIfNotDefined(builder,endpoint.outputChannel)
+        }*/
 
 		attributes = buildAttributes(attributes, endpoint)
 		if (endpoint.hasProperty('action') && endpoint.action) {

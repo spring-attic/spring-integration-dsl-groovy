@@ -42,9 +42,12 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(AbstractChannel.class)
 
 		def previousComponent = null
-		if (messageFlow.outputChannel) {
+
+        //Fix for https://jira.springsource.org/browse/INTDSLGROOVY-11
+		/*if (messageFlow.outputChannel) {
 			channelBuilder.createDirectChannelIfNotDefined(builder, messageFlow.outputChannel)
-		}
+		}*/
+
 		messageFlow.components.each {component ->
 			if (component instanceof FlowExecution ) {
 				if (!previousComponent) {

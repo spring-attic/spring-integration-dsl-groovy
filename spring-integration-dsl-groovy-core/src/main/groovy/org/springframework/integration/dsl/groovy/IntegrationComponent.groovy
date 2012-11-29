@@ -20,12 +20,15 @@ import org.apache.commons.logging.LogFactory
  * @author David Turanski
  *
  */
+//todo change when @Trait comes to Groovy
 @Mixin(AttributeHelper)
 @Mixin(ComponentNamer)
+//@CompileStatic
 abstract class IntegrationComponent   {
 	protected logger = LogFactory.getLog(this.class)
+
 	protected String name
-	protected attributes = [:]
+	protected Map attributes = [:]
 	protected String builderName
 
 	def component

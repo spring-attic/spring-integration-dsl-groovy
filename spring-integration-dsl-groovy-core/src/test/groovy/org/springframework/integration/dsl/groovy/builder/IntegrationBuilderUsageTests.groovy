@@ -27,10 +27,10 @@ class IntegrationBuilderUsageTests {
 
 	@Test
 	void test1() {
-		
+
 		def codeSource = new GroovyCodeSource(new File("src/test/resources/messageflow1.groovy"));
 		script = new GroovyClassLoader().parseClass(codeSource).newInstance()
-		
+
 		def eip = builder.build(script)
 	}
 
@@ -44,28 +44,38 @@ class IntegrationBuilderUsageTests {
 
 		assert ic.sendAndReceive('t1.inputChannel','Hello') == "HELLOHELLO"
 	}
-	
-	@Test 
+
+	@Test
 	void testMergedApplicationContext() {
 		IntegrationBuilder builder1 = new IntegrationBuilder()
 		builder1.setAutoCreateApplicationContext(false)
-		
+
 		IntegrationBuilder builder2 = new IntegrationBuilder()
 		builder2.setAutoCreateApplicationContext(false)
-		
+
 		def ic1 = builder1.doWithSpringIntegration {
-			transform('t1',outputChannel:'t1.out',{it.toUpperCase()})
+            queueChannel('global.out')
+			transform('t1',inputChannel:'t1.in',outputChannel:'global.out',{it.toUpperCase()})
 		}
-		
+
 		def ic2 = builder2.doWithSpringIntegration {
-			transform('t2',outputChannel:'t2.out',{it.toUpperCase()})
+			transform('t2',inputChannel:'t2.in',outputChannel:'global.out',{it.toUpperCase()})
 		}
-		
+
 		def ac = ic2.createApplicationContext([ic1])
-		
+
 		ac.getBean('t1')
+		ac.getBean('t1.in')
 		ac.getBean('t2')
-        ac.getBean('t1.out')
-	    ac.getBean('t2.out')
+		ac.getBean('t2.in')
+        def queue = ac.getBean('global.out')
+
+        ic1.send('t1.in','hello')
+        ic1.send('t2.in','hello')
+        2.times {
+            assert queue.receive().payload == 'HELLO'
+        }
 	}
+
+
 }

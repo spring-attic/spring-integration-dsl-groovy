@@ -12,14 +12,12 @@
  */
 package org.springframework.integration.dsl.groovy.builder
 
-import org.apache.commons.logging.LogFactory
-import org.apache.commons.logging.Log
+import groovy.util.logging.Commons
 import org.springframework.context.ApplicationContext
 import org.springframework.core.io.Resource
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
 import org.springframework.integration.dsl.groovy.IntegrationContext
 import org.springframework.integration.dsl.groovy.MessageFlow
-import org.springframework.integration.dsl.groovy.SpringModuleContext
 import org.springframework.integration.dsl.groovy.XMLBean
 
 /**
@@ -27,6 +25,7 @@ import org.springframework.integration.dsl.groovy.XMLBean
  * @author David Turanski
  *
  */
+//Todo implement static compile checked DSL
 class IntegrationBuilderCategory {
 	/**
 	 * Overrrides the DefaultGroovyMethods.split() with no parameters
@@ -44,8 +43,8 @@ class IntegrationBuilderCategory {
  * @author David Turanski
  *
  */
+@Commons('logger')
 class IntegrationBuilder extends FactoryBuilderSupport {
-	private static final Log logger = LogFactory.getLog(IntegrationBuilder.class)
 	private final IntegrationContext integrationContext
 	private final ApplicationContext parentContext
 	private boolean autoCreateApplicationContext = true
@@ -68,7 +67,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 
 		this.integrationContext.moduleSupportInstances = moduleSupportInstances
 
-		moduleSupportInstances.each { AbstractIntegrationBuilderModuleSupport moduleSupport ->
+		for(moduleSupport in moduleSupportInstances) {
 			moduleSupport.registerBuilderFactories(this)
 		}
 	}
@@ -128,7 +127,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 	@Override
 	protected dispathNodeCall(name, args){
 		use (IntegrationBuilderCategory) {
-			super.dispathNodeCall(name,args)
+			super.dispathNodeCall(name, args)
 		}
 	}
 
@@ -138,12 +137,12 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 
 	Object build(InputStream is) {
 		def grs  = new GroovyCodeSource(new InputStreamReader(is),this.getClass().getName(),GroovyShell.DEFAULT_CODE_BASE)
-		def script = new GroovyClassLoader().parseClass(grs).newInstance()
+		def script = new GroovyClassLoader().parseClass(grs).newInstance() as Script
 		this.build(script)
 	}
 	
 	Object build(Resource resource) {
-		return build(resource.getInputStream())
+		return build(resource.inputStream)
 	}
 	
 	Object build (String className) {
@@ -152,12 +151,12 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 	}
 	
 	Object build(File file) {
-		def script = new GroovyClassLoader().parseClass(file).newInstance()
+        def script = new GroovyClassLoader().parseClass(file).newInstance() as Script
 		this.build(script)
 	}
 	
 	Object build(GroovyCodeSource codeSource) {
-		def script = new GroovyClassLoader().parseClass(codeSource).newInstance()
+        def script = new GroovyClassLoader().parseClass(codeSource).newInstance() as Script
 		this.build(script)
 	}
 
@@ -193,22 +192,22 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 
 		Closure actionClosure
 
-		list = []
-		list.addAll(0,args)
+        list = []
+        list.addAll(0,args)
 
 		Map attributes = [:]
 
 		if ( (list.size() > 0) && (list.last() instanceof Map)) {
-			attributes = list.head()
+			attributes = list.head() as Map
 		}
 		/*
 		 * Identify any unnamed closures. Should be at most 2. If there are 2, the first one must be the action closure
 		 */
-		def closures = list.findAll {it instanceof Closure}
+		def closures = list.findAll {it instanceof Closure} as List
 
-		if (closures?.size == 2) {
+		if (closures?.size() == 2) {
 			logger.debug(closures)
-			actionClosure = closures[0]
+			actionClosure = closures.get(0) as Closure
 		}
 
 		/*
@@ -216,10 +215,10 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		 * attribute is set, then it is invalid to also provide an action closure. In this case assume it's the
 		 * builder closure
 		 */
-		else if (closures?.size == 1) {
+		else if (closures?.size() == 1) {
 			if (!attributes.containsKey('ref')){
 				logger.debug(closures)
-				actionClosure = closures[0]
+				actionClosure = closures.get(0) as Closure
 			}
 		}
 		/*
@@ -238,7 +237,7 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 			logger.debug("invoking dispathNodeCall for name: $name with args: $list")
 		}
 
-		def node = dispathNodeCall(name,list as Object[])
+		dispathNodeCall(name,list as Object[])
 	}
 
 	def springXml(Closure closure) {
@@ -250,9 +249,9 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		this
 	}
 
-	private getIntegrationBuilderModuleSupportInstances(String[] modules) {
+	private List<AbstractIntegrationBuilderModuleSupport> getIntegrationBuilderModuleSupportInstances(String[] modules) {
 		def instances = []
-		modules?.each { module ->
+		for(module in modules){
 			def className = "org.springframework.integration.dsl.groovy.${module}.builder.IntegrationBuilderModuleSupport"
 			if (logger.isDebugEnabled()) {
 				logger.debug("checking classpath for $className")
