@@ -15,10 +15,6 @@ package org.springframework.integration.dsl.groovy.builder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.integration.dsl.groovy.BaseIntegrationComposition
-import java.util.Map
-
-import groovy.lang.Closure;
-import groovy.util.FactoryBuilderSupport
 
 /**
  * @author David Turanski
@@ -27,7 +23,7 @@ import groovy.util.FactoryBuilderSupport
 abstract class IntegrationComponentFactory extends AbstractFactory {
 	protected Log logger = LogFactory.getLog(this.class)
 
-	protected defaultAttributes(name, value, attributes) {
+	protected defaultAttributes(name, value, Map attributes) {
 		assert !(attributes.containsKey('name') && value), "$name cannot accept both a default value and a 'name' attribute"
 		assert !(attributes.containsKey('id') && value), "$name cannot accept both a default value and a 'id' attribute"
 
@@ -41,7 +37,7 @@ abstract class IntegrationComponentFactory extends AbstractFactory {
 		attributes
 	}
 
-	def newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) throws InstantiationException, IllegalAccessException {
+	def newInstance(FactoryBuilderSupport builder, name, value, Map attributes) throws InstantiationException, IllegalAccessException {
 		if (logger.isDebugEnabled()){
 			logger.debug("newInstance name: $name value:$value attr:$attributes")
 		}

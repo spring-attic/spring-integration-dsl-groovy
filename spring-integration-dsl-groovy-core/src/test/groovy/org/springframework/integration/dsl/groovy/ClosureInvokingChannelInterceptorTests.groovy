@@ -26,49 +26,49 @@ import org.springframework.integration.message.GenericMessage
  */
 class ClosureInvokingChannelInterceptorTests {
 
-	@Test
-	void testSimplePresendClosure() {
-		def message = new GenericMessage('hello')
-		def channel = new DirectChannel()
-		def channelInterceptor = new ChannelInterceptor(preSend:{payload -> "$payload, world" })
-		def interceptor = new ClosureInvokingChannelInterceptor(channelInterceptor)
-		channel.setInterceptors([interceptor])
+    @Test
+    void testSimplePresendClosure() {
+        def message = new GenericMessage('hello')
+        def channel = new DirectChannel()
+        def channelInterceptor = new ChannelInterceptor(preSend: { payload -> "$payload, world" })
+        def interceptor = new ClosureInvokingChannelInterceptor(channelInterceptor)
+        channel.interceptors = [interceptor]
 
-		def count = 0
-		channel.subscribe(new MessageHandler(){
-					void handleMessage(Message<?> msg) throws MessagingException{
-						count++
-						assert msg.payload == 'hello, world'
-					}
-				}
-				)
+        def count = 0
+        channel.subscribe(new MessageHandler() {
+            void handleMessage(Message<?> msg) throws MessagingException {
+                count++
+                assert msg.payload == 'hello, world'
+            }
+        }
+        )
 
-		channel.send(message)
-		assert count
-	}
+        channel.send(message)
+        assert count
+    }
 
-	@Test
-	void testSimplePostSendClosure() {
-		def message = new GenericMessage('hello')
-		def channel = new DirectChannel()
-		def count = 0
-		def channelInterceptor = new ChannelInterceptor(postSend:{msg,chnl,sent ->
-			assert msg.payload == 'hello'
-			assert chnl.componentName == 'channel'
-			assert sent
-			count++
-		})
-		def interceptor = new ClosureInvokingChannelInterceptor(channelInterceptor)
-		channel.setInterceptors([interceptor])
-		channel.setComponentName('channel')
+    @Test
+    void testSimplePostSendClosure() {
+        def message = new GenericMessage('hello')
+        def channel = new DirectChannel()
+        def count = 0
+        def channelInterceptor = new ChannelInterceptor(postSend: { msg, chnl, sent ->
+            assert msg.payload == 'hello'
+            assert chnl.componentName == 'channel'
+            assert sent
+            count++
+        })
+        def interceptor = new ClosureInvokingChannelInterceptor(channelInterceptor)
+        channel.setInterceptors([interceptor])
+        channel.setComponentName('channel')
 
-		channel.subscribe(new MessageHandler(){
-					void handleMessage(Message<?> msg) throws MessagingException{
-					}
-				}
-				)
+        channel.subscribe(new MessageHandler() {
+            void handleMessage(Message<?> msg) throws MessagingException {
+            }
+        }
+        )
 
-		channel.send(message)
-		assert count
-	}
+        channel.send(message)
+        assert count
+    }
 }

@@ -25,7 +25,6 @@ import org.springframework.integration.dsl.groovy.*
  *
  */
 class AggregatorDomBuilder extends IntegrationComponentDomBuilder {
-	ChannelDomBuilder channelBuilder
 
 	AggregatorDomBuilder(IntegrationDomSupport integrationDomSupport){
 		this.integrationDomSupport = integrationDomSupport
@@ -34,13 +33,13 @@ class AggregatorDomBuilder extends IntegrationComponentDomBuilder {
 	@Override
 	public void doBuild(Object builder, ApplicationContext applicationContext, IntegrationComponent endpoint, Closure closure) {
 
-		ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(Channel.class)
 		def name = endpoint.name
 		assert endpoint.name, "name cannot be null for object $endpoint"
 
-		if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel ) {
+        //Fix for https://jira.springsource.org/browse/INTDSLGROOVY-11
+		/*if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel ) {
 			channelBuilder.createDirectChannelIfNotDefined(builder,endpoint.outputChannel)
-		}
+		}*/
 
 		def attributes = buildAttributes(endpoint.attributes, endpoint)
 		

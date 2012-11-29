@@ -12,6 +12,7 @@
  */
 package org.springframework.integration.dsl.groovy
 
+import groovy.transform.PackageScope
 import org.springframework.context.ApplicationContext
 import org.springframework.context.support.GenericXmlApplicationContext
 import org.springframework.integration.channel.QueueChannel
@@ -29,7 +30,7 @@ import org.springframework.core.io.ByteArrayResource
 class IntegrationContext extends BaseIntegrationComposition {
 
 	private applicationContext
-	private List<AbstractIntegrationBuilderModuleSupport> moduleSupportInstances
+	@PackageScope List<AbstractIntegrationBuilderModuleSupport> moduleSupportInstances
 
 	/**
 	 * Send a message without expecting a reply

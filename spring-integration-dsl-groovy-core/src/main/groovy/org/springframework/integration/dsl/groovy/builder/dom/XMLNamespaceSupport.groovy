@@ -19,13 +19,13 @@ package org.springframework.integration.dsl.groovy.builder.dom
  *
  */
 class XMLNamespaceSupport {
-	static final REQUIRED_SCHEMA_LOCATIONS =
+	static final String REQUIRED_SCHEMA_LOCATIONS =
 	"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd "+
 	"http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd"
 
-	static final DEFAULT_INTEGRATION_NAMESPACE_PREFIX = 'si'
+	static final String DEFAULT_INTEGRATION_NAMESPACE_PREFIX = 'si'
 
-	static final REQUIRED_NAMESPACE_DECLARATIONS =
+	static final Map REQUIRED_NAMESPACE_DECLARATIONS =
 	[
 		'': 'http://www.springframework.org/schema/beans',
 		xsi: 'http://www.w3.org/2001/XMLSchema-instance',
@@ -33,11 +33,11 @@ class XMLNamespaceSupport {
 	]
 
 
-	def schemaLocations = new String(REQUIRED_SCHEMA_LOCATIONS)
+	String schemaLocations = new String(REQUIRED_SCHEMA_LOCATIONS)
 
-	def namespaceDeclarations = [:] << REQUIRED_NAMESPACE_DECLARATIONS
+	Map namespaceDeclarations = [:] << REQUIRED_NAMESPACE_DECLARATIONS
 
-	def integrationNamespacePrefix = DEFAULT_INTEGRATION_NAMESPACE_PREFIX
+	String integrationNamespacePrefix = DEFAULT_INTEGRATION_NAMESPACE_PREFIX
 
 	/**
 	 * Add an XML namespace for a Spring Integration component using Spring Integration conventions
@@ -117,7 +117,7 @@ class XMLNamespaceSupport {
 		['xsi:schemaLocation':schemaLocations]
 	}
 
-	private addSchemaLocation(namespace, xsd) {
+	private addSchemaLocation(String namespace, xsd) {
 		if (!schemaLocations.contains(namespace)){
 			schemaLocations += " $namespace $xsd"
 		}

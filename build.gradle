@@ -1,5 +1,3 @@
-
-
 apply plugin: 'base'
 
 description = 'Spring Integration Groovy DSL'
@@ -7,6 +5,7 @@ description = 'Spring Integration Groovy DSL'
 allprojects {
   group = 'org.springframework.integration' 
   repositories {
+         mavenLocal()
          maven { url 'http://repo.springsource.org/libs-milestone' }
          maven { url 'https://repo.springsource.org/libs-snapshot'}
          maven { url 'https://repo.springsource.org/libs-release'}
@@ -17,6 +16,7 @@ allprojects {
 subprojects { subproject ->
    apply plugin: 'groovy'
    apply plugin: 'maven'
+   apply plugin: 'idea'
    apply plugin: 'eclipse'
    sourceCompatibility=1.6
    targetCompatibility=1.6

@@ -1,6 +1,10 @@
 package org.springframework.integration.dsl.groovy
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+
 import java.lang.reflect.GenericArrayType
+import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 
 import org.apache.commons.logging.Log
@@ -14,6 +18,7 @@ import org.springframework.integration.support.MessageBuilder
  * @author David Turanski
  *
  */
+@CompileStatic
 class ClosureInvokingMessageProcessor  {
 	protected  Log logger = LogFactory.getLog(this.class)
 	protected final Class parameterType
@@ -21,7 +26,7 @@ class ClosureInvokingMessageProcessor  {
 
 	ClosureInvokingMessageProcessor(Closure closure){
 		assert closure.parameterTypes.size() == 1, 'Closure must specify exactly one parameter'
-		this.closure = closure.clone()
+		this.closure = closure.clone() as Closure
 		this.parameterType = closure.parameterTypes[0]
 	}
 
@@ -31,14 +36,14 @@ class ClosureInvokingMessageProcessor  {
 			if (logger.isDebugEnabled()) {
 				logger.debug('invoking closure on message')
 			}
-			result =  this.closure.doCall(message)
+			result =  this.closure.call(message)
 		}
 
 		else if (parameterType == Map && !(message.payload instanceof Map)) {
 			if (logger.isDebugEnabled()) {
 				logger.debug('invoking closure on message headers')
 			}
-			result =  this.closure.doCall(message.headers)
+			result =  this.closure.call(message.headers)
 		}
 
 		else {
@@ -46,7 +51,7 @@ class ClosureInvokingMessageProcessor  {
 				logger.debug('invoking closure on message payload')
 			}
 
-			result =  this.closure.doCall(message.payload)
+			result =  this.closure.call(message.payload)
 		}
 
 		result
@@ -62,28 +67,28 @@ class MultiMessageParameterTransformer {
 	private final boolean closureExpectsMessages
 	private final boolean closureParameterIsArray
 
-	MultiMessageParameterTransformer(Closure closure) {
-		def method = closure.class.methods.find { it.name == 'call' }
+    MultiMessageParameterTransformer(Closure closure) {
+		def method = closure.class.methods.find {Method method-> method.name == 'call' }
 		if (method.genericParameterTypes) {
 			def ptype =  method.genericParameterTypes[0]
  			if (ptype instanceof ParameterizedType) {
- 				closureExpectsMessages = Message.isAssignableFrom(ptype.actualTypeArguments[0])
+ 				closureExpectsMessages = Message.isAssignableFrom(ptype.actualTypeArguments[0] as Class)
 			} else if (ptype instanceof GenericArrayType){
 				closureParameterIsArray = ptype instanceof Object[]
 				closureExpectsMessages = false
-				
+
 			} else {
-			    closureParameterIsArray = ptype.isArray()
-				closureExpectsMessages =  Message == ptype.componentType
+			    closureParameterIsArray = (ptype as Class).array
+				closureExpectsMessages =  Message == (ptype as Class).componentType
 			}
 		}
 	}
-	
 
+    @CompileStatic
 	def mapClosureArg(List list){
 		boolean listContainsMessages = list?.get(0) instanceof Message
-		
-		def transformedArg = closureExpectsMessages  ? list: listContainsMessages  ? list*.payload : list
+
+		def transformedArg = closureExpectsMessages  ? list: listContainsMessages  ? list.collect{Message m -> m.payload} : list
 		if (closureParameterIsArray) {
 			transformedArg = closureExpectsMessages? transformedArg as Message[] : transformedArg as Object[]
 		}
@@ -91,6 +96,7 @@ class MultiMessageParameterTransformer {
 	}
 }
 
+@CompileStatic
 class MultiMessageClosureInvoker extends ClosureInvokingMessageProcessor {
 	private final MultiMessageParameterTransformer multiMessageParameterTransformer
 
@@ -108,6 +114,7 @@ class MultiMessageClosureInvoker extends ClosureInvokingMessageProcessor {
  * @author David Turanski
  *
  */
+@CompileStatic
 class ClosureInvokingListProcessor extends MultiMessageClosureInvoker {
 
 	ClosureInvokingListProcessor(Closure closure) {
@@ -116,7 +123,7 @@ class ClosureInvokingListProcessor extends MultiMessageClosureInvoker {
 
 	def processList(List list){
 		def arg = mapClosureArg(list)
-		this.closure.doCall(arg)
+		this.closure.call(arg)
 	}
 }
 
@@ -126,7 +133,7 @@ class ClosureInvokingListProcessor extends MultiMessageClosureInvoker {
  * @author David Turanski
  *
  */
-
+@CompileStatic
 class ClosureInvokingReleaseStrategy extends MultiMessageClosureInvoker {
 
 	ClosureInvokingReleaseStrategy(Closure closure) {
@@ -135,10 +142,11 @@ class ClosureInvokingReleaseStrategy extends MultiMessageClosureInvoker {
 
 	Boolean canRelease(List items){
 		def arg = mapClosureArg(items)
-		this.closure.doCall(arg)
+		this.closure.call(arg)
 	}
 }
 
+@CompileStatic
 class ClosureInvokingChannelInterceptor implements org.springframework.integration.channel.ChannelInterceptor {
 	protected  Log logger = LogFactory.getLog(this.class)
 	private final org.springframework.integration.dsl.groovy.ChannelInterceptor interceptor
@@ -150,7 +158,7 @@ class ClosureInvokingChannelInterceptor implements org.springframework.integrati
 	/* (non-Javadoc)
 	 * @see org.springframework.integration.channel.ChannelInterceptor#preSend(org.springframework.integration.Message, org.springframework.integration.MessageChannel)
 	 */
-	Message<?> preSend(Message<?> message, MessageChannel channel) {
+	Message preSend(Message message, MessageChannel channel) {
 		if (!interceptor.preSend){
 			return message
 		}
@@ -162,13 +170,13 @@ class ClosureInvokingChannelInterceptor implements org.springframework.integrati
 		if (result && !(result instanceof Message)){
 			result = MessageBuilder.withPayload(result).copyHeaders(message.headers).build()
 		}
-		result
+		result as Message
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.integration.channel.ChannelInterceptor#postSend(org.springframework.integration.Message, org.springframework.integration.MessageChannel, boolean)
 	 */
-	void postSend(Message<?> message, MessageChannel channel, boolean sent) {
+	void postSend(Message message, MessageChannel channel, boolean sent) {
 		if (!interceptor.postSend){
 			return
 		}
@@ -183,13 +191,13 @@ class ClosureInvokingChannelInterceptor implements org.springframework.integrati
 	 * @see org.springframework.integration.channel.ChannelInterceptor#preReceive(org.springframework.integration.MessageChannel)
 	 */
 	boolean preReceive(MessageChannel channel) {
-		interceptClosure.preReceive ? interceptClosure.prereceive.doCall(channel) : true
+        interceptor.preReceive ? interceptor.preReceive.call(channel) as boolean : true
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.integration.channel.ChannelInterceptor#postReceive(org.springframework.integration.Message, org.springframework.integration.MessageChannel)
 	 */
-	Message<?> postReceive(Message<?> message, MessageChannel channel) {
+	Message postReceive(Message message, MessageChannel channel) {
 		if (!interceptor.postReceive){
 			return message
 		}
@@ -198,10 +206,10 @@ class ClosureInvokingChannelInterceptor implements org.springframework.integrati
 		if (result && !(result instanceof Message)){
 			result = MessageBuilder.withPayload(result).copyHeaders(message.headers).build()
 		}
-		result
+		result as Message
 	}
 
-	private Object execClosure(Closure interceptClosure, Message<?>message, MessageChannel channel, sent = null){
+	private execClosure(Closure interceptClosure, Message message, MessageChannel channel, sent = null){
 		def paramTypes = interceptClosure.parameterTypes
 		def numParams = paramTypes.size()
 
@@ -211,7 +219,7 @@ class ClosureInvokingChannelInterceptor implements org.springframework.integrati
 		def result
 
 		if (numParams == 0){
-			result = interceptClosure.doCall()
+			result = interceptClosure.call()
 		}
 		else if (numParams == 1){
 			def parameterType = paramTypes[0]
@@ -219,34 +227,34 @@ class ClosureInvokingChannelInterceptor implements org.springframework.integrati
 				if (logger.isDebugEnabled()) {
 					logger.debug('invoking closure on message')
 				}
-				result = interceptClosure.doCall(message)
+				result = interceptClosure.call(message)
 			} else if (parameterType == Map && !(message.payload instanceof Map)) {
 				if (logger.isDebugEnabled()) {
 					logger.debug('invoking closure on message headers')
 				}
-				result =  interceptClosure.doCall(message.headers)
+				result =  interceptClosure.call(message.headers)
 			} else if (parameterType == MessageChannel) {
 				if (logger.isDebugEnabled()) {
 					logger.debug('invoking closure on message headers')
 				}
-				result =  interceptClosure.doCall(channel)
+				result =  interceptClosure.call(channel)
 			}
 			else if (parameterType == boolean && !(message.payload instanceof boolean)) {
 				if (logger.isDebugEnabled()) {
 					logger.debug('invoking closure on message sent')
 				}
-				result =  interceptClosure.doCall(sent)
+				result =  interceptClosure.call(sent)
 			}
 			else {
 				if (logger.isDebugEnabled()) {
 					logger.debug('invoking closure on message payload')
 				}
-				result =  interceptClosure.doCall(message.payload)
+				result =  interceptClosure.call(message.payload)
 			}
 		} else if (numParams == 2){
-			result =  interceptClosure.doCall(message,channel)
+			result =  interceptClosure.call(message,channel)
 		} else if (numParams == 3){
-			result =  interceptClosure.doCall(message,channel,sent)
+			result =  interceptClosure.call(message,channel,sent)
 		}
 
 		result
