@@ -128,7 +128,7 @@ class IntegrationContext extends BaseIntegrationComposition {
 		if (!applicationContext){
 			applicationContext = new  GenericXmlApplicationContext()
 			if (parentContext){
-				applicationContext.parentContext = parentContext
+				applicationContext.parent = parentContext
 			}
 
 			def integrationDomSupport = new IntegrationDomSupport(this.moduleSupportInstances)
