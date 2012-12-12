@@ -39,12 +39,12 @@ class SimpleEndpointDomBuilder extends IntegrationComponentDomBuilder {
         def attributes = endpoint.attributes
 
         //Fix for https://jira.springsource.org/browse/INTDSLGROOVY-11
-        //ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(new Channel())
-        /*if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel ) {
+        if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel?.startsWith('from.') ) {
+            ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(new Channel())
             channelBuilder.createDirectChannelIfNotDefined(builder,endpoint.outputChannel)
-        }*/
+        }
 
-		attributes = buildAttributes(attributes, endpoint)
+        attributes = buildAttributes(attributes, endpoint)
 		if (endpoint.hasProperty('action') && endpoint.action) {
 			assert !(attributes.containsKey('ref')), 'endpoint cannot provide a bean reference and a closure'
 			attributes.method='processMessage'

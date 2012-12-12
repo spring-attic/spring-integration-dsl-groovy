@@ -55,23 +55,24 @@ class IntegrationBuilderUsageTests {
 
 		def ic1 = builder1.doWithSpringIntegration {
             queueChannel('global.out')
-			transform('t1',inputChannel:'t1.in',outputChannel:'global.out',{it.toUpperCase()})
+			transform('t1',inputChannel:'from.t1',outputChannel:'global.out',{it.toUpperCase()})
 		}
 
 		def ic2 = builder2.doWithSpringIntegration {
-			transform('t2',inputChannel:'t2.in',outputChannel:'global.out',{it.toUpperCase()})
+			transform('t2',inputChannel:'from.t2',outputChannel:'global.out',{it.toUpperCase()})
 		}
 
-		def ac = ic2.createApplicationContext([ic1])
+        def ac1 = ic1.createApplicationContext()
+		def ac2 = ic2.createApplicationContext(ac1)
 
-		ac.getBean('t1')
-		ac.getBean('t1.in')
-		ac.getBean('t2')
-		ac.getBean('t2.in')
-        def queue = ac.getBean('global.out')
+		ac2.getBean('t1')
+		ac2.getBean('from.t1')
+		ac2.getBean('t2')
+		ac2.getBean('from.t2')
+        def queue = ac2.getBean('global.out')
 
-        ic1.send('t1.in','hello')
-        ic1.send('t2.in','hello')
+        ic2.send('from.t1','hello')
+        ic2.send('from.t2','hello')
         2.times {
             assert queue.receive().payload == 'HELLO'
         }
