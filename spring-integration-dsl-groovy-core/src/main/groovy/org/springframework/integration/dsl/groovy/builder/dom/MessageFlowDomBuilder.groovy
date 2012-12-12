@@ -64,7 +64,7 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 			previousComponent = component
 		}
         //Fix for https://jira.springsource.org/browse/INTDSLGROOVY-11
-		if (messageFlow.inputChannel?.startsWith('$mflw')){
+		if (messageFlow.inputChannel?.startsWith('$mfl')){
             channelBuilder.createDirectChannelIfNotDefined(builder, messageFlow.inputChannel)
         }
 	}
