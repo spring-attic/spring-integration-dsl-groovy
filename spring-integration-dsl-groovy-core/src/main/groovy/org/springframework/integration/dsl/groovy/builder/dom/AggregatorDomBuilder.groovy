@@ -36,10 +36,10 @@ class AggregatorDomBuilder extends IntegrationComponentDomBuilder {
 		def name = endpoint.name
 		assert endpoint.name, "name cannot be null for object $endpoint"
 
-        //Fix for https://jira.springsource.org/browse/INTDSLGROOVY-11
-		/*if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel ) {
+		if (endpoint.hasProperty("outputChannel") && endpoint.outputChannel?.startsWith('from.')  ) {
+            ChannelDomBuilder channelBuilder = integrationDomSupport.domBuilder(Channel.class)
 			channelBuilder.createDirectChannelIfNotDefined(builder,endpoint.outputChannel)
-		}*/
+		}
 
 		def attributes = buildAttributes(endpoint.attributes, endpoint)
 		

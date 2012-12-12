@@ -48,7 +48,7 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 			channelBuilder.createDirectChannelIfNotDefined(builder, messageFlow.outputChannel)
 		}*/
 
-		messageFlow.components.each {component ->
+		for(component in messageFlow.components){
 			if (component instanceof FlowExecution ) {
 				if (!previousComponent) {
 					endpointBuilder.createBridge(builder,messageFlow.inputChannel, component.inputChannel)
@@ -63,7 +63,10 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 
 			previousComponent = component
 		}
-		channelBuilder.createDirectChannelIfNotDefined(builder, messageFlow.inputChannel)
+        //Fix for https://jira.springsource.org/browse/INTDSLGROOVY-11
+		if (messageFlow.inputChannel?.startsWith('$mflw')){
+            channelBuilder.createDirectChannelIfNotDefined(builder, messageFlow.inputChannel)
+        }
 	}
 
 	def resolveMessageFlowChannels(messageFlow) {
@@ -87,7 +90,7 @@ class MessageFlowDomBuilder extends IntegrationComponentDomBuilder {
 			last.replyChannel = last.replyChannel ?: messageFlow.outputChannel
 		}
 
-		def outputChannel
+		def outputChannel = null
 
 		endpoints.eachWithIndex {component, i->
 
