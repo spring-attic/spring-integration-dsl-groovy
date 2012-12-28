@@ -87,7 +87,7 @@ class AmqpUsageTests {
 				directExchange 'myExchange', bindings:[[key:'t1',queue:'q1']]
 			}
 			messageFlow {
-				amqpListen queueNames:'q1'
+				amqpListen queueNames:'q1', autoStartup:false
 				handle {println it}
 			}
 		}
