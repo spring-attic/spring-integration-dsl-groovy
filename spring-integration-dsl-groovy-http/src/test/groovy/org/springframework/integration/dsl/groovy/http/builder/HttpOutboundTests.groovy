@@ -12,9 +12,7 @@
  */
 package org.springframework.integration.dsl.groovy.http.builder
 
-import org.springframework.integration.Message
 import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder;
-import org.springframework.integration.message.GenericMessage
 import org.junit.Test
 import org.junit.Ignore
 /**

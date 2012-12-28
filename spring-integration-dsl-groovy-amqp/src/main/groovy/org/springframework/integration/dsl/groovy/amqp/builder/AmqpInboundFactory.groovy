@@ -15,6 +15,7 @@ package org.springframework.integration.dsl.groovy.amqp.builder
 import groovy.util.FactoryBuilderSupport
 import java.util.Map
 import org.springframework.integration.dsl.groovy.builder.IntegrationComponentFactory
+import org.springframework.integration.dsl.groovy.amqp.AmqpInbound
 
 /**
  * @author David Turanski
@@ -27,8 +28,7 @@ class AmqpInboundFactory extends IntegrationComponentFactory {
 	 */
 	@Override
 	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
-		// TODO Auto-generated method stub
-		return null;
+		 new AmqpInbound(attributes)
 	}
 
 }

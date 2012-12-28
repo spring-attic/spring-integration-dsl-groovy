@@ -76,4 +76,19 @@ class AmqpUsageTests {
 			}
 		}
 	}
+	
+	@Test
+	//TODO: Not easy to test without running rabbit broker
+	void testInboundGateway() {
+		builder.doWithSpringIntegration {
+			doWithRabbit {
+				connectionFactory()
+				queue 'q1'
+			}
+			messageFlow {
+				amqpListen queueNames:'q1'
+				handle {println it}
+			}
+		}
+	}
 }
