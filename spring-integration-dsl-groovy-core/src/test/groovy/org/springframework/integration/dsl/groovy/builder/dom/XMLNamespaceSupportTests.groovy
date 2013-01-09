@@ -14,6 +14,7 @@ package org.springframework.integration.dsl.groovy.builder.dom
 
 import static org.junit.Assert.*
 import org.junit.*
+import org.springframework.integration.dsl.groovy.builder.IntegrationBuilder
 
 /**
  * @author David Turanski
@@ -21,6 +22,13 @@ import org.junit.*
  */
 class XMLNamespaceSupportTests {
 	def namespaceSupport = new XMLNamespaceSupport()
+	
+	@Test
+	void testMultipleNamespaces () {
+		new IntegrationBuilder().doWithSpringIntegration {
+			namespaces("int-twitter,rabbit")
+		}
+	}
 
 	@Test
 	void testAddIntegrationNamespace() {

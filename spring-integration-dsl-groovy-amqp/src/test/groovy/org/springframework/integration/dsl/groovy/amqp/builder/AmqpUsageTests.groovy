@@ -68,19 +68,22 @@ class AmqpUsageTests {
 	void testOutboundGateway() {
 		builder.doWithSpringIntegration {
 			doWithRabbit {
-				connectionFactory()
+				connectionFactory(host: 'localhost', port: '5672', username: 'guest', password: 'guest')
 				template 'myRabbitTemplate'
 			}
 			messageFlow {
 				amqpSend amqpTemplate:'myRabbitTemplate'
 			}
 		}
+		
+		//builder.messageFlows[0].send("hello")
 	}
 	
 	@Test
 	//TODO: Not easy to test without running rabbit broker
 	void testInboundGateway() {
 		builder.doWithSpringIntegration {
+			
 			doWithRabbit {
 				connectionFactory()
 				queue 'q1'

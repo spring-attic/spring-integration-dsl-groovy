@@ -26,7 +26,7 @@ class RabbitConnectionFactoryFactory extends SpringXmlComponentFactory {
 	 */
 	@Override
 	protected Object doNewInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) {
-		def id =  attributes.name ?:'connectionFactory'
-		builder.springXml{"rabbit:connection-factory"(id:id)}
+		  attributes.id  = attributes.id ?: (attributes.remove('name')?:'connectionFactory')
+		  builder.springXml{"rabbit:connection-factory"(attributes)}
 	}
 }
