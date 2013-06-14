@@ -29,8 +29,6 @@ class PollerTests {
 			queueChannel('transformer.inputChannel')
 			transform('transformer',{it},poller:"cronPoller")
 		}
-
-		ic.createApplicationContext()
 	}
 
 	@Test
@@ -40,7 +38,5 @@ class PollerTests {
 			queueChannel('transformer.inputChannel')
 			transform('transformer',{it}){ poll(cron:"*/10 * * * * MON-FRI") }
 		}
-
-		ic.createApplicationContext()
 	}
 }

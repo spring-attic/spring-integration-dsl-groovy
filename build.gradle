@@ -5,10 +5,10 @@ description = 'Spring Integration Groovy DSL'
 allprojects {
   group = 'org.springframework.integration' 
   repositories {
-         mavenLocal()
          maven { url 'http://repo.springsource.org/libs-milestone' }
          maven { url 'https://repo.springsource.org/libs-snapshot'}
          maven { url 'https://repo.springsource.org/libs-release'}
+         maven { url 'https://repo.springsource.org/plugins-release'}
      }
 }
 
@@ -20,13 +20,15 @@ subprojects { subproject ->
    apply plugin: 'eclipse'
    sourceCompatibility=1.6
    targetCompatibility=1.6
-
-   install {
-      repositories.mavenInstaller {
-          customizePom(pom, subproject)
-      }
-   }
-
+ 
+   
+  install {
+    repositories.mavenInstaller {
+        customizePom(pom, project)
+    }
+  }
+   
+  
   task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource

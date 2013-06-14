@@ -13,14 +13,17 @@
 package org.springframework.integration.dsl.groovy.builder;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.junit.Test;
-
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.integration.dsl.groovy.IntegrationContext;
 import org.springframework.integration.dsl.groovy.MessageFlow;
 
@@ -54,6 +57,19 @@ public class IntegrationBuilderTests {
 				"src/test/resources/messageflow1.groovy"));
 		MessageFlow flow1 = ic.getMessageFlowByName("flow1");
 		flow1.send("hello");
+	}
+	
+	@Test
+	public void testPropertyPlaceholderConfigurerPresent() throws FileNotFoundException {
+		IntegrationContext ic = (IntegrationContext) builder.build(new FileInputStream(
+				"src/test/resources/messageflow1.groovy"));
+		GenericApplicationContext gac = (GenericApplicationContext) ic.getApplicationContext();
+		boolean ppcPresent = false;
+		for (Object obj:gac.getBeanFactoryPostProcessors()) {
+			System.out.println(obj.getClass().getName());
+			ppcPresent = ppcPresent || obj instanceof PropertySourcesPlaceholderConfigurer;
+		}
+		assertTrue(ppcPresent);
 	}
 
 	@Test(expected = ClassNotFoundException.class)

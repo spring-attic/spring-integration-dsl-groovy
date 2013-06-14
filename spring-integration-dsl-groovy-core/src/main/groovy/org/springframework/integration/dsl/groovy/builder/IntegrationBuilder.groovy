@@ -76,6 +76,10 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		this.autoCreateApplicationContext = autoCreateApplicationContext
 	}
 
+	void setProperties(Properties properties) {
+		this.integrationContext.properties = properties;
+	}
+
 	ApplicationContext getApplicationContext() {
 		this.integrationContext.applicationContext
 	}
@@ -140,23 +144,23 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		def script = new GroovyClassLoader().parseClass(grs).newInstance() as Script
 		this.build(script)
 	}
-	
+
 	Object build(Resource resource) {
 		return build(resource.inputStream)
 	}
-	
+
 	Object build (String className) {
 		Class script = new GroovyClassLoader().loadClass(className)
 		this.build(script)
 	}
-	
+
 	Object build(File file) {
-        def script = new GroovyClassLoader().parseClass(file).newInstance() as Script
+		def script = new GroovyClassLoader().parseClass(file).newInstance() as Script
 		this.build(script)
 	}
-	
+
 	Object build(GroovyCodeSource codeSource) {
-        def script = new GroovyClassLoader().parseClass(codeSource).newInstance() as Script
+		def script = new GroovyClassLoader().parseClass(codeSource).newInstance() as Script
 		this.build(script)
 	}
 
@@ -192,8 +196,8 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 
 		Closure actionClosure
 
-        list = []
-        list.addAll(0,args)
+		list = []
+		list.addAll(0,args)
 
 		Map attributes = [:]
 

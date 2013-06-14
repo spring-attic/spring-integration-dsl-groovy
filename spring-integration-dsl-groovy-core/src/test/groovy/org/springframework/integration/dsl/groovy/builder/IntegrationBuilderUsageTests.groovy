@@ -14,6 +14,8 @@ package org.springframework.integration.dsl.groovy.builder
 
 import static org.junit.Assert.*
 
+import java.util.logging.Logger;
+
 import org.junit.Test
 
 /**
@@ -46,6 +48,18 @@ class IntegrationBuilderUsageTests {
 	}
 
 	@Test
+	void testProperties() {
+		builder.setAutoCreateApplicationContext(false)
+		builder.setProperties(['cron':'*/10 * * * * MON-FRI'] as Properties)
+		def ic = builder.doWithSpringIntegration {
+			queueChannel('transformer.inputChannel')
+			transform('transformer',{it}){ poll(cron:'${cron}') }
+		}
+
+		ic.createApplicationContext()
+	}
+
+	@Test
 	void testMergedApplicationContext() {
 		IntegrationBuilder builder1 = new IntegrationBuilder()
 		builder1.setAutoCreateApplicationContext(false)
@@ -54,7 +68,7 @@ class IntegrationBuilderUsageTests {
 		builder2.setAutoCreateApplicationContext(false)
 
 		def ic1 = builder1.doWithSpringIntegration {
-            queueChannel('global.out')
+			queueChannel('global.out')
 			transform('t1',inputChannel:'from.t1',outputChannel:'global.out',{it.toUpperCase()})
 		}
 
@@ -62,21 +76,19 @@ class IntegrationBuilderUsageTests {
 			transform('t2',inputChannel:'from.t2',outputChannel:'global.out',{it.toUpperCase()})
 		}
 
-        def ac1 = ic1.createApplicationContext()
+		def ac1 = ic1.createApplicationContext()
 		def ac2 = ic2.createApplicationContext(ac1)
 
 		ac2.getBean('t1')
 		ac2.getBean('from.t1')
 		ac2.getBean('t2')
 		ac2.getBean('from.t2')
-        def queue = ac2.getBean('global.out')
+		def queue = ac2.getBean('global.out')
 
-        ic2.send('from.t1','hello')
-        ic2.send('from.t2','hello')
-        2.times {
-            assert queue.receive().payload == 'HELLO'
-        }
+		ic2.send('from.t1','hello')
+		ic2.send('from.t2','hello')
+		2.times {
+			assert queue.receive().payload == 'HELLO'
+		}
 	}
-
-
 }

@@ -15,12 +15,15 @@ package org.springframework.integration.dsl.groovy
 import groovy.transform.PackageScope
 import org.springframework.context.ApplicationContext
 import org.springframework.context.support.GenericXmlApplicationContext
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
 import org.springframework.integration.channel.QueueChannel
 import org.springframework.integration.dsl.groovy.builder.AbstractIntegrationBuilderModuleSupport
 import org.springframework.integration.dsl.groovy.builder.dom.IntegrationDomSupport
 import org.springframework.integration.message.GenericMessage
 import org.springframework.integration.support.MessageBuilder
 import org.springframework.integration.Message
+import org.springframework.core.env.MutablePropertySources
+import org.springframework.core.env.PropertiesPropertySource
 import org.springframework.core.io.ByteArrayResource
 
 /**
@@ -28,8 +31,8 @@ import org.springframework.core.io.ByteArrayResource
  *
  */
 class IntegrationContext extends BaseIntegrationComposition {
-
-	private applicationContext
+	private Properties properties
+	private ApplicationContext applicationContext
 	@PackageScope List<AbstractIntegrationBuilderModuleSupport> moduleSupportInstances
 
 	/**
@@ -116,7 +119,9 @@ class IntegrationContext extends BaseIntegrationComposition {
 		this.applicationContext
 	}
 
-
+	void setProperties(Properties properties) {
+		this.properties = properties
+	}
 	/**
 	 * Create an application context
 	 * @param parentContext optional parent application context
@@ -147,6 +152,21 @@ class IntegrationContext extends BaseIntegrationComposition {
 			}
 
 			applicationContext.load(resources)
+
+			boolean propertyConfigurerPresent = 
+			this.applicationContext.getBeanDefinitionNames().find {name->
+				name.startsWith("org.springframework.context.support.PropertySourcesPlaceholderConfigurer")
+			}
+			if (!propertyConfigurerPresent) {
+				PropertySourcesPlaceholderConfigurer placeholderConfigurer = new PropertySourcesPlaceholderConfigurer()
+				placeholderConfigurer.setEnvironment(applicationContext.environment)
+				this.applicationContext.addBeanFactoryPostProcessor(placeholderConfigurer)
+			}
+			
+			if ( properties ) {
+				MutablePropertySources propertySources = this.applicationContext.environment.propertySources
+				propertySources.addFirst(new PropertiesPropertySource("properties",properties))
+			}
 			applicationContext.refresh()
 		}
 		applicationContext

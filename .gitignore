@@ -3,6 +3,7 @@
 target
 out
 build
+.springBeans
 .settings
 .idea
 .gradle
