@@ -1,0 +1,27 @@
+
+
+
+contribute(currentType("org.springframework.integration.dsl.groovy.builder.IntegrationBuilder")) {
+	provider = "Spring Integration DSL for Feed"
+
+	//Feed adapters
+
+	method  name: 'readFeed',
+			type: 'org.springframework.integration.dsl.groovy.feed.FeedSubscriber',
+			useNamedArgs: true,
+			namedParameters:[outputChannel:String, url:Object, feedFetcher:String, metadataStore:String],	
+			doc: """Creates a Feed Inbound Channel Adapter for the given url."""
+}
+
+contribute(currentType("org.springframework.integration.dsl.groovy.MessageFlow")) {
+	provider = "Spring Integration DSL"
+
+	//Feed adapters
+
+	method  name: 'readFeed',
+			type: 'org.springframework.integration.dsl.groovy.feed.FeedSubscriber',
+			useNamedArgs: true,
+			namedParameters:[url:Object, feedFetcher:String, metadataStore:String],
+			optionalParameters:[outputChannel:String, linkToNext:boolean],
+			doc: """Creates a Feed Inbound Channel Adapter for the given url."""
+}
