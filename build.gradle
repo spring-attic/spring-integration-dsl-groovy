@@ -110,6 +110,15 @@ project('spring-integration-dsl-groovy-samples') {
   compileJava.enabled = false
 }
 
+project('spring-integration-dsl-groovy-feed') {
+  description = 'Spring Integration Groovy DSL Feed'
+  dependencies {
+    compile project(":spring-integration-dsl-groovy-core")
+    compile "org.springframework.integration:spring-integration-feed:$springIntegrationVersion"
+  }
+}
+
+
 task 'run-cafe'(type:JavaExec) {
 	description "Runs the cafe example"
 	main = 'org.springframework.integration.samples.cafe.Main'
