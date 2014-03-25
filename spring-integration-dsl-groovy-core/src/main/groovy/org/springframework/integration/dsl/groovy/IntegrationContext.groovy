@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,18 +13,19 @@
 package org.springframework.integration.dsl.groovy
 
 import groovy.transform.PackageScope
+
 import org.springframework.context.ApplicationContext
 import org.springframework.context.support.GenericXmlApplicationContext
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
-import org.springframework.integration.channel.QueueChannel
-import org.springframework.integration.dsl.groovy.builder.AbstractIntegrationBuilderModuleSupport
-import org.springframework.integration.dsl.groovy.builder.dom.IntegrationDomSupport
-import org.springframework.integration.message.GenericMessage
-import org.springframework.integration.support.MessageBuilder
-import org.springframework.integration.Message
 import org.springframework.core.env.MutablePropertySources
 import org.springframework.core.env.PropertiesPropertySource
 import org.springframework.core.io.ByteArrayResource
+import org.springframework.integration.channel.QueueChannel
+import org.springframework.integration.dsl.groovy.builder.AbstractIntegrationBuilderModuleSupport
+import org.springframework.integration.dsl.groovy.builder.dom.IntegrationDomSupport
+import org.springframework.integration.support.MessageBuilder
+import org.springframework.messaging.Message
+import org.springframework.messaging.support.GenericMessage
 
 /**
  * @author David Turanski
@@ -37,7 +38,7 @@ class IntegrationContext extends BaseIntegrationComposition {
 
 	/**
 	 * Send a message without expecting a reply
-	 * 
+	 *
 	 * @param inputChannelName
 	 * @param msgOrPayload either a Message or an Object used as a Message payload
 	 * @return true if the send succeeded
@@ -49,12 +50,12 @@ class IntegrationContext extends BaseIntegrationComposition {
 				new GenericMessage(msgOrPayload)
 		inputChannel.send(messageToSend)
 	}
-	
+
 	/**
 	 * Send a message and receive a reply
 	 * @param inputChannelName
 	 * @param msgOrPayload either a Message or an Object used as a Message payload
-	 * @return the result. If the input object is a Message, also returns a Message 
+	 * @return the result. If the input object is a Message, also returns a Message
 	 * otherwise the payload is returned
 	 */
 	//TODO: Add error routing
@@ -77,25 +78,25 @@ class IntegrationContext extends BaseIntegrationComposition {
 
 		(msgOrPayload instanceof Message) ? result : result?.payload
 	}
-	
+
 	Message<?> receive(String channelName, long timeout = 0) {
-		
+
 		def ac = createApplicationContext()
 		def channel = ac.getBean(channelName)
-		
+
 		Message<?> msg
 		if (timeout){
 			msg = channel.receive(timeout)
 		} else {
 			msg = channel.receive()
 		}
-		
+
 		msg
 	}
-	
+
 
 	/**
-	 * 
+	 *
 	 * @return all defined MessageFlows
 	 */
 	List<MessageFlow> getMessageFlows() {
@@ -128,7 +129,7 @@ class IntegrationContext extends BaseIntegrationComposition {
 	 * @param integrationContextsToMerge a list of {@link IntegrationContext} from other builder instances to merge.
 	 * @return the application context
 	 */
-	ApplicationContext createApplicationContext(ApplicationContext parentContext = null, 
+	ApplicationContext createApplicationContext(ApplicationContext parentContext = null,
 		List<IntegrationContext> integrationContextsToMerge = null) {
 		if (!applicationContext){
 			applicationContext = new  GenericXmlApplicationContext()
@@ -137,23 +138,23 @@ class IntegrationContext extends BaseIntegrationComposition {
 			}
 
 			def integrationDomSupport = new IntegrationDomSupport(this.moduleSupportInstances)
-			
+
 			List<IntegrationContext> integrationContexts = [this];
 			if (integrationContextsToMerge) {
 				integrationContexts.addAll(integrationContextsToMerge)
 			}
-			
+
 			ByteArrayResource[] resources = new ByteArrayResource[integrationContexts.size()]
 
 			integrationContexts.eachWithIndex {ic, i ->
-			  ic.applicationContext = applicationContext	
+			  ic.applicationContext = applicationContext
 			  def xml = integrationDomSupport.translateToXML(ic)
 			  resources[i] = new ByteArrayResource(xml.getBytes())
 			}
 
 			applicationContext.load(resources)
 
-			boolean propertyConfigurerPresent = 
+			boolean propertyConfigurerPresent =
 			this.applicationContext.getBeanDefinitionNames().find {name->
 				name.startsWith("org.springframework.context.support.PropertySourcesPlaceholderConfigurer")
 			}
@@ -162,7 +163,7 @@ class IntegrationContext extends BaseIntegrationComposition {
 				placeholderConfigurer.setEnvironment(applicationContext.environment)
 				this.applicationContext.addBeanFactoryPostProcessor(placeholderConfigurer)
 			}
-			
+
 			if ( properties ) {
 				MutablePropertySources propertySources = this.applicationContext.environment.propertySources
 				propertySources.addFirst(new PropertiesPropertySource("properties",properties))
@@ -171,13 +172,13 @@ class IntegrationContext extends BaseIntegrationComposition {
 		}
 		applicationContext
 	}
-		
+
 	/**
 	 * Create an application context
 	 * @param integrationContextsToMerge a list of {@link IntegrationContext} from other builder instances to merge.
 	 * @return the application context
 	 */
 	ApplicationContext createApplicationContext(List<IntegrationContext> integrationContextsToMerge) {
-		this.createApplicationContext(null, integrationContextsToMerge)	
+		this.createApplicationContext(null, integrationContextsToMerge)
 	}
 }

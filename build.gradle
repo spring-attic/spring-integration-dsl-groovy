@@ -103,6 +103,7 @@ project('spring-integration-dsl-groovy-http') {
 	dependencies {
 		compile project(":spring-integration-dsl-groovy-core")
 		compile "org.springframework.integration:spring-integration-http:$springIntegrationVersion"
+		testCompile "javax.servlet:javax.servlet-api:$servletApiVersion"
 	}
 }
 
