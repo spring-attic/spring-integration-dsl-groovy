@@ -1,7 +1,18 @@
+/*
+ * Copyright 2002-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package org.springframework.integration.dsl.groovy
 
 import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
 
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Method
@@ -9,9 +20,10 @@ import java.lang.reflect.ParameterizedType
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.springframework.integration.Message
-import org.springframework.integration.MessageChannel
+
 import org.springframework.integration.support.MessageBuilder
+import org.springframework.messaging.Message
+import org.springframework.messaging.MessageChannel
 
 /**
  *
@@ -147,7 +159,7 @@ class ClosureInvokingReleaseStrategy extends MultiMessageClosureInvoker {
 }
 
 @CompileStatic
-class ClosureInvokingChannelInterceptor implements org.springframework.integration.channel.ChannelInterceptor {
+class ClosureInvokingChannelInterceptor implements org.springframework.messaging.support.ChannelInterceptor {
 	protected  Log logger = LogFactory.getLog(this.class)
 	private final org.springframework.integration.dsl.groovy.ChannelInterceptor interceptor
 
@@ -155,10 +167,7 @@ class ClosureInvokingChannelInterceptor implements org.springframework.integrati
 		this.interceptor = interceptor
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.integration.channel.ChannelInterceptor#preSend(org.springframework.integration.Message, org.springframework.integration.MessageChannel)
-	 */
-	Message preSend(Message message, MessageChannel channel) {
+	Message<?> preSend(Message message, MessageChannel channel) {
 		if (!interceptor.preSend){
 			return message
 		}
@@ -173,9 +182,6 @@ class ClosureInvokingChannelInterceptor implements org.springframework.integrati
 		result as Message
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.integration.channel.ChannelInterceptor#postSend(org.springframework.integration.Message, org.springframework.integration.MessageChannel, boolean)
-	 */
 	void postSend(Message message, MessageChannel channel, boolean sent) {
 		if (!interceptor.postSend){
 			return
@@ -197,7 +203,7 @@ class ClosureInvokingChannelInterceptor implements org.springframework.integrati
 	/* (non-Javadoc)
 	 * @see org.springframework.integration.channel.ChannelInterceptor#postReceive(org.springframework.integration.Message, org.springframework.integration.MessageChannel)
 	 */
-	Message postReceive(Message message, MessageChannel channel) {
+	Message<?> postReceive(Message message, MessageChannel channel) {
 		if (!interceptor.postReceive){
 			return message
 		}

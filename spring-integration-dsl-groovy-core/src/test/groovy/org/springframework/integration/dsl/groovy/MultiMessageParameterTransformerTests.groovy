@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -15,8 +15,9 @@ package org.springframework.integration.dsl.groovy
 import static org.junit.Assert.*
 
 import org.junit.Test
-import org.springframework.integration.Message
-import org.springframework.integration.message.GenericMessage
+
+import org.springframework.messaging.Message
+import org.springframework.messaging.support.GenericMessage
 /**
  * @author David Turanski
  *
@@ -57,8 +58,8 @@ class MultiMessageParameterTransformerTests {
 		def closure = {Message[] messages ->
 			(1..messages.length).each { i-> assert messages[i-1].payload as int == i}
 		}
-		
-		 
+
+
 		multiMessageParameterTransformer = new MultiMessageParameterTransformer(closure)
 		def arg = multiMessageParameterTransformer.mapClosureArg(messageList)
 		assert arg instanceof Message[]
