@@ -5,10 +5,10 @@ description = 'Spring Integration Groovy DSL'
 allprojects {
   group = 'org.springframework.integration' 
   repositories {
-         maven { url 'http://repo.springsource.org/libs-milestone' }
-         maven { url 'https://repo.springsource.org/libs-snapshot'}
-         maven { url 'https://repo.springsource.org/libs-release'}
-         maven { url 'https://repo.springsource.org/plugins-release'}
+         maven { url 'https://repo.spring.io/libs-snapshot'}
+         maven { url 'https://repo.spring.io/libs-milestone' }
+         maven { url 'https://repo.spring.io/libs-release'}
+         maven { url 'https://repo.spring.io/plugins-release'}
      }
 }
 
@@ -20,8 +20,8 @@ subprojects { subproject ->
    apply plugin: 'eclipse'
    sourceCompatibility=1.6
    targetCompatibility=1.6
- 
-   
+
+
   install {
     repositories.mavenInstaller {
         customizePom(pom, project)
@@ -62,7 +62,7 @@ project('spring-integration-dsl-groovy-core') {
     // dependent libraries
     compile "org.springframework.integration:spring-integration-core:$springIntegrationVersion"
     testCompile "org.springframework.integration:spring-integration-http:$springIntegrationVersion" 
-    testCompile 'javax.servlet:servlet-api:2.5'
+    testCompile "javax.servlet:javax.servlet-api:$servletApiVersion"
   }
 }
 
@@ -71,10 +71,11 @@ project('spring-integration-dsl-groovy-jms') {
   dependencies {
     compile project(":spring-integration-dsl-groovy-core")
     compile "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
-    compile "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1" 
+    compile "javax.jms:jms-api:$jmsApiVersion"
   
     // libraries only needed for test
-    testCompile ("org.apache.activemq:activemq-core:5.3.0") {
+    testCompile("org.apache.activemq:activemq-broker:$activeMqVersion")
+    testCompile("org.apache.activemq:activemq-kahadb-store:$activeMqVersion") {
          exclude group: 'org.springframework', module: 'spring-context'
     }
   }
@@ -93,11 +94,6 @@ project('spring-integration-dsl-groovy-http') {
   dependencies {
     compile project(":spring-integration-dsl-groovy-core")
     compile "org.springframework.integration:spring-integration-http:$springIntegrationVersion"
-  
-    // libraries only needed for test
-    testCompile ("org.apache.activemq:activemq-core:5.3.0") {
-         exclude group: 'org.springframework', module: 'spring-context'
-    }
   }
 }
 
@@ -132,8 +128,8 @@ task 'run-cafe'(type:JavaExec) {
 
 task wrapper(type: Wrapper) {
     description = 'Generates gradlew[.bat] scripts'
-    gradleVersion = '1.1'
-    distributionUrl = 'http://services.gradle.org/distributions/gradle-1.1-bin.zip'
+    gradleVersion = '1.11'
+    distributionUrl = "http://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
     jarFile = '.wrapper/gradle-wrapper.jar'
 }
 
