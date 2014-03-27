@@ -3,200 +3,203 @@ apply plugin: 'base'
 description = 'Spring Integration Groovy DSL'
 
 allprojects {
-  group = 'org.springframework.integration' 
-  repositories {
-         maven { url 'http://repo.springsource.org/libs-milestone' }
-         maven { url 'https://repo.springsource.org/libs-snapshot'}
-         maven { url 'https://repo.springsource.org/libs-release'}
-         maven { url 'https://repo.springsource.org/plugins-release'}
-     }
+	group = 'org.springframework.integration'
+	repositories {
+		maven { url 'https://repo.spring.io/libs-snapshot' }
+		maven { url 'https://repo.spring.io/libs-milestone' }
+		maven { url 'https://repo.spring.io/libs-release' }
+		maven { url 'https://repo.spring.io/plugins-release' }
+	}
 }
 
 
 subprojects { subproject ->
-   apply plugin: 'groovy'
-   apply plugin: 'maven'
-   apply plugin: 'idea'
-   apply plugin: 'eclipse'
-   sourceCompatibility=1.6
-   targetCompatibility=1.6
- 
-   
-  install {
-    repositories.mavenInstaller {
-        customizePom(pom, project)
-    }
-  }
-   
-  
-  task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-  }
-
-  task groovydocJar(type:Jar) {
-    classifier = 'groovydoc'
-    from groovydoc
-  }
+	apply plugin: 'groovy'
+	apply plugin: 'maven'
+	apply plugin: 'idea'
+	apply plugin: 'eclipse'
+	sourceCompatibility = 1.6
+	targetCompatibility = 1.6
 
 
-   artifacts {
-    archives sourcesJar
-    archives groovydocJar
-   }
+	install {
+		repositories.mavenInstaller {
+			customizePom(pom, project)
+		}
+	}
 
-  // dependencies that are common across all java projects
-   dependencies {
 
-    groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
+	task sourcesJar(type: Jar) {
+		classifier = 'sources'
+		from sourceSets.main.allSource
+	}
 
-    testCompile "junit:junit-dep:$junitVersion"
-    testRuntime "log4j:log4j:$log4jVersion"
-    testCompile "org.mockito:mockito-all:$mockitoVersion"
-  }
+	task groovydocJar(type: Jar) {
+		classifier = 'groovydoc'
+		from groovydoc
+	}
+
+
+	artifacts {
+		archives sourcesJar
+		archives groovydocJar
+	}
+
+	// dependencies that are common across all java projects
+	dependencies {
+
+		compile "org.codehaus.groovy:groovy-all:$groovyVersion"
+
+		testCompile "junit:junit-dep:$junitVersion"
+		testRuntime "log4j:log4j:$log4jVersion"
+		testCompile "org.mockito:mockito-all:$mockitoVersion"
+	}
+
+
+	sourceSets.main.groovy.srcDirs = ["src/main/java", "src/main/groovy"]
+
+	// enable all compiler warnings; individual projects may customize further
+	ext.xLintArg = '-Xlint:all,-options'
+	[compileGroovy, compileTestGroovy]*.options*.compilerArgs = [xLintArg]
+
+	compileJava.enabled = compileTestJava.enabled = false
 }
 
 project('spring-integration-dsl-groovy-core') {
-  description = 'Spring Integration Groovy DSL Core'
-  dependencies {
-    // dependent libraries
-    compile "org.springframework.integration:spring-integration-core:$springIntegrationVersion"
-    testCompile "org.springframework.integration:spring-integration-http:$springIntegrationVersion" 
-    testCompile 'javax.servlet:servlet-api:2.5'
-  }
+	description = 'Spring Integration Groovy DSL Core'
+	dependencies {
+		// dependent libraries
+		compile "org.springframework.integration:spring-integration-core:$springIntegrationVersion"
+		testCompile "org.springframework.integration:spring-integration-http:$springIntegrationVersion"
+		testCompile "javax.servlet:javax.servlet-api:$servletApiVersion"
+	}
 }
 
 project('spring-integration-dsl-groovy-jms') {
-  description = 'Spring Integration Groovy DSL JMS'
-  dependencies {
-    compile project(":spring-integration-dsl-groovy-core")
-    compile "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
-    compile "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1" 
-  
-    // libraries only needed for test
-    testCompile ("org.apache.activemq:activemq-core:5.3.0") {
-         exclude group: 'org.springframework', module: 'spring-context'
-    }
-  }
+	description = 'Spring Integration Groovy DSL JMS'
+	dependencies {
+		compile project(":spring-integration-dsl-groovy-core")
+		compile "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
+		compile "javax.jms:jms-api:$jmsApiVersion"
+
+		// libraries only needed for test
+		testCompile("org.apache.activemq:activemq-broker:$activeMqVersion")
+		testCompile("org.apache.activemq:activemq-kahadb-store:$activeMqVersion") {
+			exclude group: 'org.springframework', module: 'spring-context'
+		}
+	}
 }
 
 project('spring-integration-dsl-groovy-amqp') {
-  description = 'Spring Integration Groovy DSL AMQP'
-  dependencies {
-    compile project(":spring-integration-dsl-groovy-core")
-    compile "org.springframework.integration:spring-integration-amqp:$springIntegrationVersion"
-  }
+	description = 'Spring Integration Groovy DSL AMQP'
+	dependencies {
+		compile project(":spring-integration-dsl-groovy-core")
+		compile "org.springframework.integration:spring-integration-amqp:$springIntegrationVersion"
+	}
 }
 
 project('spring-integration-dsl-groovy-http') {
-  description = 'Spring Integration Groovy DSL Http'
-  dependencies {
-    compile project(":spring-integration-dsl-groovy-core")
-    compile "org.springframework.integration:spring-integration-http:$springIntegrationVersion"
-  
-    // libraries only needed for test
-    testCompile ("org.apache.activemq:activemq-core:5.3.0") {
-         exclude group: 'org.springframework', module: 'spring-context'
-    }
-  }
+	description = 'Spring Integration Groovy DSL Http'
+	dependencies {
+		compile project(":spring-integration-dsl-groovy-core")
+		compile "org.springframework.integration:spring-integration-http:$springIntegrationVersion"
+	}
 }
 
 project('spring-integration-dsl-groovy-samples') {
-  description = 'Spring Integration Groovy DSL Samples'
-  dependencies {
-    compile project(":spring-integration-dsl-groovy-core")
-     compile project(":spring-integration-dsl-groovy-http")
-    compile "log4j:log4j:$log4jVersion"
-  }
-  sourceSets.main.groovy.srcDirs = ["src/main/java", "src/main/groovy"]
-  compileJava.enabled = false
+	description = 'Spring Integration Groovy DSL Samples'
+	dependencies {
+		compile project(":spring-integration-dsl-groovy-core")
+		compile project(":spring-integration-dsl-groovy-http")
+		compile "log4j:log4j:$log4jVersion"
+	}
 }
 
 project('spring-integration-dsl-groovy-feed') {
-  description = 'Spring Integration Groovy DSL Feed'
-  dependencies {
-    compile project(":spring-integration-dsl-groovy-core")
-    compile "org.springframework.integration:spring-integration-feed:$springIntegrationVersion"
-  }
+	description = 'Spring Integration Groovy DSL Feed'
+	dependencies {
+		compile project(":spring-integration-dsl-groovy-core")
+		compile "org.springframework.integration:spring-integration-feed:$springIntegrationVersion"
+	}
 }
 
 
-task 'run-cafe'(type:JavaExec) {
+task 'run-cafe'(type: JavaExec) {
 	description "Runs the cafe example"
 	main = 'org.springframework.integration.samples.cafe.Main'
-	
+
 	classpath = subprojects.find { it.name == 'spring-integration-dsl-groovy-samples' }
-	 .sourceSets.main.runtimeClasspath;
+			.sourceSets.main.runtimeClasspath;
 	workingDir = 'spring-integration-dsl-groovy-samples'
 }
 
 task wrapper(type: Wrapper) {
-    description = 'Generates gradlew[.bat] scripts'
-    gradleVersion = '1.1'
-    distributionUrl = 'http://services.gradle.org/distributions/gradle-1.1-bin.zip'
-    jarFile = '.wrapper/gradle-wrapper.jar'
+	description = 'Generates gradlew[.bat] scripts'
+	gradleVersion = '1.11'
+	distributionUrl = "http://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+	jarFile = '.wrapper/gradle-wrapper.jar'
 }
 
 def customizePom(def pom, def gradleProject) {
-    pom.whenConfigured { generatedPom ->
-        // respect 'optional' and 'provided' dependencies
-        def deps = gradleProject.configurations.runtime.allDependencies
-        def optionalDeps = deps.findAll { dep ->
-            dep.asDynamicObject.hasProperty('optional') && dep.optional
-        }
-        def providedDeps = deps.findAll { dep ->
-            dep.asDynamicObject.hasProperty('provided') && dep.provided
-        }
-        generatedPom.dependencies.each { mavenDep ->
-            mavenDep.optional = optionalDeps.any { optionalDep ->
-                optionalDep.group == mavenDep.groupId &&
-                        optionalDep.name == mavenDep.artifactId &&
-                        optionalDep.version == mavenDep.version
-            }
-            boolean isProvided = providedDeps.any { providedDep ->
-                providedDep.group == mavenDep.groupId &&
-                        providedDep.name == mavenDep.artifactId &&
-                        providedDep.version == mavenDep.version
-            }
-            if (isProvided) {
-                mavenDep.scope = 'provided'
-            }
-        }
+	pom.whenConfigured { generatedPom ->
+		// respect 'optional' and 'provided' dependencies
+		def deps = gradleProject.configurations.runtime.allDependencies
+		def optionalDeps = deps.findAll { dep ->
+			dep.asDynamicObject.hasProperty('optional') && dep.optional
+		}
+		def providedDeps = deps.findAll { dep ->
+			dep.asDynamicObject.hasProperty('provided') && dep.provided
+		}
+		generatedPom.dependencies.each { mavenDep ->
+			mavenDep.optional = optionalDeps.any { optionalDep ->
+				optionalDep.group == mavenDep.groupId &&
+						optionalDep.name == mavenDep.artifactId &&
+						optionalDep.version == mavenDep.version
+			}
+			boolean isProvided = providedDeps.any { providedDep ->
+				providedDep.group == mavenDep.groupId &&
+						providedDep.name == mavenDep.artifactId &&
+						providedDep.version == mavenDep.version
+			}
+			if (isProvided) {
+				mavenDep.scope = 'provided'
+			}
+		}
 
-        // eliminate test-scoped dependencies (no need in maven central poms)
-        generatedPom.dependencies.removeAll { dep ->
-            dep.scope == 'test'
-        }
+		// eliminate test-scoped dependencies (no need in maven central poms)
+		generatedPom.dependencies.removeAll { dep ->
+			dep.scope == 'test'
+		}
 
-        // add all items necessary for maven central publication
-        generatedPom.project {
-            name = gradleProject.description
-            description = gradleProject.description
-            url = 'https://github.com/SpringSource/spring-integration-dsl-groovy'
-            organization {
-                name = 'SpringSource'
-                url = 'http://springsource.org'
-            }
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution 'repo'
-                }
-            }
-            scm {
-                url = 'https://github.com/SpringSource/spring-integration-groovy-dsl'
-                connection = 'scm:git:git://github.com/SpringSource/spring-integration-dsl-groovy'
-                developerConnection = 'scm:git:git://github.com/SpringSource/spring-integration-dsl-groovy'
-            }
-            developers {
-                developer {
-                    id = 'dturanski'
-                    name = 'David Turanski'
-                    email = 'dturanski@vmware.com'
-                }
-            }
-        }
-    }
+		// add all items necessary for maven central publication
+		generatedPom.project {
+			name = gradleProject.description
+			description = gradleProject.description
+			url = 'https://github.com/spring-projects/spring-integration-dsl-groovy'
+			organization {
+				name = 'Spring IO'
+				url = 'https://spring.io'
+			}
+			licenses {
+				license {
+					name 'The Apache Software License, Version 2.0'
+					url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					distribution 'repo'
+				}
+			}
+			scm {
+				url = 'https://github.com/SpringSource/spring-integration-groovy-dsl'
+				connection = 'scm:git:git://github.com/spring-projects/spring-integration-dsl-groovy'
+				developerConnection = 'scm:git:ssh://git@github.com:spring-projects/spring-integration-dsl-groovy'
+			}
+			developers {
+				developer {
+					id = 'dturanski'
+					name = 'David Turanski'
+					email = 'dturanski@gopivotal.com'
+				}
+			}
+		}
+	}
 }
 
