@@ -97,10 +97,10 @@ class MultiMessageParameterTransformer {
 	}
 
     @CompileStatic
-	def mapClosureArg(List list){
+	def mapClosureArg(List<Message<?>> list){
 		boolean listContainsMessages = list?.get(0) instanceof Message
 
-		def transformedArg = closureExpectsMessages  ? list: listContainsMessages  ? list.collect{Message m -> m.payload} : list
+		def transformedArg = closureExpectsMessages  ? list : listContainsMessages  ? list.collect{Message<?> m -> m.payload} : list
 		if (closureParameterIsArray) {
 			transformedArg = closureExpectsMessages? transformedArg as Message[] : transformedArg as Object[]
 		}
