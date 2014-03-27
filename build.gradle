@@ -18,6 +18,7 @@ subprojects { subproject ->
 	apply plugin: 'maven'
 	apply plugin: 'idea'
 	apply plugin: 'eclipse'
+
 	sourceCompatibility = 1.6
 	targetCompatibility = 1.6
 
@@ -50,9 +51,14 @@ subprojects { subproject ->
 
 		compile "org.codehaus.groovy:groovy-all:$groovyVersion"
 
-		testCompile "junit:junit-dep:$junitVersion"
-		testRuntime "log4j:log4j:$log4jVersion"
-		testCompile "org.mockito:mockito-all:$mockitoVersion"
+		testCompile ("junit:junit:$junitVersion") {
+			exclude group: 'org.hamcrest'
+		}
+		testCompile "log4j:log4j:$log4jVersion"
+		testCompile "org.hamcrest:hamcrest-all:$hamcrestVersion"
+		testCompile ("org.mockito:mockito-core:$mockitoVersion") {
+			exclude group: 'org.hamcrest'
+		}
 	}
 
 
@@ -136,9 +142,8 @@ task 'run-cafe'(type: JavaExec) {
 
 task wrapper(type: Wrapper) {
 	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '1.11'
+	gradleVersion = '2.3'
 	distributionUrl = "http://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
-	jarFile = '.wrapper/gradle-wrapper.jar'
 }
 
 def customizePom(def pom, def gradleProject) {
@@ -189,7 +194,7 @@ def customizePom(def pom, def gradleProject) {
 				}
 			}
 			scm {
-				url = 'https://github.com/SpringSource/spring-integration-groovy-dsl'
+				url = 'https://github.com/spring-projects/spring-integration-dsl-groovy'
 				connection = 'scm:git:git://github.com/spring-projects/spring-integration-dsl-groovy'
 				developerConnection = 'scm:git:ssh://git@github.com:spring-projects/spring-integration-dsl-groovy'
 			}
@@ -197,7 +202,7 @@ def customizePom(def pom, def gradleProject) {
 				developer {
 					id = 'dturanski'
 					name = 'David Turanski'
-					email = 'dturanski@gopivotal.com'
+					email = 'dturanski@pivotal.io'
 				}
 			}
 		}
