@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -129,9 +129,9 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 	}
 
 	@Override
-	protected dispathNodeCall(name, args){
+	protected dispatchNodeCall(name, args){
 		use (IntegrationBuilderCategory) {
-			super.dispathNodeCall(name, args)
+			super.dispatchNodeCall(name, args)
 		}
 	}
 
@@ -238,10 +238,10 @@ class IntegrationBuilder extends FactoryBuilderSupport {
 		}
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("invoking dispathNodeCall for name: $name with args: $list")
+			logger.debug("invoking dispatchNodeCall for name: $name with args: $list")
 		}
 
-		dispathNodeCall(name,list as Object[])
+		dispatchNodeCall(name,list as Object[])
 	}
 
 	def springXml(Closure closure) {
