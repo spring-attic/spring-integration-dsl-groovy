@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ import java.util.zip.GZIPInputStream;
 
 import org.springframework.util.Assert;
 
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.fetcher.FetcherEvent;
-import com.sun.syndication.fetcher.FetcherException;
-import com.sun.syndication.fetcher.impl.AbstractFeedFetcher;
-import com.sun.syndication.fetcher.impl.SyndFeedInfo;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.fetcher.FetcherEvent;
+import com.rometools.fetcher.FetcherException;
+import com.rometools.fetcher.impl.AbstractFeedFetcher;
+import com.rometools.fetcher.impl.SyndFeedInfo;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
 
 /**
  * @author Oleg Zhurakousky
@@ -43,7 +43,7 @@ class FileUrlFeedFetcher extends AbstractFeedFetcher {
 
 	/**
 	 * Retrieve a SyndFeed for the given URL.
-	 * @see com.sun.syndication.fetcher.FeedFetcher#retrieveFeed(java.net.URL)
+	 * @see com.rometools.fetcher.FeedFetcher#retrieveFeed(java.net.URL)
 	 */
 	public SyndFeed retrieveFeed(URL feedUrl) throws IOException, FeedException, FetcherException {
 		Assert.notNull(feedUrl, "feedUrl must not be null");
@@ -51,6 +51,10 @@ class FileUrlFeedFetcher extends AbstractFeedFetcher {
 		SyndFeedInfo syndFeedInfo = new SyndFeedInfo();
 		this.refreshFeedInfo(feedUrl, syndFeedInfo, connection);
 		return syndFeedInfo.getSyndFeed();
+	}
+
+	public SyndFeed retrieveFeed(String userAgent, URL feedUrl) throws IOException, FeedException, FetcherException {
+		return retrieveFeed(feedUrl);
 	}
 
 	private void refreshFeedInfo(URL feedUrl, SyndFeedInfo syndFeedInfo, URLConnection connection) throws IOException, FeedException {
