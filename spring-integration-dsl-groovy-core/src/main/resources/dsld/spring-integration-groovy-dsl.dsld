@@ -159,7 +159,7 @@ ${standardXMLAttributes}"""
 	method name: "interceptor",
 	type: "org.springframework.integration.dsl.groovy.ChannelInterceptor",
 	useNamedArgs: true,
-	optionalParams: [pattern: String, name:String, preSend:Closure, postSend:Closure, preReceive:Closure,postReceive:Closure],
+	optionalParams: [pattern: String, name:String, preSend:Closure, postSend:Closure, preReceive:Closure, postReceive:Closure, afterSendCompletion:Closure, afterReceiveCompletion:Closure],
 	doc: """
 Required parent node: doWithSpringIntegration ,messageFlow, or channel type
 Used to declare a global channel interceptor to intercept channels whose name matches the pattern(all channels if omitted).
