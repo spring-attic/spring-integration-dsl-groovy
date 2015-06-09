@@ -69,7 +69,7 @@ class ClosureInvokingMessageProcessor {
 			result = this.closure.call(message.payload)
 		}
 
-		result
+		result instanceof GString? result.toString(): result
 	}
 }
 
