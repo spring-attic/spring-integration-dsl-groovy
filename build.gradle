@@ -140,12 +140,6 @@ task 'run-cafe'(type: JavaExec) {
 	workingDir = 'spring-integration-dsl-groovy-samples'
 }
 
-task wrapper(type: Wrapper) {
-	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '2.3'
-	distributionUrl = "http://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
-}
-
 def customizePom(def pom, def gradleProject) {
 	pom.whenConfigured { generatedPom ->
 		// respect 'optional' and 'provided' dependencies
