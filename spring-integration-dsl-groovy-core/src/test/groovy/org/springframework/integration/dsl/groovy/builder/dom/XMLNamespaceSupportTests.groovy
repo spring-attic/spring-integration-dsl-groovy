@@ -35,7 +35,7 @@ class XMLNamespaceSupportTests {
 		namespaceSupport.addIntegrationNamespace('jms')
 
 		assert namespaceSupport.schemaLocations.contains(
-		'http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd')
+		'https://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd')
 
 		assert namespaceSupport.schemaLocations != XMLNamespaceSupport.REQUIRED_NAMESPACE_DECLARATIONS
 		assert namespaceSupport.namespaceDeclarations.jms == 'http://www.springframework.org/schema/integration/jms'
