@@ -14,7 +14,7 @@ This project implements a Groovy DSL for Spring Integration. Coming on the heels
 * May be executed direclty in Groovy or from a Java class
 
 ## Implementation
-The DSL uses Groovy Builder pattern so the syntax will be familiar to Groovyists. The central class is the *IntegrationBuilder* which extends  [FactoryBuilderSupport](http://groovy.codehaus.org/FactoryBuilderSupport) framework to create a Spring Integration domain model which is translated directly to Spring XML to create a Spring Application Context. 
+The DSL uses Groovy Builder pattern so the syntax will be familiar to Groovyists. The central class is the *IntegrationBuilder* which extends  [FactoryBuilderSupport](https://groovy.codehaus.org/FactoryBuilderSupport) framework to create a Spring Integration domain model which is translated directly to Spring XML to create a Spring Application Context. 
 
 The main benefit of this approach is that the DSL can leverage existing Spring Integration namespace parsers to perform all the necessary validation and bean definition processing. Since this code is tightly coupled to XML parsing, the bean definitions and would otherwise need to be entirely replicated for the DSL. Another advantage is that if the log level is set to DEBUG, you can inspect the generated XML on the console which will give you more insight into how the DSL interprets things. Finally it makes it very easy for the IntegrationBuilder to inject XML builder markup, providing seamless integration with Spring XML.
 

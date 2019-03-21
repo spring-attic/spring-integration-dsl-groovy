@@ -17,7 +17,7 @@ public class HttpExamples {
 		 * Demonstrates defining url as a closure
 		 */
 		def flow = builder.messageFlow {
-				httpGet(url:{"http://www.google.com/finance/info?q=$it"},responseType:String)
+				httpGet(url:{"https://www.google.com/finance/info?q=$it"},responseType:String)
 		}		
 						
 		def result = flow.sendAndReceive('VMW')

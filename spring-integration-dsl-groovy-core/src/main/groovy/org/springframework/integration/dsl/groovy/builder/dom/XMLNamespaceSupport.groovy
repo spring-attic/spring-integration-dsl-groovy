@@ -20,8 +20,8 @@ package org.springframework.integration.dsl.groovy.builder.dom
  */
 class XMLNamespaceSupport {
 	static final String REQUIRED_SCHEMA_LOCATIONS =
-	"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd "+
-	"http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd"
+	"http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd "+
+	"http://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd"
 
 	static final String DEFAULT_INTEGRATION_NAMESPACE_PREFIX = 'si'
 
@@ -42,7 +42,7 @@ class XMLNamespaceSupport {
 	/**
 	 * Add an XML namespace for a Spring Integration component using Spring Integration conventions
 	 * Example: The prefix 'int-jms' generates xmlns:int-jms="http://www.springframework.org/schema/integration/jms" and
-	 * binds the namespace URL to the schema location "http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd"
+	 * binds the namespace URL to the schema location "https://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd"
 	 * @param prefix the namespace prefix - If it starts with 'int-' the component name will be the remaining characters otherwise the
 	 * namespace prefix will be the same as the component name.
 	 */
