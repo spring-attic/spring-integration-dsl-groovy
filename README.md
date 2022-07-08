@@ -1,3 +1,5 @@
+# spring-integration-dsl-groovy is no longer actively maintained by VMware, Inc.
+
 Groovy DSL For Spring Integration
 =================================
 
